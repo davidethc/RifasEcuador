@@ -1,0 +1,208 @@
+-- ============================================
+-- PASO 3: TABLA USERS (sin dependencias)
+-- ============================================
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  auth_user_id UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  phone VARCHAR(20),
+  name VARCHAR(255),
+  avatar_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_auth_user_id ON users(auth_user_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+COMMENT ON TABLE users IS 'Perfiles de usuarios autenticados, sincronizados con auth.users';
+COMMENT ON COLUMN users.auth_user_id IS 'Referencia al usuario en auth.users de Supabase';
+
+-- ============================================
+-- PASO 4: TABLA RAFFLES (sin dependencias)
+-- ============================================
+CREATE TABLE IF NOT EXISTS raffles (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  prize_name VARCHAR(255) NOT NULL,
+  prize_image_url TEXT,
+  price_per_ticket DECIMAL(10, 2) NOT NULL CHECK (price_per_ticket > 0),
+  total_tickets INTEGER NOT NULL DEFAULT 60000 CHECK (total_tickets > 0),
+  tickets_sold INTEGER NOT NULL DEFAULT 0 CHECK (tickets_sold >= 0),
+  total_revenue DECIMAL(12, 2) NOT NULL DEFAULT 0 CHECK (total_revenue >= 0),
+  status raffle_status NOT NULL DEFAULT 'draft',
+  draw_date TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  CONSTRAINT check_tickets_sold CHECK (tickets_sold <= total_tickets)
+);
+
+CREATE INDEX IF NOT EXISTS idx_raffles_status ON raffles(status);
+CREATE INDEX IF NOT EXISTS idx_raffles_created_at ON raffles(created_at);
+CREATE INDEX IF NOT EXISTS idx_raffles_active ON raffles(status, created_at) WHERE status = 'active';
+
+COMMENT ON TABLE raffles IS 'Sorteos disponibles. Campos total_tickets, tickets_sold, total_revenue y draw_date son SECRETOS';
+COMMENT ON COLUMN raffles.draw_date IS 'Fecha del sorteo - NO visible públicamente';
+
+-- ============================================
+-- PASO 5: TABLA CUSTOMERS (depende de users)
+-- ============================================
+CREATE TABLE IF NOT EXISTS customers (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+);
+
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
+CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone);
+CREATE INDEX IF NOT EXISTS idx_customers_user_id ON customers(user_id);
+
+COMMENT ON TABLE customers IS 'Clientes que compran boletos. Pueden no tener cuenta (user_id NULL)';
+
+-- ============================================
+-- PASO 6: TABLA SALES (depende de raffles y customers)
+-- ============================================
+CREATE TABLE IF NOT EXISTS sales (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  raffle_id UUID NOT NULL REFERENCES raffles(id) ON DELETE RESTRICT,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+  ticket_start_number INTEGER NOT NULL,
+  ticket_end_number INTEGER NOT NULL,
+  unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price > 0),
+  total_amount DECIMAL(12, 2) NOT NULL CHECK (total_amount > 0),
+  payment_status payment_status NOT NULL DEFAULT 'pending',
+  payment_id VARCHAR(255) UNIQUE,
+  payment_provider VARCHAR(50) DEFAULT 'payphone',
+  email_sent BOOLEAN NOT NULL DEFAULT FALSE,
+  whatsapp_sent BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  completed_at TIMESTAMP WITH TIME ZONE,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  CONSTRAINT valid_ticket_range CHECK (ticket_end_number >= ticket_start_number),
+  CONSTRAINT valid_total CHECK (total_amount = (quantity * unit_price))
+);
+
+CREATE INDEX IF NOT EXISTS idx_sales_raffle_id ON sales(raffle_id);
+CREATE INDEX IF NOT EXISTS idx_sales_customer_id ON sales(customer_id);
+CREATE INDEX IF NOT EXISTS idx_sales_payment_id ON sales(payment_id) WHERE payment_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_sales_payment_status ON sales(payment_status);
+CREATE INDEX IF NOT EXISTS idx_sales_created_at ON sales(created_at);
+CREATE INDEX IF NOT EXISTS idx_sales_completed ON sales(raffle_id, completed_at) WHERE payment_status = 'completed';
+
+COMMENT ON TABLE sales IS 'Ventas de boletos. Una venta puede incluir múltiples boletos consecutivos';
+COMMENT ON COLUMN sales.ticket_start_number IS 'Primer número de boleto asignado';
+COMMENT ON COLUMN sales.ticket_end_number IS 'Último número de boleto asignado';
+
+-- ============================================
+-- PASO 7: TABLA TICKETS (depende de raffles y sales)
+-- ============================================
+CREATE TABLE IF NOT EXISTS tickets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  raffle_id UUID NOT NULL REFERENCES raffles(id) ON DELETE CASCADE,
+  ticket_number INTEGER NOT NULL CHECK (ticket_number >= 1 AND ticket_number <= 60000),
+  status ticket_status NOT NULL DEFAULT 'available',
+  sale_id UUID REFERENCES sales(id) ON DELETE SET NULL,
+  assigned_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  CONSTRAINT unique_raffle_ticket UNIQUE (raffle_id, ticket_number)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tickets_raffle_number ON tickets(raffle_id, ticket_number);
+CREATE INDEX IF NOT EXISTS idx_tickets_raffle_status ON tickets(raffle_id, status);
+CREATE INDEX IF NOT EXISTS idx_tickets_sale_id ON tickets(sale_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_available ON tickets(raffle_id, ticket_number) WHERE status = 'available';
+
+COMMENT ON TABLE tickets IS 'Boletos de cada sorteo. 60,000 boletos por sorteo, numerados del 1 al 60,000';
+COMMENT ON COLUMN tickets.ticket_number IS 'Número del boleto (1-60000), único por sorteo';
+
+-- ============================================
+-- PASO 8: TABLA PAYMENTS (depende de sales)
+-- ============================================
+CREATE TABLE IF NOT EXISTS payments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  sale_id UUID NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
+  payment_id VARCHAR(255) UNIQUE NOT NULL,
+  session_id VARCHAR(255),
+  amount DECIMAL(12, 2) NOT NULL CHECK (amount > 0),
+  currency VARCHAR(3) NOT NULL DEFAULT 'USD',
+  status VARCHAR(50) NOT NULL,
+  payment_method VARCHAR(50),
+  payphone_response JSONB,
+  webhook_received BOOLEAN NOT NULL DEFAULT FALSE,
+  webhook_data JSONB,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_payments_sale_id ON payments(sale_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_payments_payment_id ON payments(payment_id);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+CREATE INDEX IF NOT EXISTS idx_payments_webhook ON payments(webhook_received, updated_at);
+
+COMMENT ON TABLE payments IS 'Registro detallado de todas las transacciones con Payphone';
+COMMENT ON COLUMN payments.payphone_response IS 'Respuesta completa de la API de Payphone (JSON)';
+COMMENT ON COLUMN payments.webhook_data IS 'Datos recibidos del webhook de Payphone';
+
+-- ============================================
+-- PASO 9: TABLA NOTIFICATIONS (depende de sales)
+-- ============================================
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  sale_id UUID NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
+  type notification_type NOT NULL,
+  channel notification_channel NOT NULL,
+  recipient VARCHAR(255) NOT NULL,
+  subject VARCHAR(255),
+  content TEXT NOT NULL,
+  status notification_status NOT NULL DEFAULT 'pending',
+  sent_at TIMESTAMP WITH TIME ZONE,
+  error_message TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_sale_id ON notifications(sale_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_status ON notifications(status);
+CREATE INDEX IF NOT EXISTS idx_notifications_channel ON notifications(channel);
+CREATE INDEX IF NOT EXISTS idx_notifications_pending ON notifications(status, created_at) WHERE status = 'pending';
+
+COMMENT ON TABLE notifications IS 'Log de todas las notificaciones enviadas (email, WhatsApp, SMS)';
+
+-- ============================================
+-- PASO 10: TABLA TRANSACTION_LOGS (depende de users)
+-- ============================================
+CREATE TABLE IF NOT EXISTS transaction_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  table_name VARCHAR(50) NOT NULL,
+  record_id UUID NOT NULL,
+  action VARCHAR(50) NOT NULL,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  old_data JSONB,
+  new_data JSONB,
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_logs_table_record ON transaction_logs(table_name, record_id);
+CREATE INDEX IF NOT EXISTS idx_logs_created_at ON transaction_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_logs_user_id ON transaction_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_logs_action ON transaction_logs(action);
+
+COMMENT ON TABLE transaction_logs IS 'Log de auditoría de todas las operaciones críticas del sistema';
+
+
+
+-- Tipos ENUM para estados
+CREATE TYPE raffle_status AS ENUM ('draft', 'active', 'completed', 'cancelled');
+CREATE TYPE ticket_status AS ENUM ('available', 'sold', 'reserved');
+CREATE TYPE payment_status AS ENUM ('pending', 'completed', 'failed', 'cancelled', 'refunded');
+CREATE TYPE notification_type AS ENUM ('ticket_confirmation', 'payment_confirmation', 'reminder');
+CREATE TYPE notification_channel AS ENUM ('email', 'whatsapp', 'sms');
+CREATE TYPE notification_status AS ENUM ('pending', 'sent', 'failed');

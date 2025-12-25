@@ -78,7 +78,7 @@ export function HeroSection() {
               className="mb-0"
               textClassName="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight text-gray-900 dark:text-white"
               speed={0.4}
-              highlightWords={["Premios"]}
+              highlightWords={[]}
               highlightClassName="text-blue-600 dark:text-amber-400"
               letterColors={{
                 "ecuador": [
@@ -105,7 +105,7 @@ export function HeroSection() {
             
             {/* Texto descriptivo - Apoyo */}
             <AnimatedTextGenerate
-              text="Participa en sorteos digitales por autos, motos y tecnología de alto valor, con un costo accesible desde cualquier ciudad del país."
+              text="Participa en sorteos por autos, motos de alto valor, con un costo accesible desde cualquier ciudad del país."
               className="mb-0 mt-4 md:mt-6"
               textClassName="text-lg sm:text-xl md:text-2xl text-gray-700 dark:text-gray-400 max-w-4xl mx-auto leading-relaxed"
               speed={0.3}

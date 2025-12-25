@@ -192,6 +192,34 @@ export async function GET(request: NextRequest) {
         console.error('❌ Error al actualizar orden:', updateError);
       } else {
         console.log('✅ Orden actualizada a completada');
+        
+        // Enviar correo de confirmación (no bloquea si falla)
+        try {
+          console.log('📧 Intentando enviar correo de confirmación para orden:', finalOrderId);
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+          const emailUrl = `${baseUrl}/api/email/send-purchase-confirmation`;
+          console.log('📧 URL del correo:', emailUrl);
+          
+          const emailResponse = await fetch(emailUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId: finalOrderId }),
+          });
+          
+          const emailData = await emailResponse.json();
+          
+          if (emailResponse.ok) {
+            console.log('✅ Correo de confirmación enviado exitosamente:', emailData);
+          } else {
+            console.error('⚠️ Error al enviar correo:', emailData);
+            console.warn('⚠️ No se pudo enviar correo de confirmación');
+          }
+        } catch (emailError) {
+          console.error('❌ Error al enviar correo (no crítico):', emailError);
+          // No lanzamos error para no bloquear el flujo
+        }
       }
 
       // Redirigir a página de confirmación exitosa

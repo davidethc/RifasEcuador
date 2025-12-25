@@ -1,0 +1,201 @@
+body {
+  font-family: "Josefin Sans", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  overflow-x: hidden;
+  background: #100235 !important;
+  color: #fff !important;
+}
+
+body.coming-soon:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #683DF5 !important;
+  opacity: 0.7;
+  z-index: 1;
+}
+
+.josefin-sans-700 {
+  font-family: "Josefin Sans", serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+ul, ol{
+  padding: 0;
+  list-style: none;
+  text-decoration: none;
+}
+
+a:link, a:visited,  a:hover, a:active{
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+p,h1,h2,h3,h4,h5,h6{
+  color:#fff !important;
+}
+
+.rounded{
+  border-radius:12px !important;
+}
+
+#top, .modal-content.bg{
+  background: #360254 !important;
+  color: #fff !important;
+}
+
+#hero{
+  overflow: hidden;
+  color:#fff !important;
+  background: #b92163 !important;
+  background: linear-gradient(0deg, #b92163 0%, #360254 100%) !important;
+  height:70vh;
+  
+}
+
+#heroCheckout{
+  overflow: hidden;
+  color:#fff !important;
+  background: #b92163 !important;
+  background: linear-gradient(0deg, #b92163 0%, #360254 100%) !important;  
+}
+
+@media all and (max-width: 991px) {
+  #hero {
+    height:105vh;
+  }
+}
+
+.t1{
+  color: #FFB200 !important;
+}
+
+#hero .b1, #heroCheckout .b1, #main .b1, .btn.b1{
+  color:#fff !important;
+  background: #f02080 !important;
+  background: linear-gradient(0deg, #ffb200 0%, #f02080 100%) !important;
+}
+
+#hero .b2{
+  color:#fff !important;
+  background: #A83EF5 !important;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ray {
+  animation: rotate 20s linear infinite;
+}
+
+#main{
+  background:#100235 !important;
+  color:#fff !important;
+}
+
+@media all and (min-width: 992px) {
+  #main .countdown{
+    position: relative;
+    bottom:100px;
+  }
+}
+
+#main .c1{
+  width:80px;
+  line-height:80px;
+}
+
+#main p{
+   color:#fff !important;
+}
+
+#main .bg{
+  background:#683DF5 !important;
+}
+
+#main .numbers, #heroCheckout .numbers{
+  width:70px !important;
+  height:70px !important;
+  line-height:70px !important;
+  border:1px solid #fff;
+}
+
+#heroCheckout .numbers{
+  background:orange;
+  color: #fff;
+}
+
+#main .numbers.sold{
+  background:#A83EF5 !important;
+  color:#FFB200;
+}
+
+#main .numbers.sold:before{
+  position:absolute;
+  margin-left:5px;
+  font-family: "bootstrap-icons";  
+  font-weight: 900;
+  content: "\F657";
+}
+
+#prize{
+  background: #100235  !important;
+  background: linear-gradient(0deg, #100235 0%, #360254  100%) !important;
+}
+
+#prize a{
+  color: #fff !important;
+}
+
+#prize .bg{
+  background:#683DF5 !important; 
+}
+
+#prize .progress-bar{
+  background: #EC6624 !important;
+}
+
+#faq .bgFaq{
+  background: #683DF5 !important;
+  color: #fff !important;
+}
+
+#myVideo .modal-dialog .modal-content{
+  background: #360254 !important;
+  color: #fff !important;
+
+}
+
+#myVideo .btn{
+   color: #fff !important;
+}
+
+.colorImage{
+  filter: hue-rotate(0deg) saturate(100%) invert(0%);
+}
+
+@media (min-width: 1366px) {
+    .display-2 {
+        font-size: 4.5rem !important;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1365px){
+    .display-2 {
+        font-size: 3rem !important;
+    }
+}
+
