@@ -1,13 +1,10 @@
 'use client';
 
-import { useBreakpoint } from '@/hooks/useBreakpoint';
-
 /**
  * Página "Cómo jugar"
  * Muestra una guía paso a paso para participar en los sorteos
  */
 export default function ComoJugarPage() {
-  const breakpoint = useBreakpoint();
 
   const pasos = [
     {

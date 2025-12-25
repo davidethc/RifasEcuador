@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useBreakpoint } from "@/hooks/useBreakpoint";
 
 /**
  * Footer - Pie de página de la aplicación
  * Incluye enlaces importantes, información legal y redes sociales
  */
 export function Footer() {
-  const breakpoint = useBreakpoint();
 
   const currentYear = new Date().getFullYear();
 

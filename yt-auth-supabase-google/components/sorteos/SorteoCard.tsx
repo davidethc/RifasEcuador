@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useBreakpoint } from "@/hooks/useBreakpoint";
 
 interface SorteoCardProps {
   id: string;
@@ -18,7 +17,6 @@ interface SorteoCardProps {
  * Muestra información del premio y permite acceder a los detalles
  */
 export function SorteoCard({ id, titulo, premio, precio, destacado = false, imagen }: SorteoCardProps) {
-  const breakpoint = useBreakpoint();
 
   // Formatear precio en dólares
   const formatPrice = (price: number) => {

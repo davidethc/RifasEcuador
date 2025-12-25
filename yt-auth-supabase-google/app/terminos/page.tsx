@@ -1,13 +1,10 @@
 'use client';
 
-import { useBreakpoint } from '@/hooks/useBreakpoint';
-
 /**
  * Página "Términos y condiciones"
  * Muestra los términos y condiciones de participación en los sorteos
  */
 export default function TerminosPage() {
-  const breakpoint = useBreakpoint();
 
   const terminos = [
     {
