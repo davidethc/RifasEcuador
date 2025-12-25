@@ -1,5 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+// Cliente de Supabase con service role para bypass de RLS
+const getSupabaseAdmin = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+};
 
 /**
  * API Route para confirmar transacciones de la Cajita de Pagos
@@ -106,6 +123,7 @@ export async function POST(request: NextRequest) {
       console.log('🔍 Buscando orden con prefijo:', orderPrefix);
       
       // Buscar en la base de datos por el prefijo del ID
+      const supabase = getSupabaseAdmin();
       const { data: orders } = await supabase
         .from('orders')
         .select('id')
@@ -143,6 +161,7 @@ export async function POST(request: NextRequest) {
       console.log('✅ Pago aprobado, actualizando orden...');
 
       // Crear o actualizar registro de pago
+      const supabase = getSupabaseAdmin();
       const { data: existingPayment } = await supabase
         .from('payments')
         .select('id')
@@ -219,6 +238,7 @@ export async function POST(request: NextRequest) {
       // statusCode 2 = Canceled
       console.log('⚠️ Pago cancelado');
 
+      const supabase = getSupabaseAdmin();
       await supabase
         .from('orders')
         .update({
