@@ -19,7 +19,6 @@ interface SorteoCardProps {
  */
 export function SorteoCard({ id, titulo, premio, precio, destacado = false, imagen }: SorteoCardProps) {
   const breakpoint = useBreakpoint();
-  const isMobile = breakpoint === "base" || breakpoint === "sm";
 
   // Formatear precio en dólares
   const formatPrice = (price: number) => {

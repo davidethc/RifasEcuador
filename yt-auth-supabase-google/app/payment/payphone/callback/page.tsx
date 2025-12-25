@@ -65,7 +65,7 @@ function PayphoneCallbackContent() {
 
           // El orderId completo viene del endpoint de confirmación
           // que lo buscó en la base de datos por el prefijo
-          let orderId: string | null = data.orderId || transaction.optionalParameter || null;
+          const orderId: string | null = data.orderId || transaction.optionalParameter || null;
           
           console.log('🔍 OrderId recibido:', orderId);
 
@@ -103,13 +103,14 @@ function PayphoneCallbackContent() {
         setMessage(error instanceof Error ? error.message : 'Error al procesar el pago');
 
         setTimeout(() => {
-          router.push('/comprar/error?message=' + encodeURIComponent(message));
+          const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago';
+          router.push('/comprar/error?message=' + encodeURIComponent(errorMessage));
         }, 3000);
       }
     };
 
     confirmPayment();
-  }, [searchParams, router, message]);
+  }, [searchParams, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">

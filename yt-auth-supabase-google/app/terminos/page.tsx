@@ -8,7 +8,6 @@ import { useBreakpoint } from '@/hooks/useBreakpoint';
  */
 export default function TerminosPage() {
   const breakpoint = useBreakpoint();
-  const isMobile = breakpoint === 'base' || breakpoint === 'sm';
 
   const terminos = [
     {

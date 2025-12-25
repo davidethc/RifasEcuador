@@ -10,7 +10,6 @@ import { useBreakpoint } from "@/hooks/useBreakpoint";
  */
 export function Footer() {
   const breakpoint = useBreakpoint();
-  const isMobile = breakpoint === "base" || breakpoint === "sm";
 
   const currentYear = new Date().getFullYear();
 

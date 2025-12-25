@@ -8,7 +8,6 @@ import { useBreakpoint } from '@/hooks/useBreakpoint';
  */
 export default function ComoJugarPage() {
   const breakpoint = useBreakpoint();
-  const isMobile = breakpoint === 'base' || breakpoint === 'sm';
 
   const pasos = [
     {

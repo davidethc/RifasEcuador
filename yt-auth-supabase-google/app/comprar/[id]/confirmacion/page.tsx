@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 
 interface OrderDetails {
   id: string;
@@ -33,16 +34,9 @@ export default function ConfirmacionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const status = searchParams.get('status');
   const transactionId = searchParams.get('transactionId');
 
-  useEffect(() => {
-    if (orderId) {
-      fetchOrderDetails();
-    }
-  }, [orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -63,14 +57,20 @@ export default function ConfirmacionPage() {
         return;
       }
 
-      setOrder(result.data as any);
+      setOrder(result.data as OrderDetails);
     } catch (err) {
       console.error('Error inesperado:', err);
       setError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (orderId) {
+      fetchOrderDetails();
+    }
+  }, [orderId, fetchOrderDetails]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-EC', {
@@ -208,11 +208,13 @@ export default function ConfirmacionPage() {
           {/* Información del sorteo */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6">
             {order.raffles?.image_url && (
-              <div className="mb-4 rounded-xl overflow-hidden">
-                <img
+              <div className="mb-4 rounded-xl overflow-hidden relative w-full h-48">
+                <Image
                   src={order.raffles.image_url}
                   alt={order.raffles.title}
-                  className="w-full h-48 object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
             )}

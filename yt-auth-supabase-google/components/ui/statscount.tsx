@@ -50,7 +50,7 @@ const defaultTitle = "CREATE STUNNING INTERFACES WITH SCROLLX-UI COMPONENTS";
 function AnimatedCounter({
   value,
   suffix = "",
-  duration = 1,
+  duration: _duration = 1,
   delay = 0,
   label,
 }: {

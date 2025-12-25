@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       let errorData: PayphoneErrorResponse | null = null;
       try {
         errorData = JSON.parse(responseText);
-      } catch (e) {
+      } catch {
         // No se pudo parsear como JSON
       }
 

@@ -35,7 +35,6 @@ export function PayphoneSaleButton({
   onError,
 }: PayphoneSaleButtonProps) {
   const [status, setStatus] = useState<PaymentStatus>('idle');
-  const [transactionId, setTransactionId] = useState<number | null>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pollingAttempts, setPollingAttempts] = useState(0);
@@ -107,7 +106,6 @@ export function PayphoneSaleButton({
 
       console.log('✅ Pago creado:', data);
 
-      setTransactionId(data.transactionId);
       setStatus('pending');
       setPollingAttempts(0);
 
@@ -198,7 +196,6 @@ export function PayphoneSaleButton({
     setStatus('idle');
     setPhoneNumber('');
     setErrorMessage(null);
-    setTransactionId(null);
     setPollingAttempts(0);
   };
 
