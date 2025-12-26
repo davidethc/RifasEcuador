@@ -10,7 +10,7 @@ interface Sorteo {
   titulo: string;
   premio: string;
   precio: number;
-  destacado?: boolean;
+  
   imagen?: string;
 }
 
