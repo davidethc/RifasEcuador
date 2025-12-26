@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { purchaseService, type UserTicket } from "@/services/purchaseService";
 import { AnimatedTextGenerate } from "@/components/ui/animated-textgenerate";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import StatsCount from "@/components/ui/statscount";
 import { AnimatedButton } from "@/components/ui/animated-button";
+import { HeroCarousel } from "@/components/ui/hero-carousel";
 
 /**
  * Hero Section - Sección principal de la página de inicio
@@ -20,6 +20,11 @@ export function HeroSection() {
   const { user, isLoading: authLoading } = useAuth();
   const [userTickets, setUserTickets] = useState<UserTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
+  const heroCarouselImages = [
+    { src: "/imagenhero.png", alt: "Premios: Autos, Motos y Tecnología" },
+    { src: "/tren02.jpeg", alt: "Tren histórico" },
+    { src: "/volcan01.jpeg", alt: "Volcán Ecuador" },
+  ];
 
   // Cargar boletos del usuario cuando esté autenticado
   useEffect(() => {
@@ -56,17 +61,9 @@ export function HeroSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-        {/* Banner visual con premios */}
-        <div className="mb-8 md:mb-12">
-          <AspectRatio ratio={23 / 9} className="rounded-3xl overflow-hidden border-4 border-blue-500/30 shadow-2xl">
-            <Image
-              src="/imagenhero.png"
-              alt="Premios: Autos, Motos y Tecnología"
-              fill
-              className="object-cover"
-              priority
-            />
-          </AspectRatio>
+        {/* Carrusel de imágenes */}
+        <div className="mb-5 md:mb-12">
+          <HeroCarousel images={heroCarouselImages} ratio={22 / 9} />
         </div>
 
         <div className="text-center w-full">
@@ -74,7 +71,7 @@ export function HeroSection() {
           <div className="mb-8 md:mb-12 space-y-4 md:space-y-6">
             {/* Título principal - Dominante */}
             <AnimatedTextGenerate
-              text="Premios esperándote en todo el Ecuador."
+              text="Premios reales. Ganadores reales. En todo el Ecuador 🇪🇨"
               className="mb-0"
               textClassName="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight text-gray-900 dark:text-white"
               speed={0.4}
@@ -91,26 +88,6 @@ export function HeroSection() {
                   "text-black dark:text-white",           // r - Negro
                 ]
               }}
-            />
-            
-            {/* Subtítulo - Secundario */}
-            <AnimatedTextGenerate
-              text="Ganadores reales como tú."
-              className="mb-0 mt-2 md:mt-4"
-              textClassName="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-800 dark:text-gray-200"
-              speed={0.4}
-              highlightWords={["Ganadores", "reales"]}
-              highlightClassName="text-blue-600 dark:text-amber-400"
-            />
-            
-            {/* Texto descriptivo - Apoyo */}
-            <AnimatedTextGenerate
-              text="Participa en sorteos por autos, motos de alto valor, con un costo accesible desde cualquier ciudad del país."
-              className="mb-0 mt-4 md:mt-6"
-              textClassName="text-lg sm:text-xl md:text-2xl text-gray-700 dark:text-gray-400 max-w-4xl mx-auto leading-relaxed"
-              speed={0.3}
-              highlightWords={["autos", "motos", "tecnología"]}
-              highlightClassName="text-blue-600 dark:text-amber-400 font-semibold"
             />
           </div>
 
@@ -151,6 +128,87 @@ export function HeroSection() {
             >
               Cómo Funciona
             </Link>
+          </div>
+
+          {/* Bloque de Confianza */}
+          <div className="mt-12 md:mt-16 max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6 md:p-8 shadow-lg">
+              {/* Título */}
+              <div className="text-center mb-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)] flex items-center justify-center gap-2">
+                  <span className="text-2xl">🔒</span>
+                  <span>Plataforma segura y legal</span>
+                </h2>
+              </div>
+
+              {/* Beneficios */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                      Sorteos transparentes y públicos
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                      Cumplimos normativa vigente en Ecuador
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                      Pagos 100% seguros
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                      Premios entregados a ganadores reales
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Métodos de pago */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <p className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 font-[var(--font-dm-sans)]">
+                  Métodos de pago disponibles
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
+                  {/* PayPhone */}
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="relative w-24 h-16 md:w-32 md:h-20">
+                      <Image
+                        src="/payphonee.webp"
+                        alt="PayPhone"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Transferencia Bancaria */}
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-24 h-16 md:w-32 md:h-20 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+                      <span className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-300 text-center px-2 font-[var(--font-dm-sans)]">
+                        Transferencia Bancaria
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 font-[var(--font-dm-sans)]">
+                  Pagos procesados de forma segura y verificada
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Estadísticas animadas */}
@@ -297,3 +355,5 @@ export function HeroSection() {
     </section>
   );
 }
+
+

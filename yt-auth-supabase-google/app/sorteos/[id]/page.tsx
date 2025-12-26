@@ -143,14 +143,6 @@ export default function SorteoDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 min-h-[85vh]">
           {/* Imagen del sorteo */}
           <div className="relative flex flex-col">
-            {raffle.featured && (
-              <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold font-[var(--font-dm-sans)] shadow-lg">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                DESTACADO
-              </div>
-            )}
             <div className="relative w-full h-[350px] md:h-[450px] lg:h-[550px] bg-gradient-to-br from-blue-100 to-amber-100 dark:from-gray-700 dark:to-gray-600 rounded-2xl overflow-hidden shadow-2xl">
               {raffle.image_url ? (
                 <Image
@@ -367,6 +359,73 @@ export default function SorteoDetailPage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Bloque de confianza */}
+          <div className="mt-12 md:mt-16">
+            <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6 md:p-8 shadow-xl">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)] flex items-center justify-center gap-2">
+                  <span className="text-2xl">🔒</span>
+                  Plataforma segura y legal
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                    Sorteos transparentes y públicos
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                    Cumplimos normativa vigente en Ecuador
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                    Pagos 100% seguros
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
+                  <p className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                    Premios entregados a ganadores reales
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <p className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 font-[var(--font-dm-sans)]">
+                  Métodos de pago disponibles
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="relative w-24 h-16 md:w-32 md:h-20">
+                      <Image
+                        src="/payphonee.webp"
+                        alt="PayPhone"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-24 h-16 md:w-32 md:h-20 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+                      <span className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-300 text-center px-2 font-[var(--font-dm-sans)]">
+                        Transferencia Bancaria
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 font-[var(--font-dm-sans)]">
+                  Pagos procesados de forma segura y verificada
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Call to action final */}

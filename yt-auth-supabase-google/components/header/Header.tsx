@@ -178,8 +178,8 @@ export function Header() {
                   Iniciar Sesión
                 </Link>
                 <AnimatedButton
-                  onClick={() => router.push('/sorteos')}
-                  className="px-6 py-2 text-sm font-bold text-white bg-blue-600 dark:bg-amber-400 font-[var(--font-dm-sans)] border-0"
+                  onClick={() => router.push('/sorteos/3b1f1182-ce6b-42cb-802c-a1537fe59c0e')}
+                  className="px-6 py-2 text-sm font-bold text-white bg-blue-600 dark:bg-amber-400 font-[var(--font-dm-sans)]"
                   variant="default"
                   size="default"
                   glow={true}
@@ -256,11 +256,11 @@ export function Header() {
                     Iniciar Sesión
                   </Link>
                   <AnimatedButton
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      router.push('/sorteos');
-                    }}
-                    className="px-4 py-2 text-base font-bold text-white bg-blue-600 dark:bg-amber-400 text-center font-[var(--font-dm-sans)] border-0"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push('/sorteos/3b1f1182-ce6b-42cb-802c-a1537fe59c0e');
+                  }}
+                    className="px-4 py-2 text-base font-bold text-white bg-blue-600 dark:bg-amber-400 text-center font-[var(--font-dm-sans)]"
                     variant="default"
                     size="default"
                     glow={true}

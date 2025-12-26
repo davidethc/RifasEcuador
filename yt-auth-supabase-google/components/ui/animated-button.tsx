@@ -139,7 +139,7 @@ const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButtonProps>(
         animation: animatedButton-spread calc(var(--speed) * 3) ease-in-out infinite;
       }
       .shadow-glow-scoped {
-        box-shadow: 0 0 5px var(--shimmer-color), 0 0 25px var(--shimmer-color), 0 0 50px var(--shimmer-color);
+        box-shadow: 0 0 3px var(--shimmer-color), 0 0 2px var(--shimmer-color), 0 0 40px var(--shimmer-color);
       }
       @media (max-width: 768px) {
         .animated-button-mobile {
