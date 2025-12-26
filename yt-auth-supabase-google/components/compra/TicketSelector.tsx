@@ -56,9 +56,9 @@ export function TicketSelector({
   return (
     <div className="space-y-4">
       {/* Mensaje motivador compacto */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-4 border-2 border-green-200 dark:border-green-700">
+      <div className="bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-gray-800 rounded-xl p-4 border-2 border-secondary-200 dark:border-gray-700">
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+          <div className="flex-shrink-0 w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
@@ -82,15 +82,15 @@ export function TicketSelector({
             <button
               key={bundle.quantity}
               onClick={() => handleBundleClick(bundle.quantity)}
-              className={`relative p-4 md:p-5 rounded-xl border-2 transition-all transform hover:scale-105 active:scale-95 ${
+              className={`relative p-3 md:p-4 lg:p-5 rounded-xl border-2 transition-all transform active:scale-95 min-h-[100px] md:min-h-[120px] ${
                 isSelected
-                  ? 'border-blue-600 dark:border-amber-400 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-amber-900/30 dark:to-amber-900/20 shadow-lg scale-105'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-amber-500 bg-white dark:bg-gray-800 hover:shadow-md'
+                  ? 'border-primary-500 bg-gradient-to-br from-secondary-50 to-secondary-100 shadow-lg'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-primary-400 bg-white dark:bg-gray-800 hover:shadow-md'
               }`}
             >
               {isSelected && (
-                <div className="absolute -top-2 -right-2 w-7 h-7 bg-blue-600 dark:bg-amber-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                  <svg className="w-4 h-4 text-white dark:text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                <div className="absolute -top-2 -right-2 w-7 h-7 bg-primary-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -100,21 +100,21 @@ export function TicketSelector({
                 </div>
               )}
               {bundle.quantity >= 10 && (
-                <div className="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                <div className="absolute -top-2 -left-2 bg-accent-500 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
                   Popular
                 </div>
               )}
               <div className="text-center">
                 <p
                   className={`text-xs md:text-sm font-medium mb-1 font-[var(--font-dm-sans)] ${
-                    isSelected ? 'text-blue-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'
+                    isSelected ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400'
                   }`}
                 >
                   {bundle.label}
                 </p>
                 <p
-                  className={`text-2xl md:text-3xl font-bold mb-0.5 font-[var(--font-comfortaa)] ${
-                    isSelected ? 'text-blue-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'
+                  className={`text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 font-[var(--font-comfortaa)] ${
+                    isSelected ? 'text-primary-500' : 'text-gray-900 dark:text-white'
                   }`}
                 >
                   {formatPrice(bundle.totalPrice)}
@@ -141,10 +141,10 @@ export function TicketSelector({
             value={customValue}
             onChange={(e) => handleCustomChange(e.target.value)}
             placeholder="1-100"
-            className="flex-1 px-3 py-2 md:py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-blue-600 dark:focus:border-amber-400 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-[var(--font-dm-sans)] text-sm md:text-base"
+            className="flex-1 px-4 py-3 md:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-[var(--font-dm-sans)] text-base min-h-[48px]"
           />
           <div className="flex items-center px-3 md:px-4 py-2 md:py-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-            <span className="text-base md:text-lg font-bold text-blue-600 dark:text-amber-400 font-[var(--font-comfortaa)] whitespace-nowrap">
+            <span className="text-base md:text-lg font-bold text-accent-500 font-[var(--font-comfortaa)] whitespace-nowrap">
               {formatPrice((selectedQuantity || 0) * pricePerTicket)}
             </span>
           </div>
@@ -158,19 +158,19 @@ export function TicketSelector({
 
       {/* Resumen y botón continuar - MÁS COMPACTO Y ATRACTIVO */}
       {selectedQuantity > 0 && selectedQuantity <= 100 && (
-        <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 rounded-xl p-4 shadow-2xl animate-in slide-in-from-bottom">
+        <div className="sticky bottom-0 left-0 right-0 bg-primary-500 rounded-xl p-4 shadow-2xl animate-in slide-in-from-bottom">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-xs text-white/80 dark:text-gray-900/80 font-[var(--font-dm-sans)]">
+              <p className="text-xs text-white/80 font-[var(--font-dm-sans)]">
                 {selectedQuantity} {selectedQuantity === 1 ? 'boleto' : 'boletos'}
               </p>
-              <p className="text-2xl md:text-3xl font-bold text-white dark:text-gray-900 font-[var(--font-comfortaa)]">
+              <p className="text-2xl md:text-3xl font-bold text-white font-[var(--font-comfortaa)]">
                 {formatPrice(selectedQuantity * pricePerTicket)}
               </p>
             </div>
             <button
               onClick={onContinue}
-              className="px-6 md:px-8 py-3 md:py-4 bg-white dark:bg-gray-900 text-blue-600 dark:text-amber-400 rounded-xl font-bold text-base md:text-lg hover:scale-105 active:scale-95 transition-all shadow-xl font-[var(--font-dm-sans)] flex items-center gap-2"
+              className="px-6 md:px-8 py-3.5 md:py-4 bg-white text-primary-500 rounded-xl font-bold text-base md:text-lg hover:scale-105 active:scale-95 transition-all shadow-xl font-[var(--font-dm-sans)] flex items-center gap-2 min-h-[48px]"
             >
               <span>Continuar</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,6 +186,7 @@ export function TicketSelector({
     </div>
   );
 }
+
 
 
 

@@ -26,7 +26,7 @@ export function usePurchase(raffleId: string) {
 
   // Avanzar al siguiente paso
   const nextStep = useCallback(() => {
-    setCurrentStep((prev) => Math.min(prev + 1, 3));
+    setCurrentStep((prev) => Math.min(prev + 1, 2));
   }, []);
 
   // Retroceder al paso anterior
@@ -114,6 +114,7 @@ export function usePurchase(raffleId: string) {
     reset,
   };
 }
+
 
 
 

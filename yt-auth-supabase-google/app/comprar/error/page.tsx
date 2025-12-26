@@ -73,14 +73,14 @@ export default function ErrorPage() {
           {orderId ? (
             <button
               onClick={() => router.push(`/comprar/${orderId}`)}
-              className="w-full px-6 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+              className="w-full px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors font-[var(--font-dm-sans)]"
             >
               Intentar de nuevo
             </button>
           ) : (
             <button
               onClick={() => router.push('/sorteos')}
-              className="w-full px-6 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+              className="w-full px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors font-[var(--font-dm-sans)]"
             >
               Ver sorteos disponibles
             </button>
@@ -114,7 +114,7 @@ export default function ErrorPage() {
             <span className="text-gray-300 dark:text-gray-600">•</span>
             <a
               href="mailto:soporte@tudominio.com"
-              className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-amber-400 hover:underline font-[var(--font-dm-sans)]"
+              className="inline-flex items-center gap-2 text-sm text-primary-600 dark:text-accent-500 hover:underline font-[var(--font-dm-sans)]"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -127,6 +127,7 @@ export default function ErrorPage() {
     </div>
   );
 }
+
 
 
 

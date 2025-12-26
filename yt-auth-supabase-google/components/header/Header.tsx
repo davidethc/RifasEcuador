@@ -88,12 +88,21 @@ export function Header() {
   };
 
   return (
-    <header className="w-full sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors">
+    <header className="w-full sticky top-0 z-50 bg-white/90 dark:bg-primary-900/90 backdrop-blur-md border-b border-primary-200 dark:border-primary-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        {/* Certificaciones en header - Solo desktop */}
+        <div className="hidden md:flex items-center justify-center py-2 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
+            <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span>Licencia #12345 • Regulado por SRI • Notario Público</span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center group flex-shrink-0">
-            <div className="relative h-12 w-auto md:h-16 lg:h-20 aspect-[2/1] transition-transform group-hover:scale-105">
+            <div className="relative h-10 w-auto md:h-14 lg:h-16 aspect-[2/1] transition-transform group-hover:scale-105">
               <Image
                 src="/logo922.png"
                 alt="La Cima Logo"
@@ -110,7 +119,7 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-amber-400 transition-colors font-[var(--font-dm-sans)]"
+                className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
               >
                 {link.label}
               </Link>
@@ -123,16 +132,35 @@ export function Header() {
               <>
                 <Link
                   href="/mis-boletos"
-                  className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-amber-400 transition-colors font-[var(--font-dm-sans)]"
+                  className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
                 >
                   Mis boletos
                 </Link>
+                <AnimatedButton
+                  onClick={() => router.push('/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e')}
+                  className="w-[190px] px-6 py-2 text-sm font-bold text-white bg-primary-500 hover:bg-primary-600 font-[var(--font-dm-sans)]"
+                  variant="default"
+                  size="default"
+                  glow={true}
+                  textEffect="normal"
+                  uppercase={false}
+                  rounded="custom"
+                  asChild={false}
+                  hideAnimations={false}
+                  shimmerColor="#3ab795"
+                  shimmerSize="0.15em"
+                  shimmerDuration="3s"
+                  borderRadius="8px"
+                  background="#3ab795"
+                >
+                  Participar - Desde $1.00
+                </AnimatedButton>
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-gray-800 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-blue-500 dark:bg-amber-400 flex items-center justify-center text-white dark:text-gray-900 font-semibold text-sm">
+                    <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-semibold text-sm">
                       {userName?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300 font-[var(--font-dm-sans)]">
@@ -178,8 +206,8 @@ export function Header() {
                   Iniciar Sesión
                 </Link>
                 <AnimatedButton
-                  onClick={() => router.push('/sorteos/3b1f1182-ce6b-42cb-802c-a1537fe59c0e')}
-                  className="px-6 py-2 text-sm font-bold text-white bg-blue-600 dark:bg-amber-400 font-[var(--font-dm-sans)]"
+                  onClick={() => router.push('/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e')}
+                  className="w-[190px] px-6 py-2 text-sm font-bold text-white bg-primary-500 hover:bg-primary-600 font-[var(--font-dm-sans)]"
                   variant="default"
                   size="default"
                   glow={true}
@@ -188,13 +216,13 @@ export function Header() {
                   rounded="custom"
                   asChild={false}
                   hideAnimations={false}
-                  shimmerColor="#39FF14"
+                  shimmerColor="#3ab795"
                   shimmerSize="0.15em"
                   shimmerDuration="3s"
                   borderRadius="8px"
-                  background="rgb(37 99 235)"
+                  background="#3ab795"
                 >
-                  Comprar boletos ahora
+                  Participar - Desde $1.00
                 </AnimatedButton>
               </>
             )}
@@ -205,7 +233,7 @@ export function Header() {
             {isAuthenticated && (
               <Link
                 href="/mis-boletos"
-                className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-[var(--font-dm-sans)]"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-[var(--font-dm-sans)] min-h-[44px] flex items-center"
               >
                 Mis boletos
               </Link>
@@ -213,7 +241,7 @@ export function Header() {
             <button
               ref={menuButtonRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
             >
               <svg
@@ -240,7 +268,7 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-4 py-2 text-base font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors font-[var(--font-dm-sans)]"
+                  className="px-4 py-3 text-base font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors font-[var(--font-dm-sans)] min-h-[44px] flex items-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
@@ -250,7 +278,7 @@ export function Header() {
                 <>
                   <Link
                     href="/login"
-                    className="px-4 py-2 text-base font-semibold text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-center font-[var(--font-dm-sans)]"
+                    className="px-4 py-3 text-base font-semibold text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-center font-[var(--font-dm-sans)] min-h-[44px] flex items-center justify-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Iniciar Sesión
@@ -258,9 +286,9 @@ export function Header() {
                   <AnimatedButton
                   onClick={() => {
                     setIsMenuOpen(false);
-                    router.push('/sorteos/3b1f1182-ce6b-42cb-802c-a1537fe59c0e');
+                    router.push('/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e');
                   }}
-                    className="px-4 py-2 text-base font-bold text-white bg-blue-600 dark:bg-amber-400 text-center font-[var(--font-dm-sans)]"
+                    className="px-4 py-3 text-base font-bold text-white bg-primary-500 hover:bg-primary-600 text-center font-[var(--font-dm-sans)] min-h-[44px]"
                     variant="default"
                     size="default"
                     glow={true}
@@ -269,19 +297,19 @@ export function Header() {
                     rounded="custom"
                     asChild={false}
                     hideAnimations={false}
-                    shimmerColor="#39FF14"
+                    shimmerColor="#fbbf24"
                     shimmerSize="0.15em"
                     shimmerDuration="3s"
                     borderRadius="8px"
-                    background="rgb(37 99 235)"
+                    background="rgb(22 163 74)"
                   >
-                    Comprar boletos ahora
+                    Participar - Desde $1.00
                   </AnimatedButton>
                 </>
               )}
               {isAuthenticated && (
                 <div className="px-4 py-2 flex items-center gap-3 border-t border-gray-200 dark:border-gray-800 pt-4 mt-2">
-                  <div className="w-10 h-10 rounded-full bg-blue-500 dark:bg-amber-400 flex items-center justify-center text-white dark:text-gray-900 font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-semibold">
                     {userName?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <div className="flex-1">
@@ -300,7 +328,7 @@ export function Header() {
                     setIsMenuOpen(false);
                     handleLogout();
                   }}
-                  className="px-4 py-2 text-base font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-center font-[var(--font-dm-sans)]"
+                  className="px-4 py-3 text-base font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-center font-[var(--font-dm-sans)] min-h-[44px] flex items-center justify-center"
                 >
                   Cerrar Sesión
                 </button>

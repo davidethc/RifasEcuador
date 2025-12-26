@@ -96,7 +96,7 @@ export default function SorteoDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 dark:border-amber-400"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 dark:border-accent-500"></div>
       </div>
     );
   }
@@ -128,7 +128,7 @@ export default function SorteoDetailPage() {
           </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+            className="px-6 py-3.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-semibold transition-colors font-[var(--font-dm-sans)] min-h-[44px]"
           >
             Volver al inicio
           </button>
@@ -138,12 +138,12 @@ export default function SorteoDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 lg:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 min-h-[85vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-10">
           {/* Imagen del sorteo */}
           <div className="relative flex flex-col">
-            <div className="relative w-full h-[350px] md:h-[450px] lg:h-[550px] bg-gradient-to-br from-blue-100 to-amber-100 dark:from-gray-700 dark:to-gray-600 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px] bg-gradient-to-br from-primary-100 to-accent-100 dark:from-gray-700 dark:to-gray-600 rounded-2xl overflow-hidden shadow-2xl">
               {raffle.image_url ? (
                 <Image
                   src={raffle.image_url}
@@ -156,7 +156,7 @@ export default function SorteoDetailPage() {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center p-8">
                   <svg
-                    className="w-32 h-32 md:w-40 md:h-40 text-blue-500 dark:text-amber-400 mb-4"
+                    className="w-32 h-32 md:w-40 md:h-40 text-primary-500 dark:text-accent-500 mb-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -176,11 +176,11 @@ export default function SorteoDetailPage() {
             </div>
 
             {/* Indicador para scroll - Conoce los premios - Solo Desktop */}
-            <div className="hidden lg:block mt-6 bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-dashed border-blue-300 dark:border-amber-400/50 shadow-md hover:shadow-lg transition-all cursor-pointer group">
+            <div className="hidden lg:block mt-6 bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-dashed border-primary-300 dark:border-accent-500/50 shadow-md hover:shadow-lg transition-all cursor-pointer group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-amber-400/20 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-primary-100 dark:bg-accent-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-primary-600 dark:text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                     </svg>
                   </div>
@@ -193,7 +193,7 @@ export default function SorteoDetailPage() {
                     </p>
                   </div>
                 </div>
-                <svg className="w-6 h-6 text-blue-600 dark:text-amber-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-primary-600 dark:text-accent-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
               </div>
@@ -202,47 +202,47 @@ export default function SorteoDetailPage() {
 
           {/* Información del sorteo */}
           <div className="flex flex-col justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 lg:p-10 border border-gray-200 dark:border-gray-700 shadow-2xl">
-              <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6 font-[var(--font-comfortaa)] leading-tight">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 lg:p-8 border border-gray-200 dark:border-gray-700 shadow-2xl">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4 lg:mb-6 font-[var(--font-comfortaa)] leading-tight">
                 {raffle.title}
               </h1>
 
               {raffle.description && (
-                <p className="text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-400 mb-6 md:mb-8 font-[var(--font-dm-sans)] leading-relaxed">
+                <p className="text-sm md:text-base lg:text-lg text-gray-600 dark:text-gray-400 mb-4 md:mb-6 lg:mb-8 font-[var(--font-dm-sans)] leading-relaxed">
                   {raffle.description}
                 </p>
               )}
 
               {/* Precio */}
-              <div className="mb-6 md:mb-8 p-6 md:p-8 bg-gradient-to-br from-blue-50 to-amber-50 dark:from-blue-900/20 dark:to-amber-900/20 rounded-2xl border-2 border-blue-200 dark:border-amber-400 shadow-inner">
+              <div className="mb-4 md:mb-6 lg:mb-8 p-4 md:p-6 lg:p-8 bg-gradient-to-br from-primary-50 to-accent-50 dark:from-blue-900/20 dark:to-amber-900/20 rounded-2xl border-2 border-blue-200 dark:border-amber-400 shadow-inner">
                 <div className="text-center">
-                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-2 font-[var(--font-dm-sans)] uppercase tracking-wide">
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 font-[var(--font-dm-sans)] uppercase tracking-wide">
                     Precio por boleto
                   </p>
-                  <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-blue-600 dark:text-amber-400 font-[var(--font-comfortaa)]">
+                  <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary-600 dark:text-accent-500 font-[var(--font-comfortaa)]">
                     {formatPrice(raffle.price_per_ticket)}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 font-[var(--font-dm-sans)]">
+                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-500 mt-2 font-[var(--font-dm-sans)]">
                     🎫 Compra fácil y rápida
                   </p>
                 </div>
               </div>
 
               {/* Información adicional */}
-              <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
-                <div className="text-center p-3 md:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-2 font-[var(--font-dm-sans)]">
+              <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-6 lg:mb-8">
+                <div className="text-center p-2 md:p-3 lg:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 md:mb-2 font-[var(--font-dm-sans)]">
                     Probabilidad
                   </p>
-                  <p className="text-base md:text-lg lg:text-xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)]">
+                  <p className="text-sm md:text-base lg:text-lg font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)]">
                     99%
                   </p>
                 </div>
-                <div className="text-center p-3 md:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-2 font-[var(--font-dm-sans)]">
+                <div className="text-center p-2 md:p-3 lg:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 md:mb-2 font-[var(--font-dm-sans)]">
                     Inicia
                   </p>
-                  <p className="text-sm md:text-base font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+                  <p className="text-xs md:text-sm font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
                     {raffle.start_date ? new Date(raffle.start_date).toLocaleDateString('es-EC', { day: 'numeric', month: 'short' }) : 'Pronto'}
                   </p>
                 </div>
@@ -264,17 +264,17 @@ export default function SorteoDetailPage() {
               <button
                 onClick={handleBuyTicket}
                 disabled={raffle.status !== 'active'}
-                className="w-full py-4 md:py-5 px-6 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 text-white dark:text-gray-900 rounded-xl font-bold text-lg md:text-xl hover:from-blue-700 hover:to-blue-800 dark:hover:from-amber-500 dark:hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-xl hover:shadow-2xl font-[var(--font-dm-sans)]"
+                className="w-full py-3.5 md:py-4 lg:py-5 px-6 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-bold text-base md:text-lg lg:text-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-xl hover:shadow-2xl font-[var(--font-dm-sans)] min-h-[48px]"
               >
                 ¡Comprar boletos ahora!
               </button>
 
               {/* Indicador para scroll - Conoce los premios - Solo Móvil */}
-              <div className="lg:hidden mt-6 bg-gradient-to-r from-blue-50 to-amber-50 dark:from-gray-700/50 dark:to-gray-600/50 rounded-xl p-4 border-2 border-dashed border-blue-300 dark:border-amber-400/50 shadow-md">
+              <div className="lg:hidden mt-6 bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-700/50 dark:to-gray-600/50 rounded-xl p-4 border-2 border-dashed border-primary-300 dark:border-accent-500/50 shadow-md">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-amber-400/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-blue-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 bg-primary-100 dark:bg-accent-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-primary-600 dark:text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                       </svg>
                     </div>
@@ -287,7 +287,7 @@ export default function SorteoDetailPage() {
                       </p>
                     </div>
                   </div>
-                  <svg className="w-6 h-6 text-blue-600 dark:text-amber-400 animate-bounce flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-primary-600 dark:text-accent-500 animate-bounce flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                   </svg>
                 </div>
@@ -318,7 +318,7 @@ export default function SorteoDetailPage() {
               >
                 {/* Imagen del premio */}
                 <div className="w-full md:w-1/2 relative">
-                  <div className="relative w-full h-64 md:h-80 bg-gradient-to-br from-blue-100 via-white to-amber-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700 rounded-xl overflow-hidden shadow-lg">
+                  <div className="relative w-full h-64 md:h-80 bg-gradient-to-br from-primary-100 via-white to-accent-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700 rounded-xl overflow-hidden shadow-lg">
                     <Image
                       src={premio.imagen}
                       alt={premio.nombre}
@@ -328,7 +328,7 @@ export default function SorteoDetailPage() {
                     />
                   </div>
                   {/* Badge del número de premio */}
-                  <div className="absolute -top-4 -left-4 w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white dark:border-gray-800">
+                  <div className="absolute -top-4 -left-4 w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-700 dark:from-accent-500 dark:to-accent-600 rounded-full flex items-center justify-center shadow-xl border-4 border-white dark:border-gray-800">
                     <span className="text-2xl font-bold text-white dark:text-gray-900 font-[var(--font-comfortaa)]">
                       {premio.id}
                     </span>
@@ -337,7 +337,7 @@ export default function SorteoDetailPage() {
 
                 {/* Información del premio */}
                 <div className="w-full md:w-1/2 text-center md:text-left">
-                  <p className="text-sm md:text-base text-blue-600 dark:text-amber-400 font-bold mb-2 font-[var(--font-dm-sans)] uppercase tracking-wide">
+                  <p className="text-sm md:text-base text-primary-600 dark:text-accent-500 font-bold mb-2 font-[var(--font-dm-sans)] uppercase tracking-wide">
                     {premio.descripcion}
                   </p>
                   <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4 font-[var(--font-comfortaa)]">
@@ -414,8 +414,8 @@ export default function SorteoDetailPage() {
                     </div>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-24 h-16 md:w-32 md:h-20 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg border-2 border-blue-200 dark:border-blue-700">
-                      <span className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-300 text-center px-2 font-[var(--font-dm-sans)]">
+                    <div className="w-24 h-16 md:w-32 md:h-20 flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg border-2 border-primary-200 dark:border-primary-700">
+                      <span className="text-xs md:text-sm font-bold text-primary-700 dark:text-primary-300 text-center px-2 font-[var(--font-dm-sans)]">
                         Transferencia Bancaria
                       </span>
                     </div>
@@ -429,7 +429,13 @@ export default function SorteoDetailPage() {
           </div>
 
           {/* Call to action final */}
-          <div className="mt-12 text-center bg-gradient-to-r from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 rounded-2xl p-8 md:p-12 shadow-2xl">
+          <div 
+            className="mt-12 text-center rounded-2xl p-8 md:p-12 shadow-2xl"
+            style={{
+              background: 'linear-gradient(90deg, #4eb79d, #48c28c, #7dc487, #d4fba6)',
+              WebkitBackground: 'linear-gradient(90deg, #4eb79d, #48c28c, #7dc487, #d4fba6)',
+            }}
+          >
             <h3 className="text-2xl md:text-3xl font-bold text-white dark:text-gray-900 mb-4 font-[var(--font-comfortaa)]">
               ¿Listo para ganar?
             </h3>
@@ -439,7 +445,7 @@ export default function SorteoDetailPage() {
             <button
               onClick={handleBuyTicket}
               disabled={raffle.status !== 'active'}
-              className="px-8 py-4 bg-white dark:bg-gray-900 text-blue-600 dark:text-amber-400 rounded-xl font-bold text-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 shadow-xl font-[var(--font-dm-sans)]"
+              className="px-6 md:px-8 py-3.5 md:py-4 bg-white dark:bg-gray-900 text-primary-500 rounded-xl font-bold text-base md:text-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-xl font-[var(--font-dm-sans)] min-h-[48px]"
             >
               Comprar boletos ahora
             </button>

@@ -95,7 +95,7 @@ export default function ConfirmacionPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 dark:border-amber-400 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 dark:border-accent-500 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
             Cargando información de tu compra...
           </p>
@@ -132,7 +132,7 @@ export default function ConfirmacionPage() {
           </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+            className="px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors font-[var(--font-dm-sans)]"
           >
             Volver al inicio
           </button>
@@ -146,7 +146,7 @@ export default function ConfirmacionPage() {
   const isExpired = order.status === 'expired';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 md:py-12">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 md:py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado con estado */}
         <div className="text-center mb-8">
@@ -186,7 +186,7 @@ export default function ConfirmacionPage() {
 
         {/* Números de boletos */}
         {order.numbers && order.numbers.length > 0 && (
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl border-2 border-green-200 dark:border-green-800 p-6 mb-8">
+          <div className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-2xl border-2 border-primary-200 dark:border-primary-800 p-6 mb-8">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center font-[var(--font-comfortaa)]">
               🎟️ Tus Números de la Suerte
             </h3>
@@ -241,7 +241,7 @@ export default function ConfirmacionPage() {
               </div>
               <div className="flex justify-between pt-2 border-t-2 border-gray-200 dark:border-gray-700">
                 <span className="text-gray-900 dark:text-white font-bold">Total Pagado:</span>
-                <span className="font-bold text-blue-600 dark:text-amber-400 text-lg">
+                <span className="font-bold text-primary-600 dark:text-accent-500 text-lg">
                   {formatPrice(order.total)}
                 </span>
               </div>
@@ -300,7 +300,7 @@ export default function ConfirmacionPage() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => router.push('/sorteos')}
-            className="px-8 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+            className="px-8 py-3 bg-primary-600 dark:bg-accent-500 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors font-[var(--font-dm-sans)]"
           >
             Ver más sorteos
           </button>
