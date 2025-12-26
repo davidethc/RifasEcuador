@@ -100,7 +100,6 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         titulo: raffle.title,
         premio: raffle.description || raffle.title,
         precio: raffle.price_per_ticket,
-        destacado: raffle.featured || false,
         imagen: raffle.image_url || '/rifa.png',
       }))
     : [
@@ -109,7 +108,6 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           titulo: "Sorteo Especial",
           premio: "Moto Yamaha MT-07 2024",
           precio: 1.00,
-          destacado: true,
           imagen: "/yamaha.jpg",
         },
         {
@@ -117,7 +115,6 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           titulo: "Gran Sorteo",
           premio: "Carro Kia 2024",
           precio: 1.00,
-          destacado: true,
           imagen: "/kia.jpg",
         },
         {
@@ -125,7 +122,6 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           titulo: "Sorteo Premium",
           premio: "Mazda 2024",
           precio: 1.00,
-          destacado: true,
           imagen: "/mazdaprin.png",
         },
       ];
