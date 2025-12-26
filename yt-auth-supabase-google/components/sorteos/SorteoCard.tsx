@@ -16,7 +16,7 @@ interface SorteoCardProps {
  * Tarjeta de sorteo individual
  * Muestra información del premio y permite acceder a los detalles
  */
-export function SorteoCard({ id, titulo, premio, precio, destacado = false, imagen }: SorteoCardProps) {
+export function SorteoCard({ id, titulo, premio, precio, destacado: _destacado = false, imagen }: SorteoCardProps) {
 
   // Formatear precio en dólares
   const formatPrice = (price: number) => {
