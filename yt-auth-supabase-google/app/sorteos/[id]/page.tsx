@@ -433,7 +433,6 @@ export default function SorteoDetailPage() {
             className="mt-12 text-center rounded-2xl p-8 md:p-12 shadow-2xl"
             style={{
               background: 'linear-gradient(90deg, #4eb79d, #48c28c, #7dc487, #d4fba6)',
-              WebkitBackground: 'linear-gradient(90deg, #4eb79d, #48c28c, #7dc487, #d4fba6)',
             }}
           >
             <h3 className="text-2xl md:text-3xl font-bold text-white dark:text-gray-900 mb-4 font-[var(--font-comfortaa)]">
