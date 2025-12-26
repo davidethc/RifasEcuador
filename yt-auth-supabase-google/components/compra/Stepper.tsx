@@ -17,8 +17,8 @@ interface StepperProps {
  */
 export function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <div className="w-full py-6 px-4 md:px-24 lg:px-48">
-      <div className="max-w-4xl mx-auto">
+    <div className="w-full py-6 px-4">
+      <div className="max-w-4xl mx-auto md:px-12 lg:px-30 md:mr-[30px]">
         {/* Stepper Desktop */}
         <div className="hidden md:flex items-center justify-between">
           {steps.map((step, index) => (
@@ -28,9 +28,9 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${
                     currentStep > step.id
-                      ? 'bg-green-500 text-white'
+                      ? 'bg-primary-500 text-white'
                       : currentStep === step.id
-                      ? 'bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 ring-4 ring-blue-200 dark:ring-amber-200'
+                      ? 'bg-primary-500 text-white ring-4 ring-primary-200'
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                   }`}
                 >
@@ -71,9 +71,9 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   <div
                     className={`absolute inset-0 rounded transition-all duration-500 ${
                       currentStep > step.id
-                        ? 'bg-green-500 w-full'
+                        ? 'bg-primary-500 w-full'
                         : currentStep === step.id
-                        ? 'bg-blue-600 dark:bg-amber-400 w-1/2'
+                        ? 'bg-primary-500 w-1/2'
                         : 'w-0'
                     }`}
                   ></div>
@@ -91,9 +91,9 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                 key={step.id}
                 className={`h-2 flex-1 rounded-full transition-all ${
                   currentStep > step.id
-                    ? 'bg-green-500'
+                    ? 'bg-primary-500'
                     : currentStep === step.id
-                    ? 'bg-blue-600 dark:bg-amber-400'
+                    ? 'bg-primary-500'
                     : 'bg-gray-200 dark:bg-gray-700'
                 }`}
               ></div>

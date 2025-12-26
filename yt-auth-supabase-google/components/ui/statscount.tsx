@@ -113,7 +113,7 @@ function AnimatedCounter({
     >
       <motion.div
         className={cn(
-          "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4 whitespace-nowrap text-blue-600 dark:text-amber-400"
+          "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4 whitespace-nowrap text-accent-700 dark:text-accent-600"
         )}
         initial={{ scale: 0.8 }}
         animate={isInView ? { scale: 1 } : { scale: 0.8 }}
@@ -155,7 +155,7 @@ export default function StatsCount({
     <motion.section
       ref={containerRef}
       className={cn(
-        "py-8 sm:py-12 lg:py-20 px-2 sm:px-4 md:px-8 w-full overflow-hidden",
+        "py-2 sm:py-4 px-2 sm:px-4 md:px-8 w-full overflow-hidden",
         className
       )}
       initial={{ opacity: 0 }}
@@ -163,7 +163,7 @@ export default function StatsCount({
       transition={{ duration: 0.8 }}
     >
       <motion.div
-        className={cn("text-center mb-8 sm:mb-12 lg:mb-16")}
+        className={cn("text-center mb-2 sm:mb-4")}
         initial={{ opacity: 0, y: -20 }}
         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
         transition={{ duration: 0.8, delay: 0.2 }}
@@ -214,7 +214,7 @@ export default function StatsCount({
       <div className={cn("w-full max-w-6xl mx-auto")}>
         <div
           className={cn(
-            "flex flex-row items-stretch justify-between gap-2 sm:gap-4 lg:gap-8 w-full min-h-[120px] sm:min-h-[140px]"
+            "flex flex-row items-stretch justify-between gap-2 sm:gap-4 lg:gap-8 w-full min-h-[80px] sm:min-h-[100px]"
           )}
         >
           {stats.map((stat, index) => (

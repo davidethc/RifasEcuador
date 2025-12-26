@@ -50,14 +50,14 @@ export function HeroSection() {
   }, [user, authLoading]);
 
   return (
-    <section className="relative w-full min-h-screen flex items-center pt-8 md:pt-12 pb-20 md:pb-28 overflow-hidden">
+    <section className="relative w-full min-h-[60vh] flex items-center pt-8 md:pt-12 pb-12 md:pb-16 overflow-hidden">
       {/* Fondo con gradiente */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 -z-10" />
       
       {/* Patrón decorativo */}
       <div className="absolute inset-0 opacity-5 dark:opacity-10 -z-10">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -73,10 +73,10 @@ export function HeroSection() {
             <AnimatedTextGenerate
               text="Premios reales. Ganadores reales. En todo el Ecuador 🇪🇨"
               className="mb-0"
-              textClassName="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight text-gray-900 dark:text-white"
+              textClassName="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-gray-900 dark:text-white"
               speed={0.4}
               highlightWords={[]}
-              highlightClassName="text-blue-600 dark:text-amber-400"
+              highlightClassName="text-primary-600 dark:text-accent-500"
               letterColors={{
                 "ecuador": [
                   "text-yellow-500 dark:text-yellow-400", // E - Amarillo
@@ -92,12 +92,12 @@ export function HeroSection() {
           </div>
 
           {/* Título principal */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 font-[var(--font-comfortaa)] leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6 font-[var(--font-comfortaa)] leading-tight">
             Sorteos Disponibles
           </h1>
 
           {/* Subtítulo */}
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 md:mb-12 font-[var(--font-dm-sans)] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6 md:mb-12 font-[var(--font-dm-sans)] max-w-2xl mx-auto leading-relaxed px-4">
             Participa en nuestros sorteos y gana increíbles premios
           </p>
 
@@ -105,7 +105,7 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <AnimatedButton
               onClick={() => router.push('/sorteos')}
-              className="w-full sm:w-auto px-8 py-4 text-base md:text-lg font-bold text-white bg-blue-600 dark:bg-amber-400 font-[var(--font-dm-sans)] border-0"
+              className="w-full sm:w-auto px-6 py-3.5 md:px-8 md:py-4 text-base md:text-lg font-bold text-white bg-primary-500 hover:bg-primary-600 font-[var(--font-dm-sans)] border-0 min-h-[44px]"
               variant="default"
               size="lg"
               glow={false}
@@ -118,31 +118,31 @@ export function HeroSection() {
               shimmerSize="0"
               shimmerDuration="0s"
               borderRadius="8px"
-              background="rgb(37 99 235)"
+              background="#3ab795"
             >
               Ver Sorteos
             </AnimatedButton>
             <Link
               href="/como-jugar"
-              className="w-full sm:w-auto px-8 py-4 text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-[var(--font-dm-sans)]"
+              className="w-full sm:w-auto px-6 py-3.5 md:px-8 md:py-4 text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-[var(--font-dm-sans)] min-h-[44px] flex items-center justify-center"
             >
               Cómo Funciona
             </Link>
           </div>
 
           {/* Bloque de Confianza */}
-          <div className="mt-12 md:mt-16 max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6 md:p-8 shadow-lg">
+          <div className="mt-8 md:mt-12 max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-4 md:p-6 lg:p-8 shadow-lg">
               {/* Título */}
-              <div className="text-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)] flex items-center justify-center gap-2">
-                  <span className="text-2xl">🔒</span>
+              <div className="text-center mb-4 md:mb-6">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)] flex items-center justify-center gap-2">
+                  <span className="text-xl md:text-2xl">🔒</span>
                   <span>Plataforma segura y legal</span>
                 </h2>
               </div>
 
               {/* Beneficios */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
                 <div className="flex items-start gap-3">
                   <span className="text-green-600 dark:text-green-400 text-xl font-bold mt-1">✔</span>
                   <div>
@@ -178,14 +178,14 @@ export function HeroSection() {
               </div>
 
               {/* Métodos de pago */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <p className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 font-[var(--font-dm-sans)]">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4 md:pt-6">
+                <p className="text-center text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 md:mb-4 font-[var(--font-dm-sans)]">
                   Métodos de pago disponibles
                 </p>
-                <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
+                <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 lg:gap-8">
                   {/* PayPhone */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className="relative w-24 h-16 md:w-32 md:h-20">
+                    <div className="relative w-20 h-14 md:w-28 md:h-18 lg:w-32 lg:h-20">
                       <Image
                         src="/payphonee.webp"
                         alt="PayPhone"
@@ -197,14 +197,14 @@ export function HeroSection() {
                   
                   {/* Transferencia Bancaria */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-24 h-16 md:w-32 md:h-20 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg border-2 border-blue-200 dark:border-blue-700">
-                      <span className="text-xs md:text-sm font-bold text-blue-700 dark:text-blue-300 text-center px-2 font-[var(--font-dm-sans)]">
+                    <div className="w-20 h-14 md:w-28 md:h-18 lg:w-32 lg:h-20 flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg border-2 border-primary-200 dark:border-primary-700">
+                      <span className="text-[10px] md:text-xs lg:text-sm font-bold text-primary-700 dark:text-primary-300 text-center px-1.5 md:px-2 font-[var(--font-dm-sans)] leading-tight">
                         Transferencia Bancaria
                       </span>
                     </div>
                   </div>
                 </div>
-                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 font-[var(--font-dm-sans)]">
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 md:mt-4 font-[var(--font-dm-sans)] px-4">
                   Pagos procesados de forma segura y verificada
                 </p>
               </div>
@@ -212,7 +212,7 @@ export function HeroSection() {
           </div>
 
           {/* Estadísticas animadas */}
-          <div className="mt-12 md:mt-16">
+          <div className="mt-4 md:mt-6">
             <StatsCount
               stats={[
                 {
@@ -234,7 +234,7 @@ export function HeroSection() {
               ]}
               title=""
               showDividers={true}
-              className="py-4"
+              className="py-0"
             />
           </div>
         </div>
@@ -251,7 +251,7 @@ export function HeroSection() {
                 {userTickets.length > 0 && (
                   <Link
                     href="/mis-boletos"
-                    className="text-sm md:text-base text-blue-600 dark:text-amber-400 hover:text-blue-700 dark:hover:text-amber-500 font-semibold font-[var(--font-dm-sans)] transition-colors"
+                    className="text-sm md:text-base text-primary-600 dark:text-accent-500 hover:text-primary-700 dark:hover:text-accent-600 font-semibold font-[var(--font-dm-sans)] transition-colors"
                   >
                     Ver todos →
                   </Link>
@@ -260,7 +260,7 @@ export function HeroSection() {
 
               {ticketsLoading ? (
                 <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-amber-400 mx-auto mb-4"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-accent-500 mx-auto mb-4"></div>
                   <p className="text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
                     Cargando tus boletos...
                   </p>
@@ -273,7 +273,7 @@ export function HeroSection() {
                   </p>
                   <Link
                     href="/sorteos"
-                    className="inline-block px-6 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+                    className="inline-block px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors font-[var(--font-dm-sans)]"
                   >
                     Ver Sorteos Disponibles
                   </Link>
@@ -283,7 +283,7 @@ export function HeroSection() {
                   {userTickets.slice(0, 3).map((ticket) => (
                     <div
                       key={ticket.order_id}
-                      className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl border-2 border-green-200 dark:border-green-800 p-4 md:p-6 hover:shadow-md transition-shadow"
+                      className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-xl border-2 border-primary-200 dark:border-primary-800 p-4 md:p-6 hover:shadow-md transition-shadow"
                     >
                       <div className="flex flex-col md:flex-row md:items-center gap-4">
                         {ticket.raffle_image_url && (
@@ -305,7 +305,7 @@ export function HeroSection() {
                             {ticket.ticket_numbers.slice(0, 5).map((num) => (
                               <span
                                 key={num}
-                                className="px-3 py-1 bg-white dark:bg-gray-800 border-2 border-green-500 dark:border-green-400 rounded-lg font-bold text-sm text-gray-900 dark:text-white font-[var(--font-comfortaa)]"
+                                className="px-3 py-1 bg-white dark:bg-gray-800 border-2 border-primary-500 dark:border-primary-400 rounded-lg font-bold text-sm text-gray-900 dark:text-white font-[var(--font-comfortaa)]"
                               >
                                 {num}
                               </span>
@@ -324,7 +324,7 @@ export function HeroSection() {
                                 day: 'numeric',
                               })}
                             </span>
-                            <span className="font-semibold text-blue-600 dark:text-amber-400">
+                            <span className="font-semibold text-primary-600 dark:text-accent-500">
                               {new Intl.NumberFormat('es-EC', {
                                 style: 'currency',
                                 currency: 'USD',
@@ -340,7 +340,7 @@ export function HeroSection() {
                     <div className="text-center pt-4">
                       <Link
                         href="/mis-boletos"
-                        className="inline-block px-6 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+                        className="inline-block px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors font-[var(--font-dm-sans)]"
                       >
                         Ver todos los boletos ({userTickets.length})
                       </Link>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { CertificationsBadge } from "@/components/certifications/CertificationsBadge";
 
 /**
  * Footer - Pie de página de la aplicación
@@ -30,12 +31,18 @@ export function Footer() {
 
   return (
     <footer className="w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        {/* 1. Certificaciones - Primero */}
+        <div className="mb-6 md:mb-10">
+          <CertificationsBadge />
+        </div>
+
+        {/* 2. Footer principal - Logo, navegación, legal, contacto */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-12 mb-6 md:mb-10">
           {/* Logo y descripción */}
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="flex items-center mb-4">
-              <div className="relative h-16 w-auto md:h-20 lg:h-24 aspect-[2/1]">
+            <Link href="/" className="flex items-center mb-3 md:mb-4">
+              <div className="relative h-12 w-auto md:h-16 lg:h-20 aspect-[2/1]">
                 <Image
                   src="/logo922.png"
                   alt="La Cima Logo"
@@ -52,15 +59,15 @@ export function Footer() {
 
           {/* Navegación */}
           <div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 font-[var(--font-dm-sans)]">
+            <h3 className="text-sm md:text-base font-bold text-gray-900 dark:text-white mb-3 md:mb-4 font-[var(--font-dm-sans)]">
               Navegación
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 md:space-y-3">
               {footerLinks.navegacion.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-amber-400 transition-colors font-[var(--font-dm-sans)]"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
                   >
                     {link.label}
                   </Link>
@@ -79,7 +86,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-amber-400 transition-colors font-[var(--font-dm-sans)]"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
                   >
                     {link.label}
                   </Link>
@@ -98,18 +105,18 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-amber-400 transition-colors font-[var(--font-dm-sans)]"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-            {/* Redes sociales (opcional) */}
+            {/* Redes sociales */}
             <div className="mt-6 flex gap-4">
               <a
                 href="#"
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-blue-600 dark:hover:bg-amber-400 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-primary-500 transition-colors"
                 aria-label="Facebook"
               >
                 <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -118,7 +125,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-blue-600 dark:hover:bg-amber-400 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-primary-500 transition-colors"
                 aria-label="Twitter"
               >
                 <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -127,7 +134,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-blue-600 dark:hover:bg-amber-400 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-primary-500 transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -138,14 +145,14 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Línea divisoria y copyright */}
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
+        {/* 3. Copyright pequeño - Más abajo */}
+        <div className="pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-800">
+          <div className="text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-500 font-[var(--font-dm-sans)]">
               © {currentYear} RIOBAMMBA. Todos los derechos reservados.
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
-              Sorteos legales y regulados
+            <p className="text-xs text-gray-500 dark:text-gray-500 font-[var(--font-dm-sans)] mt-1">
+              RUC: 0706567344001 • RIOMBAMBA, ECUADOR
             </p>
           </div>
         </div>

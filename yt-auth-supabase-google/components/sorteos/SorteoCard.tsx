@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { ViewersCounter } from "@/components/ui/viewers-counter";
 
 interface SorteoCardProps {
   id: string;
@@ -9,13 +10,15 @@ interface SorteoCardProps {
   premio: string;
   precio: number;
   imagen?: string;
+  totalNumbers?: number;
+  soldNumbers?: number;
 }
 
 /**
  * Tarjeta de sorteo individual
  * Muestra información del premio y permite acceder a los detalles
  */
-export function SorteoCard({ id, titulo, premio, precio, imagen }: SorteoCardProps) {
+export function SorteoCard({ id, titulo, premio, precio, imagen, totalNumbers = 1000, soldNumbers = 0 }: SorteoCardProps) {
 
   // Formatear precio en dólares
   const formatPrice = (price: number) => {
@@ -26,26 +29,30 @@ export function SorteoCard({ id, titulo, premio, precio, imagen }: SorteoCardPro
     }).format(price);
   };
 
+  // Calcular porcentaje de boletos vendidos
+  const progressPercentage = totalNumbers > 0 ? Math.min((soldNumbers / totalNumbers) * 100, 100) : 0;
+  const remainingNumbers = Math.max(totalNumbers - soldNumbers, 0);
+
   return (
     <Link
       href={`/sorteos/${id}`}
-      className="group relative block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-amber-400 transition-all transform hover:scale-[1.03] hover:shadow-2xl"
+      className="group relative block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-primary-500 transition-all hover:shadow-xl"
     >
       {/* Imagen del premio */}
-      <div className="relative w-full h-56 md:h-72 bg-gradient-to-br from-blue-100 via-white to-amber-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-600 overflow-hidden">
+      <div className="relative w-full h-48 md:h-72 bg-gradient-to-br from-secondary-100 via-white to-secondary-50 dark:from-gray-700 dark:via-gray-800 dark:to-gray-600 overflow-hidden">
         {imagen ? (
           <Image
             src={imagen}
             alt={premio}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-500"
+            className="object-cover transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center p-8">
             <div className="text-center">
               <svg
-                className="w-24 h-24 md:w-32 md:h-32 text-blue-500 dark:text-amber-400 mx-auto mb-4"
+                className="w-24 h-24 md:w-32 md:h-32 text-primary-500 dark:text-accent-500 mx-auto mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -66,28 +73,50 @@ export function SorteoCard({ id, titulo, premio, precio, imagen }: SorteoCardPro
       </div>
 
       {/* Contenido */}
-      <div className="p-6">
-        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 font-[var(--font-comfortaa)] group-hover:text-blue-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2">
-          {titulo}
-        </h3>
-        
-        {/* Precio destacado */}
-        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-amber-50 dark:from-gray-700/50 dark:to-gray-600/50 rounded-xl border border-blue-200 dark:border-gray-600">
-          <div className="flex items-baseline justify-center gap-2">
-            <span className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-amber-400 font-[var(--font-comfortaa)]">
-              {formatPrice(precio)}
-            </span>
+      <div className="p-4 md:p-6">
+        <div className="flex items-start justify-between mb-3 gap-2">
+          <h3 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)] group-hover:text-primary-500 transition-colors line-clamp-2 flex-1">
+            {titulo}
+          </h3>
+          <div className="flex-shrink-0">
+            <ViewersCounter min={8} max={20} />
           </div>
-          <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-1 font-[var(--font-dm-sans)]">
-            por boleto
-          </p>
         </div>
 
-        {/* Botón de acción */}
-        <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 text-white dark:text-gray-900 rounded-xl font-bold text-base hover:from-blue-700 hover:to-blue-800 dark:hover:from-amber-500 dark:hover:to-amber-600 transition-all transform group-hover:scale-105 shadow-lg hover:shadow-xl font-[var(--font-dm-sans)] flex items-center justify-center gap-2">
-          <span>¡Participar ahora!</span>
+        {/* Barra de progreso */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between text-xs mb-2">
+            <span className="text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
+              {soldNumbers} / {totalNumbers} boletos
+            </span>
+            <span className="font-semibold text-gray-900 dark:text-white font-[var(--font-dm-sans)]">
+              {progressPercentage.toFixed(0)}% vendidos
+            </span>
+          </div>
+          <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary-500 transition-all duration-500 rounded-full"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+          {remainingNumbers > 0 && remainingNumbers <= 50 && (
+            <p className="text-xs text-red-600 dark:text-red-400 font-semibold mt-1 font-[var(--font-dm-sans)]">
+              ⚠️ Solo quedan {remainingNumbers} boletos
+            </p>
+          )}
+        </div>
+
+        {/* Botón de acción - ACCENT (dorado) para destacar */}
+        <button 
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = `/sorteos/${id}`;
+          }}
+          className="w-full py-3.5 px-4 bg-accent-500 hover:bg-accent-600 text-gray-900 rounded-xl font-bold text-sm md:text-base transition-all shadow-lg hover:shadow-xl font-[var(--font-dm-sans)] flex items-center justify-center gap-2 active:scale-95 min-h-[48px]"
+        >
+          <span>Participar desde {formatPrice(precio)}</span>
           <svg
-            className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
+            className="w-5 h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

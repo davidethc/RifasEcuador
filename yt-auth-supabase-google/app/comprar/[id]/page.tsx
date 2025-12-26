@@ -10,13 +10,12 @@ import type { Raffle } from '@/types/database.types';
 // Componentes
 import { Stepper } from '@/components/compra/Stepper';
 import { TicketSelector } from '@/components/compra/TicketSelector';
-import { PurchaseForm } from '@/components/compra/PurchaseForm';
-import { PaymentMethod } from '@/components/compra/PaymentMethod';
+import { PurchaseFormWithPayment } from '@/components/compra/PurchaseFormWithPayment';
 import { HeroCarousel } from '@/components/ui/hero-carousel';
 
 /**
  * Página principal del proceso de compra
- * Implementa un flujo de 3 pasos con stepper visual
+ * Implementa un flujo de 2 pasos con stepper visual
  */
 export default function ComprarPage() {
   const params = useParams();
@@ -84,19 +83,15 @@ export default function ComprarPage() {
     }
   };
 
-  // Manejar envío del formulario
-  const handleFormSubmit = async (data: typeof formData) => {
-    const newSaleId = await createPurchase(data);
-    if (newSaleId) {
-      nextStep();
-    }
+  // Manejar envío del formulario (ahora retorna el saleId directamente)
+  const handleFormSubmit = async (data: typeof formData): Promise<string | null> => {
+    return await createPurchase(data);
   };
 
-  // Pasos del stepper
+  // Pasos del stepper (ahora solo 2 pasos)
   const steps = [
     { id: 1, title: 'Seleccionar cantidad', description: 'Elige cuántos boletos deseas' },
-    { id: 2, title: 'Completar datos', description: 'Ingresa tu información' },
-    { id: 3, title: 'Método de pago', description: 'Realiza el pago' },
+    { id: 2, title: 'Datos y pago', description: 'Completa tu información y realiza el pago' },
   ];
 
   const purchaseCarouselImages = [
@@ -111,7 +106,7 @@ export default function ComprarPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 dark:border-amber-400 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 dark:border-accent-500 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
             Cargando información del sorteo...
           </p>
@@ -148,7 +143,7 @@ export default function ComprarPage() {
           </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-amber-500 transition-colors font-[var(--font-dm-sans)]"
+            className="px-6 py-3 bg-primary-600 dark:bg-accent-500 text-white dark:text-gray-900 rounded-lg font-semibold hover:bg-primary-700 dark:hover:bg-accent-600 transition-colors font-[var(--font-dm-sans)]"
           >
             Volver al inicio
           </button>
@@ -159,7 +154,7 @@ export default function ComprarPage() {
 
   // Main content
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-4 md:py-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-4 md:py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Carrusel destacado */}
         <div className="mb-6 md:mb-8 w-full md:max-w-4xl lg:max-w-5xl mx-auto">
@@ -170,7 +165,7 @@ export default function ComprarPage() {
         <div className="flex justify-center mb-6 md:mb-8">
           <button
             onClick={() => router.push(`/sorteos/${raffleId}`)}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 text-white dark:text-gray-900 rounded-xl font-bold text-base md:text-lg hover:from-blue-700 hover:to-blue-800 dark:hover:from-amber-500 dark:hover:to-amber-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl font-[var(--font-dm-sans)] flex items-center gap-2"
+            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 dark:from-accent-500 dark:to-accent-600 text-white dark:text-gray-900 rounded-xl font-bold text-base md:text-lg hover:from-primary-700 hover:to-primary-800 dark:hover:from-accent-600 dark:hover:to-accent-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl font-[var(--font-dm-sans)] flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -218,79 +213,23 @@ export default function ComprarPage() {
           )}
 
           {currentStep === 2 && (
-            <PurchaseForm
+            <PurchaseFormWithPayment
               initialData={formData}
               onSubmit={handleFormSubmit}
               onBack={previousStep}
               isLoading={isLoading}
               quantity={quantity}
               totalAmount={quantity * raffle.price_per_ticket}
+              raffleTitle={raffle.title}
+              saleId={saleId}
+              orderId={orderId}
+              ticketNumbers={ticketNumbers}
             />
-          )}
-
-          {currentStep === 3 && saleId && (
-            <div className="space-y-6">
-              {/* Mostrar números reservados */}
-              {ticketNumbers.length > 0 && (
-                <div className="max-w-4xl mx-auto bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl border-2 border-green-200 dark:border-green-800 p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)]">
-                        ¡Tus números han sido reservados!
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
-                        Estos números están reservados por 10 minutos. Completa el pago para confirmarlos.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {ticketNumbers.map((num) => (
-                      <div
-                        key={num}
-                        className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-green-500 dark:border-green-400 rounded-lg font-bold text-lg text-gray-900 dark:text-white font-[var(--font-comfortaa)]"
-                      >
-                        {num}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <PaymentMethod
-                orderId={orderId ?? undefined}
-                amount={quantity * raffle.price_per_ticket}
-                customerData={formData}
-                raffleTitle={raffle.title}
-                onSuccess={() => {
-                  // Redirigir a página de confirmación (cuando esté lista)
-                  router.push(`/comprar/${saleId}/confirmacion`);
-                }}
-                onError={(error) => {
-                  console.error('Error en pago:', error);
-                }}
-              />
-            </div>
           )}
           </div>
         </div>
 
-        {/* Botón volver (solo en pasos 2 y 3) */}
-        {currentStep > 1 && currentStep < 3 && (
-          <div className="flex justify-center mt-8 md:mt-12">
-            <button
-              onClick={previousStep}
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors font-[var(--font-dm-sans)] flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>Volver al paso anterior</span>
-            </button>
-          </div>
-        )}
+        {/* Botón volver (solo en paso 2, pero el componente lo maneja internamente) */}
       </div>
     </div>
   );

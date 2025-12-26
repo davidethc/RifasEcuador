@@ -51,7 +51,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           
           const result = await supabase
             .from('raffles')
-            .select('id, title, description, price_per_ticket, total_numbers, status, start_date, end_date, created_at')
+            .select('id, title, description, price_per_ticket, total_numbers, status, start_date, end_date, created_at, image_url')
             .eq('status', 'active')
             .order('created_at', { ascending: false });
           
@@ -91,9 +91,44 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
     fetchRaffles();
   }, []);
 
+  // Obtener boletos vendidos para cada sorteo
+  const [soldCounts, setSoldCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    async function fetchSoldCounts() {
+      if (raffles.length === 0) return;
+
+      try {
+        const counts: Record<string, number> = {};
+        
+        for (const raffle of raffles) {
+          const { count, error } = await supabase
+            .from('tickets')
+            .select('*', { count: 'exact', head: true })
+            .eq('raffle_id', raffle.id)
+            .eq('status', 'paid');
+
+          if (!error && count !== null) {
+            counts[raffle.id] = count;
+          } else {
+            counts[raffle.id] = 0;
+          }
+        }
+
+        setSoldCounts(counts);
+      } catch (err) {
+        console.error('Error al obtener conteo de boletos:', err);
+      }
+    }
+
+    if (raffles.length > 0) {
+      fetchSoldCounts();
+    }
+  }, [raffles]);
+
   // Datos de fallback si no hay en Supabase o está cargando
-  const sorteosDestacados: Sorteo[] = sorteos && sorteos.length > 0
-    ? sorteos
+  const sorteosDestacados: (Sorteo & { totalNumbers?: number; soldNumbers?: number })[] = sorteos && sorteos.length > 0
+    ? sorteos.map(s => ({ ...s, totalNumbers: 1000, soldNumbers: 0 }))
     : raffles.length > 0
     ? raffles.map((raffle) => ({
         id: raffle.id,
@@ -101,6 +136,8 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         premio: raffle.description || raffle.title,
         precio: raffle.price_per_ticket,
         imagen: raffle.image_url || '/rifa.png',
+        totalNumbers: raffle.total_numbers || 1000,
+        soldNumbers: soldCounts[raffle.id] || 0,
       }))
     : [
         {
@@ -109,6 +146,8 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           premio: "Moto Yamaha MT-07 2024",
           precio: 1.00,
           imagen: "/yamaha.jpg",
+          totalNumbers: 1000,
+          soldNumbers: 450,
         },
         {
           id: "2",
@@ -116,6 +155,8 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           premio: "Carro Kia 2024",
           precio: 1.00,
           imagen: "/kia.jpg",
+          totalNumbers: 1000,
+          soldNumbers: 320,
         },
         {
           id: "3",
@@ -123,17 +164,19 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           premio: "Mazda 2024",
           precio: 1.00,
           imagen: "/mazdaprin.png",
+          totalNumbers: 1000,
+          soldNumbers: 680,
         },
       ];
 
   return (
-    <section className="w-full">
-      <div className="max-w-7xl mx-auto">
+    <section className="w-full py-4 md:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Loading state */}
         {isLoading && (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-amber-400"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-accent-500"></div>
           </div>
         )}
 
@@ -146,7 +189,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
 
         {/* Sorteos grid */}
         {!isLoading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {sorteosDestacados.map((sorteo) => (
               <SorteoCard
                 key={sorteo.id}
@@ -155,6 +198,8 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
                 premio={sorteo.premio}
                 precio={sorteo.precio}
                 imagen={sorteo.imagen}
+                totalNumbers={sorteo.totalNumbers}
+                soldNumbers={sorteo.soldNumbers}
               />
             ))}
           </div>

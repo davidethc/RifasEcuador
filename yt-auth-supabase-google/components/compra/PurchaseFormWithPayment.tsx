@@ -1,29 +1,40 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { PurchaseFormData } from '@/types/purchase.types';
+import { PaymentMethod } from './PaymentMethod';
 
-interface PurchaseFormProps {
+interface PurchaseFormWithPaymentProps {
   initialData?: Partial<PurchaseFormData>;
-  onSubmit: (data: PurchaseFormData) => Promise<void>;
+  onSubmit: (data: PurchaseFormData) => Promise<string | null>;
   onBack?: () => void;
   isLoading?: boolean;
   quantity: number;
   totalAmount: number;
+  raffleTitle: string;
+  saleId: string | null;
+  orderId: string | null;
+  ticketNumbers: string[];
 }
 
 /**
- * Componente de formulario para datos personales del comprador
- * Incluye validación en tiempo real
+ * Componente combinado que fusiona el formulario de datos y el método de pago
+ * Muestra el formulario primero, y cuando se completa, muestra el método de pago
  */
-export function PurchaseForm({
+export function PurchaseFormWithPayment({
   initialData,
   onSubmit,
   onBack,
   isLoading = false,
   quantity,
   totalAmount,
-}: PurchaseFormProps) {
+  raffleTitle,
+  saleId,
+  orderId,
+  ticketNumbers,
+}: PurchaseFormWithPaymentProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState<PurchaseFormData>({
     name: initialData?.name || '',
     lastName: initialData?.lastName || '',
@@ -35,6 +46,8 @@ export function PurchaseForm({
 
   const [errors, setErrors] = useState<Partial<PurchaseFormData>>({});
   const [touched, setTouched] = useState<Set<keyof PurchaseFormData>>(new Set());
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Validar un campo específico
   const validateField = (field: keyof PurchaseFormData, value: string): string | null => {
@@ -72,7 +85,6 @@ export function PurchaseForm({
     (Object.keys(formData) as Array<keyof PurchaseFormData>).forEach((field) => {
       if (field !== 'documentId') { // documentId es opcional
         const fieldValue = formData[field];
-        // Asegurar que el valor sea string antes de validar
         if (typeof fieldValue === 'string') {
           const error = validateField(field, fieldValue);
           if (error) {
@@ -80,7 +92,6 @@ export function PurchaseForm({
             isValid = false;
           }
         } else {
-          // Si el campo es requerido y no tiene valor, es un error
           newErrors[field] = `El campo ${field} es requerido`;
           isValid = false;
         }
@@ -95,13 +106,11 @@ export function PurchaseForm({
   const handleChange = (field: keyof PurchaseFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     
-    // Validar en tiempo real si el campo ya fue tocado
     if (touched.has(field)) {
       const error = validateField(field, value);
       setErrors((prev) => ({ ...prev, [field]: error || undefined }));
     }
 
-    // Si es confirmEmail, también validar contra email
     if (field === 'confirmEmail' || field === 'email') {
       if (touched.has('confirmEmail')) {
         const confirmError = validateField(
@@ -117,7 +126,6 @@ export function PurchaseForm({
   const handleBlur = (field: keyof PurchaseFormData) => {
     setTouched((prev) => new Set(prev).add(field));
     const fieldValue = formData[field];
-    // Asegurar que el valor sea string antes de validar
     const valueToValidate = typeof fieldValue === 'string' ? fieldValue : '';
     const error = validateField(field, valueToValidate);
     setErrors((prev) => ({ ...prev, [field]: error || undefined }));
@@ -127,7 +135,6 @@ export function PurchaseForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Marcar todos los campos como tocados
     setTouched(
       new Set(Object.keys(formData) as Array<keyof PurchaseFormData>)
     );
@@ -136,7 +143,17 @@ export function PurchaseForm({
       return;
     }
 
-    await onSubmit(formData);
+    setIsSubmitting(true);
+    try {
+      const newSaleId = await onSubmit(formData);
+      if (newSaleId) {
+        setIsFormSubmitted(true);
+      }
+    } catch (error) {
+      console.error('Error al enviar formulario:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -149,7 +166,7 @@ export function PurchaseForm({
 
   const getInputClassName = (field: keyof PurchaseFormData) => {
     const baseClass =
-      'w-full px-4 py-3 border-2 rounded-xl focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-[var(--font-dm-sans)] transition-colors';
+      'w-full px-4 py-3.5 md:py-3 text-base md:text-sm border-2 rounded-xl focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-[var(--font-dm-sans)] transition-colors';
     
     if (errors[field] && touched.has(field)) {
       return `${baseClass} border-red-500 focus:border-red-600`;
@@ -159,14 +176,16 @@ export function PurchaseForm({
       return `${baseClass} border-green-500 focus:border-green-600`;
     }
     
-    return `${baseClass} border-gray-300 dark:border-gray-600 focus:border-blue-600 dark:focus:border-amber-400`;
+    return `${baseClass} border-gray-300 dark:border-gray-600 focus:border-primary-600 dark:focus:border-accent-500`;
   };
 
+  // Mostrar formulario y método de pago en la misma vista
   return (
+    <div className="space-y-6">
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 font-[var(--font-comfortaa)]">
-          Completa tus datos
+          Completa tus datos y pago
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
           Necesitamos tu información para procesar tu compra
@@ -175,7 +194,7 @@ export function PurchaseForm({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Columna izquierda: Formulario */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6 space-y-4">
+        <div className={`bg-white dark:bg-gray-800 rounded-2xl border-2 ${isFormSubmitted ? 'border-green-200 dark:border-green-800 opacity-75' : 'border-gray-200 dark:border-gray-700'} p-6 space-y-4`}>
           {/* Nombre */}
           <div>
             <label htmlFor="name" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
@@ -188,6 +207,7 @@ export function PurchaseForm({
               onChange={(e) => handleChange('name', e.target.value)}
               onBlur={() => handleBlur('name')}
               placeholder="Ingresa tu nombre"
+              disabled={isFormSubmitted}
               className={getInputClassName('name')}
             />
             {errors.name && touched.has('name') && (
@@ -207,6 +227,7 @@ export function PurchaseForm({
               onChange={(e) => handleChange('lastName', e.target.value)}
               onBlur={() => handleBlur('lastName')}
               placeholder="Ingresa tu apellido"
+              disabled={isFormSubmitted}
               className={getInputClassName('lastName')}
             />
             {errors.lastName && touched.has('lastName') && (
@@ -226,6 +247,7 @@ export function PurchaseForm({
               onChange={(e) => handleChange('whatsapp', e.target.value)}
               onBlur={() => handleBlur('whatsapp')}
               placeholder="Ej: +593 939039191 o 0939039191"
+              disabled={isFormSubmitted}
               className={getInputClassName('whatsapp')}
             />
             {errors.whatsapp && touched.has('whatsapp') && (
@@ -245,6 +267,7 @@ export function PurchaseForm({
               onChange={(e) => handleChange('email', e.target.value)}
               onBlur={() => handleBlur('email')}
               placeholder="tu@email.com"
+              disabled={isFormSubmitted}
               className={getInputClassName('email')}
             />
             {errors.email && touched.has('email') && (
@@ -264,6 +287,7 @@ export function PurchaseForm({
               onChange={(e) => handleChange('confirmEmail', e.target.value)}
               onBlur={() => handleBlur('confirmEmail')}
               placeholder="Confirma tu correo"
+              disabled={isFormSubmitted}
               className={getInputClassName('confirmEmail')}
             />
             {errors.confirmEmail && touched.has('confirmEmail') && (
@@ -283,6 +307,7 @@ export function PurchaseForm({
               value={formData.documentId}
               onChange={(e) => handleChange('documentId', e.target.value)}
               placeholder="Ej: 1234567890"
+              disabled={isFormSubmitted}
               className={getInputClassName('documentId')}
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-[var(--font-dm-sans)]">
@@ -293,7 +318,7 @@ export function PurchaseForm({
 
         {/* Columna derecha: Resumen */}
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-blue-50 to-amber-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border-2 border-blue-200 dark:border-amber-400/50 p-6">
+          <div className="bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl border-2 border-secondary-200 dark:border-gray-600 p-6">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 font-[var(--font-comfortaa)]">
               Resumen de la compra
             </h3>
@@ -310,21 +335,21 @@ export function PurchaseForm({
               </div>
               <div className="flex justify-between text-lg font-bold pt-3 border-t-2 border-gray-300 dark:border-gray-600 font-[var(--font-comfortaa)]">
                 <span className="text-gray-900 dark:text-white">Total a pagar:</span>
-                <span className="text-blue-600 dark:text-amber-400">{formatPrice(totalAmount)}</span>
+                <span className="text-gray-900 font-bold">{formatPrice(totalAmount)}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-2xl p-4">
+          <div className="bg-accent-100 border-2 border-accent-300 rounded-2xl p-4">
             <div className="flex gap-3">
-              <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-gray-900 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
               <div>
-                <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-1 font-[var(--font-dm-sans)]">
+                <p className="text-sm font-semibold text-gray-900 mb-1 font-[var(--font-dm-sans)]">
                   Nota importante
                 </p>
-                <p className="text-xs text-yellow-700 dark:text-yellow-300 font-[var(--font-dm-sans)]">
+                <p className="text-xs text-gray-800 font-[var(--font-dm-sans)]">
                   Tus números de boletos se asignarán automáticamente después de completar el pago. Los recibirás por correo y WhatsApp.
                 </p>
               </div>
@@ -333,45 +358,105 @@ export function PurchaseForm({
         </div>
       </div>
 
-      {/* Botones de acción */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-        {onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={isLoading}
-            className="px-8 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold text-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-[var(--font-dm-sans)]"
-          >
-            Volver
-          </button>
-        )}
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 text-white dark:text-gray-900 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-blue-800 dark:hover:from-amber-500 dark:hover:to-amber-600 transition-all transform hover:scale-[1.02] shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-dm-sans)] flex items-center justify-center gap-2"
-        >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>Procesando...</span>
-            </>
-          ) : (
-            <>
-              <span>Continuar al pago</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </>
+      {/* Botones de acción - Solo mostrar si el formulario no ha sido enviado */}
+      {!isFormSubmitted && (
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={isSubmitting || isLoading}
+              className="px-8 py-4 md:py-3 text-base md:text-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-[var(--font-dm-sans)] min-h-[48px]"
+            >
+              Volver
+            </button>
           )}
-        </button>
-      </div>
+          <button
+            type="submit"
+            disabled={isSubmitting || isLoading}
+            className="px-8 py-4 md:py-3 text-base md:text-lg bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-bold transition-all transform hover:scale-[1.02] shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-dm-sans)] flex items-center justify-center gap-2 min-h-[48px]"
+          >
+            {(isSubmitting || isLoading) ? (
+              <>
+                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Procesando...</span>
+              </>
+            ) : (
+              <>
+                <span>Reservar números y continuar al pago</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </form>
+
+    {/* Mostrar método de pago cuando el formulario esté completado */}
+    {isFormSubmitted && saleId && (
+      <div className="space-y-6 mt-8">
+        {/* Mostrar números reservados */}
+        {ticketNumbers.length > 0 && (
+          <div className="max-w-4xl mx-auto bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl border-2 border-green-200 dark:border-green-800 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)]">
+                  ¡Tus números han sido reservados!
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
+                  Estos números están reservados por 10 minutos. Completa el pago para confirmarlos.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {ticketNumbers.map((num) => (
+                <div
+                  key={num}
+                  className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-green-500 dark:border-green-400 rounded-lg font-bold text-lg text-gray-900 dark:text-white font-[var(--font-comfortaa)]"
+                >
+                  {num}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <PaymentMethod
+          orderId={orderId ?? undefined}
+          amount={totalAmount}
+          customerData={formData}
+          raffleTitle={raffleTitle}
+          onSuccess={() => {
+            router.push(`/comprar/${saleId}/confirmacion`);
+          }}
+          onError={(error) => {
+            console.error('Error en pago:', error);
+          }}
+        />
+
+        {/* Botón para volver a editar datos */}
+        <div className="flex justify-center">
+          <button
+            onClick={() => setIsFormSubmitted(false)}
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors font-[var(--font-dm-sans)] flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Editar datos</span>
+          </button>
+        </div>
+      </div>
+    )}
+    </div>
   );
 }
-
-
-
 

@@ -117,15 +117,15 @@ function PayphoneCallbackContent() {
       <div className="max-w-md w-full">
         {status === 'loading' && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 dark:border-amber-400 mx-auto mb-6"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 dark:border-accent-500 mx-auto mb-6"></div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-[var(--font-comfortaa)]">
               Procesando pago
             </h2>
             <p className="text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
               {message}
             </p>
-            <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <p className="text-sm text-blue-800 dark:text-blue-200 font-[var(--font-dm-sans)]">
+            <div className="mt-6 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4">
+              <p className="text-sm text-primary-800 dark:text-primary-200 font-[var(--font-dm-sans)]">
                 Por favor espera mientras confirmamos tu pago...
               </p>
             </div>
@@ -175,7 +175,7 @@ export default function PayphoneCallbackPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 dark:border-amber-400"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 dark:border-accent-500"></div>
       </div>
     }>
       <PayphoneCallbackContent />

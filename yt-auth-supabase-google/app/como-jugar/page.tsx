@@ -40,7 +40,7 @@ export default function ComoJugarPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="w-full min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Sección principal */}
       <section className="relative py-12 md:py-16 lg:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -79,13 +79,13 @@ export default function ComoJugarPage() {
             {pasos.map((paso) => (
               <div
                 key={paso.numero}
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-500 dark:hover:border-amber-400"
+                className="bg-white dark:bg-gray-800 rounded-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary-500 dark:hover:border-accent-500"
               >
                 <div className="flex items-start gap-4">
                   {/* Número del paso */}
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-100 dark:bg-amber-900/30 flex items-center justify-center">
-                      <span className="text-xl md:text-2xl font-bold text-blue-600 dark:text-amber-400 font-[var(--font-comfortaa)]">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary-100 dark:bg-accent-900/30 flex items-center justify-center">
+                      <span className="text-xl md:text-2xl font-bold text-primary-600 dark:text-accent-500 font-[var(--font-comfortaa)]">
                         {paso.numero}
                       </span>
                     </div>
@@ -113,9 +113,9 @@ export default function ComoJugarPage() {
             <div className="text-center">
               {/* Ícono de chat */}
               <div className="inline-flex items-center justify-center mb-6">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-blue-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary-100 dark:bg-accent-900/30 flex items-center justify-center">
                   <svg
-                    className="w-8 h-8 md:w-10 md:h-10 text-blue-600 dark:text-amber-400"
+                    className="w-8 h-8 md:w-10 md:h-10 text-primary-600 dark:text-accent-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -129,7 +129,7 @@ export default function ComoJugarPage() {
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-amber-400 mb-4 font-[var(--font-comfortaa)]">
+              <h3 className="text-2xl md:text-3xl font-bold text-primary-600 dark:text-accent-500 mb-4 font-[var(--font-comfortaa)]">
                 ¿Tienes preguntas?
               </h3>
               <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 font-[var(--font-dm-sans)]">

@@ -50,7 +50,7 @@ export default function TerminosPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="w-full min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Sección principal */}
       <section className="relative py-12 md:py-16 lg:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
@@ -73,31 +73,29 @@ export default function TerminosPage() {
               </h2>
 
               {/* Lista de términos */}
-              <div className="space-y-6 md:space-y-8">
+              <div className="space-y-8 md:space-y-10">
                 {terminos.map((termino, index) => (
-                  <div key={termino.numero}>
+                  <div key={termino.numero} className="relative">
                     <div className="flex items-start gap-4 md:gap-6">
-                      {/* Número del término */}
+                      {/* Número del término - Minimalista */}
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-600 dark:bg-amber-400 flex items-center justify-center shadow-md">
-                          <span className="text-xl md:text-2xl font-bold text-white dark:text-gray-900 font-[var(--font-comfortaa)]">
-                            {termino.numero}
-                          </span>
-                        </div>
+                        <span className="text-2xl md:text-3xl font-bold text-gray-400 dark:text-gray-500 font-[var(--font-comfortaa)]">
+                          {termino.numero}.
+                        </span>
                       </div>
                       {/* Contenido */}
-                      <div className="flex-1 pt-1">
+                      <div className="flex-1">
                         <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 font-[var(--font-comfortaa)]">
                           {termino.titulo}
                         </h3>
-                        <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-[var(--font-dm-sans)]">
+                        <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed font-[var(--font-dm-sans)]">
                           {termino.descripcion}
                         </p>
                       </div>
                     </div>
-                    {/* Separador (excepto en el último) */}
+                    {/* Separador sutil (excepto en el último) */}
                     {index < terminos.length - 1 && (
-                      <div className="mt-6 md:mt-8 border-t border-gray-200 dark:border-gray-700" />
+                      <div className="mt-8 md:mt-10 border-t border-gray-100 dark:border-gray-800" />
                     )}
                   </div>
                 ))}
@@ -108,7 +106,7 @@ export default function TerminosPage() {
                 <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 md:p-6">
                   <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
                     <span className="text-gray-500 dark:text-gray-500">Última actualización: </span>
-                    <span className="text-blue-600 dark:text-amber-400 font-semibold">
+                    <span className="text-primary-600 dark:text-accent-500 font-semibold">
                       {new Date().toLocaleDateString('es-ES', {
                         year: 'numeric',
                         month: 'long',
