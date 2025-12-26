@@ -12,6 +12,7 @@ import { Stepper } from '@/components/compra/Stepper';
 import { TicketSelector } from '@/components/compra/TicketSelector';
 import { PurchaseForm } from '@/components/compra/PurchaseForm';
 import { PaymentMethod } from '@/components/compra/PaymentMethod';
+import { HeroCarousel } from '@/components/ui/hero-carousel';
 
 /**
  * Página principal del proceso de compra
@@ -98,6 +99,13 @@ export default function ComprarPage() {
     { id: 3, title: 'Método de pago', description: 'Realiza el pago' },
   ];
 
+  const purchaseCarouselImages = [
+    { src: "/imagenhero.png", alt: "Premios destacados" },
+    { src: "/kia.jpg", alt: "Kia Sedan" },
+    { src: "/mazdaprin.png", alt: "Mazda CX-3 SUV" },
+    { src: "/yamaha.jpg", alt: "Yamaha Motocicleta" },
+  ];
+
   // Loading state
   if (authLoading || raffleLoading) {
     return (
@@ -152,7 +160,25 @@ export default function ComprarPage() {
   // Main content
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-4 md:py-6">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Carrusel destacado */}
+        <div className="mb-6 md:mb-8 w-full md:max-w-4xl lg:max-w-5xl mx-auto">
+          <HeroCarousel images={purchaseCarouselImages} ratio={20 / 9} />
+        </div>
+
+        {/* Botón conocer más premios */}
+        <div className="flex justify-center mb-6 md:mb-8">
+          <button
+            onClick={() => router.push(`/sorteos/${raffleId}`)}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-amber-400 dark:to-amber-500 text-white dark:text-gray-900 rounded-xl font-bold text-base md:text-lg hover:from-blue-700 hover:to-blue-800 dark:hover:from-amber-500 dark:hover:to-amber-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl font-[var(--font-dm-sans)] flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+            Conocer más de los premios
+          </button>
+        </div>
+
         {/* Stepper con los 3 pasos */}
         <div className="mb-6 md:mb-8">
           <Stepper steps={steps} currentStep={currentStep} />

@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   // Número de WhatsApp (formato: código país + número, sin + ni espacios)
   // Ejemplo: '593939039191' para Ecuador
-  const whatsappNumber = '593939039191'; // Cambia este número por el tuyo
+  const whatsappNumber = '593986910158'; // Cambia este número por el tuyo
 
   return (
     <html lang="es" suppressHydrationWarning>
