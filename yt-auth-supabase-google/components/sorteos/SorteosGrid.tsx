@@ -158,7 +158,6 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
                 titulo={sorteo.titulo}
                 premio={sorteo.premio}
                 precio={sorteo.precio}
-                destacado={sorteo.destacado}
                 imagen={sorteo.imagen}
               />
             ))}
