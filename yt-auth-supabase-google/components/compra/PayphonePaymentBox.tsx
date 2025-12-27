@@ -170,11 +170,19 @@ export function PayphonePaymentBox({
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
         const responseUrl = `${appUrl}/payment/payphone/callback`;
 
+        // Limpiar número de teléfono: quitar espacios, paréntesis, guiones
+        let cleanPhone = customerData.whatsapp.startsWith('+') 
+          ? customerData.whatsapp 
+          : `+593${customerData.whatsapp.replace(/^0/, '')}`;
+        // Remover todos los caracteres no numéricos excepto el +
+        cleanPhone = cleanPhone.replace(/[^\d+]/g, '');
+
         console.log('🚀 Inicializando Cajita de Pagos:', {
           orderId,
           clientTransactionId,
           amount: amountInCents,
           responseUrl,
+          phoneNumber: cleanPhone,
         });
 
         // Configuración de la Cajita de Pagos
@@ -198,9 +206,7 @@ export function PayphonePaymentBox({
           defaultMethod: 'card', // 'card' para tarjeta, 'payphone' para app
 
           // Datos del cliente (obligatorios según documentación)
-          phoneNumber: customerData.whatsapp.startsWith('+') 
-            ? customerData.whatsapp 
-            : `+593${customerData.whatsapp.replace(/^0/, '')}`,
+          phoneNumber: cleanPhone,
           email: customerData.email,
           documentId: customerData.documentId || '9999999999',
           identificationType: customerData.documentId ? 1 : 1, // 1=Cédula, 2=RUC, 3=Pasaporte
