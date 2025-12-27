@@ -58,10 +58,10 @@ export function Header() {
   };
 
   const userName = getUserName();
-  
+
   // Estado para el ancho de la ventana
   const [windowWidth, setWindowWidth] = useState(1024);
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWindowWidth(window.innerWidth);
@@ -70,7 +70,7 @@ export function Header() {
       return () => window.removeEventListener('resize', handleResize);
     }
   }, []);
-  
+
   // Truncar nombre si es muy largo para desktop
   const getDisplayName = (name: string | null) => {
     if (!name) return "Usuario";
@@ -146,8 +146,8 @@ export function Header() {
           background: isDarkMode
             ? 'linear-gradient(180deg, #1A1F2E, #1D2338)'
             : 'rgba(255, 255, 255, 0.8)',
-          border: isDarkMode 
-            ? '1px solid rgba(255,255,255,0.08)' 
+          border: isDarkMode
+            ? '1px solid rgba(255,255,255,0.08)'
             : '1px solid rgba(229, 231, 235, 0.5)',
           boxShadow: isDarkMode
             ? '0 8px 30px rgba(0,0,0,0.6), 0 1px 0 rgba(212,175,55,0.25)'
@@ -158,25 +158,25 @@ export function Header() {
         <div className="flex-shrink-0">
           <Link href="/">
             <Image
-              src="/logo922.png"
+              src="/logo1.webp"
               alt="La Cima Logo"
-              width={50}
-              height={50}
-              className="[@media(min-width:768px)]:w-[55px] [@media(min-width:768px)]:h-[55px] [@media(min-width:1024px)]:w-[60px] [@media(min-width:1024px)]:h-[60px] cursor-pointer hover:scale-110 transition-transform duration-200"
+              width={70}
+              height={70}
+              className="[@media(min-width:768px)]:w-[80px] [@media(min-width:768px)]:h-[80px] [@media(min-width:1024px)]:w-[90px] [@media(min-width:1024px)]:h-[90px] cursor-pointer hover:scale-110 transition-transform duration-200"
             />
           </Link>
         </div>
 
         {/* Último chance - Solo móvil */}
         <div className="[@media(min-width:640px)]:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <span 
+          <span
             className="text-sm font-bold italic"
             style={{
               color: '#00BFFF',
               textShadow: '0 0 10px rgba(0, 191, 255, 0.5)',
             }}
           >
-          Ecuador andino
+            Ecuador andino
           </span>
         </div>
 
