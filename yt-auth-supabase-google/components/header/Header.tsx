@@ -58,6 +58,26 @@ export function Header() {
   };
 
   const userName = getUserName();
+  
+  // Estado para el ancho de la ventana
+  const [windowWidth, setWindowWidth] = useState(1024);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      const handleResize = () => setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+  
+  // Truncar nombre si es muy largo para desktop
+  const getDisplayName = (name: string | null) => {
+    if (!name) return "Usuario";
+    const maxLength = windowWidth >= 1024 ? 15 : 10;
+    if (name.length <= maxLength) return name;
+    return name.substring(0, maxLength) + "...";
+  };
 
   useEffect(() => {
     if (resolvedTheme === "dark") {
@@ -121,14 +141,17 @@ export function Header() {
         initial={{ width: "95%" }}
         animate={{ width: "95%" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative flex items-center justify-between w-full max-w-5xl h-auto py-3 px-4 [@media(min-width:768px)]:px-6 backdrop-blur-xl border rounded-2xl shadow-2xl transition-all duration-300"
+        className="relative flex items-center justify-between w-full max-w-6xl h-auto py-2.5 [@media(min-width:768px)]:py-3 px-3 [@media(min-width:640px)]:px-4 [@media(min-width:768px)]:px-5 [@media(min-width:1024px)]:px-6 border rounded-2xl transition-all duration-300"
         style={{
           background: isDarkMode
-            ? 'linear-gradient(180deg, rgba(11, 18, 32, 0.9), rgba(14, 22, 39, 0.9))'
+            ? 'linear-gradient(180deg, #1A1F2E, #1D2338)'
             : 'rgba(255, 255, 255, 0.8)',
-          borderColor: isDarkMode ? 'rgba(212,175,55,0.2)' : 'rgba(229, 231, 235, 0.5)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          border: isDarkMode 
+            ? '1px solid rgba(255,255,255,0.08)' 
+            : '1px solid rgba(229, 231, 235, 0.5)',
+          boxShadow: isDarkMode
+            ? '0 8px 30px rgba(0,0,0,0.6), 0 1px 0 rgba(212,175,55,0.25)'
+            : '0 4px 12px rgba(0,0,0,0.1)',
         }}
       >
         {/* Logo */}
@@ -137,20 +160,33 @@ export function Header() {
             <Image
               src="/logo922.png"
               alt="La Cima Logo"
-              width={60}
-              height={60}
-              className="cursor-pointer hover:scale-110 transition-transform duration-200"
+              width={50}
+              height={50}
+              className="[@media(min-width:768px)]:w-[55px] [@media(min-width:768px)]:h-[55px] [@media(min-width:1024px)]:w-[60px] [@media(min-width:1024px)]:h-[60px] cursor-pointer hover:scale-110 transition-transform duration-200"
             />
           </Link>
         </div>
 
+        {/* Último chance - Solo móvil */}
+        <div className="[@media(min-width:640px)]:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <span 
+            className="text-sm font-bold italic"
+            style={{
+              color: '#00BFFF',
+              textShadow: '0 0 10px rgba(0, 191, 255, 0.5)',
+            }}
+          >
+          Ecuador andino
+          </span>
+        </div>
+
         {/* Navegación Desktop */}
-        <nav className="hidden [@media(min-width:640px)]:flex items-center space-x-4 [@media(min-width:768px)]:space-x-6">
+        <nav className="hidden [@media(min-width:640px)]:flex items-center space-x-3 [@media(min-width:768px)]:space-x-4 [@media(min-width:1024px)]:space-x-5">
           {navLinks.map((item, index) => (
             <Link
               key={index}
               href={item.href}
-              className="text-sm [@media(min-width:768px)]:text-base font-medium text-gray-700 hover:text-gray-900 dark:hover:text-[#D4AF37] transition-colors duration-200 relative group"
+              className="text-xs [@media(min-width:768px)]:text-sm [@media(min-width:1024px)]:text-base font-medium text-gray-700 hover:text-gray-900 dark:hover:text-[#D4AF37] transition-colors duration-200 relative group whitespace-nowrap"
               style={{ color: isDarkMode ? '#E5E7EB' : undefined }}
             >
               {item.label}
@@ -160,19 +196,19 @@ export function Header() {
         </nav>
 
         {/* Botones de acción Desktop */}
-        <div className="hidden [@media(min-width:640px)]:flex items-center space-x-3">
+        <div className="hidden [@media(min-width:640px)]:flex items-center space-x-2 [@media(min-width:768px)]:space-x-3">
           {isAuthenticated ? (
             <>
               <Link
                 href="/mis-boletos"
-                className="px-4 py-2 text-sm font-semibold hover:text-[#D4AF37] transition-colors font-[var(--font-dm-sans)]"
+                className="px-3 [@media(min-width:768px)]:px-4 py-2 text-xs [@media(min-width:768px)]:text-sm font-semibold hover:text-[#D4AF37] transition-colors font-[var(--font-dm-sans)] whitespace-nowrap"
                 style={{ color: isDarkMode ? '#E5E7EB' : '#0F172A' }}
               >
                 Mis boletos
               </Link>
               <button
                 onClick={() => router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e")}
-                className="px-6 py-2.5 text-sm font-bold rounded-full transition-all duration-200 font-[var(--font-dm-sans)] hover:transform hover:-translate-y-0.5"
+                className="px-4 [@media(min-width:768px)]:px-5 [@media(min-width:1024px)]:px-6 py-2 [@media(min-width:768px)]:py-2.5 text-xs [@media(min-width:768px)]:text-sm font-bold rounded-full transition-all duration-200 font-[var(--font-dm-sans)] hover:transform hover:-translate-y-0.5 whitespace-nowrap"
                 style={{
                   background: '#D4AF37',
                   color: '#111111',
@@ -188,21 +224,22 @@ export function Header() {
                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(212,175,55,0.25)';
                 }}
               >
-                Participar - Desde $1.00
+                <span className="hidden [@media(min-width:1024px)]:inline">Participar - Desde $1.00</span>
+                <span className="[@media(min-width:1024px)]:hidden">Participar</span>
               </button>
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-sky-100 dark:hover:bg-neutral-800 transition-colors"
+                  className="flex items-center gap-1.5 [@media(min-width:768px)]:gap-2 px-2 [@media(min-width:768px)]:px-3 py-2 rounded-lg hover:bg-sky-100 dark:hover:bg-neutral-800 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center text-white font-semibold text-sm">
+                  <div className="w-7 h-7 [@media(min-width:768px)]:w-8 [@media(min-width:768px)]:h-8 rounded-full bg-sky-600 flex items-center justify-center text-white font-semibold text-xs [@media(min-width:768px)]:text-sm flex-shrink-0">
                     {userName?.[0]?.toUpperCase() || "U"}
                   </div>
-                  <span className="text-sm font-medium text-sky-800 dark:text-sky-300 font-[var(--font-dm-sans)]">
-                    {userName}
+                  <span className="text-xs [@media(min-width:768px)]:text-sm font-medium text-sky-800 dark:text-sky-300 font-[var(--font-dm-sans)] max-w-[80px] [@media(min-width:1024px)]:max-w-[120px] truncate">
+                    {getDisplayName(userName)}
                   </span>
                   <svg
-                    className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                    className={`w-3.5 h-3.5 [@media(min-width:768px)]:w-4 [@media(min-width:768px)]:h-4 text-gray-500 dark:text-gray-400 transition-transform flex-shrink-0 ${isDropdownOpen ? "rotate-180" : ""
                       }`}
                     fill="none"
                     stroke="currentColor"
@@ -240,7 +277,7 @@ export function Header() {
             <>
               <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 font-[var(--font-dm-sans)]"
+                className="px-3 [@media(min-width:768px)]:px-4 py-2 text-xs [@media(min-width:768px)]:text-sm font-semibold rounded-lg transition-all duration-200 font-[var(--font-dm-sans)] whitespace-nowrap"
                 style={{
                   background: isDarkMode ? '#FFFFFF' : '#FFFFFF',
                   color: '#111111',
@@ -257,7 +294,7 @@ export function Header() {
               </Link>
               <button
                 onClick={() => router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e")}
-                className="px-6 py-2.5 text-sm font-bold rounded-full transition-all duration-200 font-[var(--font-dm-sans)] hover:transform hover:-translate-y-0.5"
+                className="px-4 [@media(min-width:768px)]:px-5 [@media(min-width:1024px)]:px-6 py-2 [@media(min-width:768px)]:py-2.5 text-xs [@media(min-width:768px)]:text-sm font-bold rounded-full transition-all duration-200 font-[var(--font-dm-sans)] hover:transform hover:-translate-y-0.5 whitespace-nowrap"
                 style={{
                   background: '#D4AF37',
                   color: '#111111',
@@ -273,7 +310,8 @@ export function Header() {
                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(212,175,55,0.25)';
                 }}
               >
-                Participar - Desde $1.00
+                <span className="hidden [@media(min-width:1024px)]:inline">Participar - Desde $1.00</span>
+                <span className="[@media(min-width:1024px)]:hidden">Participar</span>
               </button>
             </>
           )}
