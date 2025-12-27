@@ -29,7 +29,7 @@ export default function ConfirmacionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = params.id as string;
-  
+
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export default function ConfirmacionPage() {
 
       // Usar el endpoint API que tiene acceso admin a la base de datos
       const response = await fetch(`/api/orders/${orderId}`);
-      
+
       if (!response.ok) {
         console.error('Error al obtener orden:', response.status);
         setError('No se pudo cargar la información de la orden');
@@ -146,7 +146,7 @@ export default function ConfirmacionPage() {
   const isExpired = order.status === 'expired';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 md:py-12">
+    <div className="min-h-screen py-8 md:py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado con estado */}
         <div className="text-center mb-8">
@@ -282,11 +282,10 @@ export default function ConfirmacionPage() {
               )}
               <div>
                 <p className="text-gray-600 dark:text-gray-400 mb-1">Estado</p>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                  isCompleted ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400' :
-                  isPending ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400' :
-                  'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400'
-                }`}>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${isCompleted ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400' :
+                    isPending ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400' :
+                      'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400'
+                  }`}>
                   {isCompleted && '✓ Completado'}
                   {isPending && '⏳ Pendiente'}
                   {isExpired && '✗ Expirado'}

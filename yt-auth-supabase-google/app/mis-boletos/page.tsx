@@ -67,7 +67,7 @@ export default function MisBoletosPage() {
   // Estado de carga inicial
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 dark:border-amber-400 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
@@ -84,7 +84,7 @@ export default function MisBoletosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Header */}
         <div className="text-center mb-10 md:mb-16">
@@ -205,20 +205,19 @@ export default function MisBoletosPage() {
                     {/* Estado y acciones */}
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                       <div className="flex items-center gap-2">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                          ticket.status === 'completed' 
-                            ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400' 
-                            : ticket.status === 'expired'
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${ticket.status === 'completed'
+                          ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400'
+                          : ticket.status === 'expired'
                             ? 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400'
                             : 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400'
-                        }`}>
-                          {ticket.status === 'completed' 
-                            ? '✓ Completado' 
+                          }`}>
+                          {ticket.status === 'completed'
+                            ? '✓ Completado'
                             : ticket.status === 'expired'
-                            ? '✗ Expirado'
-                            : ticket.status === 'reserved'
-                            ? '⏳ Reservado'
-                            : '⏳ Pendiente'}
+                              ? '✗ Expirado'
+                              : ticket.status === 'reserved'
+                                ? '⏳ Reservado'
+                                : '⏳ Pendiente'}
                         </span>
                       </div>
                       <Link

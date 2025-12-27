@@ -37,8 +37,8 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
-        <h2 className="text-xl font-semibold mb-4">Reset Password</h2>
-        
+        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Reset Password</h2>
+
         {success ? (
           <div className="space-y-4">
             <p className="text-green-600 dark:text-green-400">
@@ -54,7 +54,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
         ) : (
           <div className="space-y-4">
             {error && (
-              <p className="text-red-500 text-sm">{error}</p>
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
             )}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -65,7 +65,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-gray-900 px-3 py-2"
                 required
               />
             </div>
@@ -80,7 +80,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
               <button
                 onClick={handleResetPassword}
                 disabled={isLoading}
-                className="py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="py-2 px-4 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-lg hover:bg-blue-700 dark:hover:bg-amber-500 disabled:opacity-50 transition-colors"
               >
                 {isLoading ? 'Sending...' : 'Send Reset Link'}
               </button>

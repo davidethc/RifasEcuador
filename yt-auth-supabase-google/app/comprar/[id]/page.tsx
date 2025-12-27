@@ -22,7 +22,7 @@ export default function ComprarPage() {
   const router = useRouter();
   const { isLoading: authLoading } = useAuth();
   const raffleId = params.id as string;
-  
+
   const [raffle, setRaffle] = useState<Raffle | null>(null);
   const [raffleLoading, setRaffleLoading] = useState(true);
   const [raffleError, setRaffleError] = useState<string | null>(null);
@@ -154,7 +154,7 @@ export default function ComprarPage() {
 
   // Main content
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-4 md:py-6">
+    <div className="min-h-screen py-4 md:py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Carrusel destacado */}
         <div className="mb-6 md:mb-8 w-full md:max-w-4xl lg:max-w-5xl mx-auto">
@@ -203,29 +203,29 @@ export default function ComprarPage() {
         {/* Contenido según el paso actual - Centrado */}
         <div className="flex justify-center">
           <div className="w-full max-w-4xl px-4 sm:px-6 md:px-8">
-          {currentStep === 1 && (
-            <TicketSelector
-              pricePerTicket={raffle.price_per_ticket}
-              selectedQuantity={quantity}
-              onQuantityChange={setQuantity}
-              onContinue={handleContinueFromQuantity}
-            />
-          )}
+            {currentStep === 1 && (
+              <TicketSelector
+                pricePerTicket={raffle.price_per_ticket}
+                selectedQuantity={quantity}
+                onQuantityChange={setQuantity}
+                onContinue={handleContinueFromQuantity}
+              />
+            )}
 
-          {currentStep === 2 && (
-            <PurchaseFormWithPayment
-              initialData={formData}
-              onSubmit={handleFormSubmit}
-              onBack={previousStep}
-              isLoading={isLoading}
-              quantity={quantity}
-              totalAmount={quantity * raffle.price_per_ticket}
-              raffleTitle={raffle.title}
-              saleId={saleId}
-              orderId={orderId}
-              ticketNumbers={ticketNumbers}
-            />
-          )}
+            {currentStep === 2 && (
+              <PurchaseFormWithPayment
+                initialData={formData}
+                onSubmit={handleFormSubmit}
+                onBack={previousStep}
+                isLoading={isLoading}
+                quantity={quantity}
+                totalAmount={quantity * raffle.price_per_ticket}
+                raffleTitle={raffle.title}
+                saleId={saleId}
+                orderId={orderId}
+                ticketNumbers={ticketNumbers}
+              />
+            )}
           </div>
         </div>
 

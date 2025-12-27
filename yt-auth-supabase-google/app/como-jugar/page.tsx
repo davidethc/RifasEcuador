@@ -40,7 +40,7 @@ export default function ComoJugarPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="w-full min-h-screen">
       {/* Sección principal */}
       <section className="relative py-12 md:py-16 lg:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
