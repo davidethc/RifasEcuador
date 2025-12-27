@@ -20,7 +20,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({
   images,
-  ratio = 23 / 9,
+  ratio = 25 / 9,
   autoplayInterval = 5000,
   className,
   showIndicators = true,
