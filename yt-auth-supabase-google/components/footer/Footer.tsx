@@ -44,7 +44,7 @@ export function Footer() {
             <Link href="/" className="flex items-center mb-3 md:mb-4">
               <div className="relative h-12 w-auto md:h-16 lg:h-20 aspect-[2/1]">
                 <Image
-                  src="/logo922.png"
+                  src="/logo1.webp"
                   alt="La Cima Logo"
                   fill
                   className="object-contain"
