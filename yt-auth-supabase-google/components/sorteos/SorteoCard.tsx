@@ -76,8 +76,8 @@ export function SorteoCard({ id, titulo, premio, precio, imagen, totalNumbers = 
       <div className="p-4 md:p-6">
         <div className="flex items-start justify-between mb-3 gap-2">
           <h3 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)] group-hover:text-primary-500 transition-colors line-clamp-2 flex-1">
-            {titulo}
-          </h3>
+          {titulo}
+        </h3>
           <div className="flex-shrink-0">
             <ViewersCounter min={8} max={20} />
           </div>
@@ -102,7 +102,7 @@ export function SorteoCard({ id, titulo, premio, precio, imagen, totalNumbers = 
           {remainingNumbers > 0 && remainingNumbers <= 50 && (
             <p className="text-xs text-red-600 dark:text-red-400 font-semibold mt-1 font-[var(--font-dm-sans)]">
               ⚠️ Solo quedan {remainingNumbers} boletos
-            </p>
+          </p>
           )}
         </div>
 

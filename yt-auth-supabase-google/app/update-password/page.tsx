@@ -55,7 +55,7 @@ export default function UpdatePasswordPage() {
       });
 
       if (error) throw error;
-      
+
       setSuccess(true);
       // Redirect to login after successful password update
       setTimeout(() => {
@@ -72,7 +72,7 @@ export default function UpdatePasswordPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold">Update Password</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Update Password</h2>
           <p className="mt-2 text-gray-600 dark:text-gray-300">
             Please enter your new password
           </p>
@@ -127,7 +127,7 @@ export default function UpdatePasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-white dark:text-gray-900 bg-blue-600 dark:bg-amber-400 hover:bg-blue-700 dark:hover:bg-amber-500 disabled:opacity-50 transition-colors"
             >
               {isLoading ? 'Updating...' : 'Update Password'}
             </button>

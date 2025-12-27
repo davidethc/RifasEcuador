@@ -56,7 +56,7 @@ export default function VerifyEmailPage() {
               ) : (
                 <button
                   onClick={handleResendEmail}
-                  className="text-blue-600 hover:text-blue-500"
+                  className="text-blue-600 dark:text-amber-400 hover:text-blue-500 dark:hover:text-amber-500 transition-colors"
                 >
                   now
                 </button>
@@ -67,7 +67,7 @@ export default function VerifyEmailPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/login')}
-              className="text-sm text-blue-600 hover:text-blue-500"
+              className="text-sm text-blue-600 dark:text-amber-400 hover:text-blue-500 dark:hover:text-amber-500 transition-colors"
             >
               ← Back to login
             </button>

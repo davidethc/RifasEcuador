@@ -9,7 +9,7 @@ import { SorteosGrid } from '@/components/sorteos';
  */
 export default function SorteosPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
         {/* Título principal compacto */}
         <div className="mb-6 md:mb-10">
@@ -39,7 +39,7 @@ export default function SorteosPage() {
             </div>
           </div>
         </div>
-        
+
         <SorteosGrid />
       </div>
     </div>

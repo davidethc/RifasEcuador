@@ -30,13 +30,13 @@ export default function LoginPage() {
       if (isSignUp) {
         const { data, error } = await signUpWithEmail(email, password);
         if (error) throw error;
-        
+
         // Check if the user needs to verify their email
         if (data?.user && !data.user.email_confirmed_at) {
           router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
           return;
         }
-        
+
         router.replace('/');
       } else {
         await signInWithEmail(email, password);
@@ -58,14 +58,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-      <LoginForm
-        onSubmit={handleSubmit}
-        onGoogleSignIn={signInWithGoogle}
-        isLoading={isLoading}
-        error={error}
-      />
+        <LoginForm
+          onSubmit={handleSubmit}
+          onGoogleSignIn={signInWithGoogle}
+          isLoading={isLoading}
+          error={error}
+        />
       </div>
     </div>
   );

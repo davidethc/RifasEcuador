@@ -51,10 +51,7 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full min-h-[60vh] flex items-center pt-8 md:pt-12 pb-12 md:pb-16 overflow-hidden">
-      {/* Fondo con gradiente */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 -z-10" />
-      
-      {/* Patrón decorativo */}
+      {/* Patrón decorativo - Opcional, menos prominente */}
       <div className="absolute inset-0 opacity-5 dark:opacity-10 -z-10">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500 rounded-full blur-3xl" />
@@ -194,7 +191,7 @@ export function HeroSection() {
                       />
                     </div>
                   </div>
-                  
+
                   {/* Transferencia Bancaria */}
                   <div className="flex flex-col items-center gap-2">
                     <div className="w-20 h-14 md:w-28 md:h-18 lg:w-32 lg:h-20 flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg border-2 border-primary-200 dark:border-primary-700">

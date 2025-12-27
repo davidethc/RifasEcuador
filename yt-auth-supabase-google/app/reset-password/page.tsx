@@ -21,7 +21,7 @@ export default function ResetPasswordPage() {
 
   const handleResetPassword = async () => {
     if (!email) return;
-    
+
     setIsLoading(true);
     setError('');
 
@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold">Invalid Request</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Invalid Request</h2>
             <p className="mt-2 text-gray-600 dark:text-gray-300">
               No email address provided. Please try the reset password link again.
             </p>
@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold">Reset Password</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Reset Password</h2>
           <p className="mt-2 text-gray-600 dark:text-gray-300">
             Sending reset link to: <span className="font-medium">{email}</span>
           </p>
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
             {error}
             <button
               onClick={handleResetPassword}
-              className="ml-2 underline hover:text-red-600"
+              className="ml-2 underline hover:text-red-600 dark:hover:text-red-400 transition-colors"
             >
               Try again
             </button>
