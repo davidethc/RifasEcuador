@@ -470,7 +470,18 @@ export function Header() {
                       <Link
                         href="/login"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block w-full px-4 py-2 text-sm font-semibold text-center text-sky-800 dark:text-sky-300 border-2 border-sky-300 dark:border-sky-600 rounded-lg hover:bg-sky-50 dark:hover:bg-neutral-800 transition-colors font-[var(--font-dm-sans)]"
+                        className="block w-full px-4 py-2 text-sm font-semibold text-center rounded-lg transition-all duration-200 font-[var(--font-dm-sans)]"
+                        style={{
+                          background: isDarkMode ? '#FFFFFF' : '#FFFFFF',
+                          color: '#111111',
+                          border: '2px solid #D4AF37',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#FFF8E1';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = isDarkMode ? '#FFFFFF' : '#FFFFFF';
+                        }}
                       >
                         Iniciar Sesión
                       </Link>
