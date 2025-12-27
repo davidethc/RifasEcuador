@@ -72,7 +72,7 @@ export function PayphonePaymentBox({
   const token = process.env.NEXT_PUBLIC_PAYPHONE_TOKEN;
   const storeId = process.env.NEXT_PUBLIC_PAYPHONE_STORE_ID;
 
-  // Debug: Log temporal para verificar variables (eliminar después)
+  // Debug: Log temporal para verificar variables (eliminar despudés)
   useEffect(() => {
     console.log('🔍 Debug Payphone Variables:', {
       hasToken: !!token,
