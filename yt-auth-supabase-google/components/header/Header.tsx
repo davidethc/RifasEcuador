@@ -23,12 +23,9 @@ export function Header() {
   const [chainLength, setChainLength] = useState(48);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [showGlow, setShowGlow] = useState(false);
-  const [glowPosition, setGlowPosition] = useState<'above' | 'below'>('below');
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navBarRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
 
   const { theme, setTheme, resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
@@ -65,25 +62,14 @@ export function Header() {
   useEffect(() => {
     if (resolvedTheme === "dark") {
       setChainPulled(true);
-      setShowGlow(true);
-      setGlowPosition("above");
       setChainLength(72);
     } else {
       setChainPulled(false);
-      setShowGlow(false);
-      setGlowPosition("below");
       setChainLength(48);
     }
   }, [resolvedTheme]);
 
-  const calculateGlowPosition = (currentDragY: number) => {
-    if (!titleRef.current || !navBarRef.current) return "below";
-    const navBarRect = navBarRef.current.getBoundingClientRect();
-    const titleRect = titleRef.current.getBoundingClientRect();
-    const chainEndY = navBarRect.bottom + chainLength + currentDragY;
-    const titleCenterY = titleRect.top + titleRect.height / 2;
-    return chainEndY < titleCenterY ? "above" : "below";
-  };
+
 
   const handleDragStart = () => {
     setIsDragging(true);
@@ -97,7 +83,6 @@ export function Header() {
       setTheme(newTheme);
       setChainPulled(newTheme === "dark");
       setChainLength(newTheme === "dark" ? 72 : 48);
-      setShowGlow(newTheme === "dark");
     }
     setTimeout(() => {
       setDragY(0);
@@ -361,10 +346,6 @@ export function Header() {
             onDrag={(event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
               const newDragY = Math.max(0, info.offset.y);
               setDragY(newDragY);
-              if (newDragY > 4) {
-                const position = calculateGlowPosition(newDragY);
-                setGlowPosition(position);
-              }
             }}
             whileHover={{ scale: 1.05 }}
             whileDrag={{
