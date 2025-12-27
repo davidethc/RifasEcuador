@@ -72,8 +72,28 @@ export function PayphonePaymentBox({
   const token = process.env.NEXT_PUBLIC_PAYPHONE_TOKEN;
   const storeId = process.env.NEXT_PUBLIC_PAYPHONE_STORE_ID;
 
+  // Debug: Log temporal para verificar variables (eliminar después)
+  useEffect(() => {
+    console.log('🔍 Debug Payphone Variables:', {
+      hasToken: !!token,
+      hasStoreId: !!storeId,
+      tokenLength: token?.length || 0,
+      storeIdValue: storeId || 'NO DEFINIDO',
+      allEnvVars: {
+        NEXT_PUBLIC_PAYPHONE_TOKEN: process.env.NEXT_PUBLIC_PAYPHONE_TOKEN ? 'DEFINIDO' : 'NO DEFINIDO',
+        NEXT_PUBLIC_PAYPHONE_STORE_ID: process.env.NEXT_PUBLIC_PAYPHONE_STORE_ID ? 'DEFINIDO' : 'NO DEFINIDO',
+        NEXT_PUBLIC_PAYPHONE_ENVIRONMENT: process.env.NEXT_PUBLIC_PAYPHONE_ENVIRONMENT || 'NO DEFINIDO',
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'NO DEFINIDO',
+      }
+    });
+  }, []);
+
   useEffect(() => {
     if (!token || !storeId) {
+      console.error('❌ Variables faltantes:', {
+        token: token ? 'OK' : 'FALTA',
+        storeId: storeId ? 'OK' : 'FALTA'
+      });
       setLoadError('Configuración de Payphone incompleta. Verifica las variables de entorno.');
       return;
     }
