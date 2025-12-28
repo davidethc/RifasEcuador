@@ -146,7 +146,7 @@ export default function ConfirmacionPage() {
   const isExpired = order.status === 'expired';
 
   return (
-    <div className="min-h-screen py-8 md:py-12">
+    <div className="min-h-screen pt-8 md:pt-12 pb-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado con estado */}
         <div className="text-center mb-8">
@@ -283,8 +283,8 @@ export default function ConfirmacionPage() {
               <div>
                 <p className="text-gray-600 dark:text-gray-400 mb-1">Estado</p>
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${isCompleted ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400' :
-                    isPending ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400' :
-                      'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400'
+                  isPending ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400' :
+                    'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400'
                   }`}>
                   {isCompleted && '✓ Completado'}
                   {isPending && '⏳ Pendiente'}
