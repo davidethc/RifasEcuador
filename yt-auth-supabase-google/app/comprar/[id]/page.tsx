@@ -154,7 +154,7 @@ export default function ComprarPage() {
 
   // Main content
   return (
-    <div className="min-h-screen py-4 md:py-6">
+    <div className="min-h-screen pt-8 md:pt-12 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Carrusel destacado */}
         <div className="mb-6 md:mb-8 w-full md:max-w-4xl lg:max-w-5xl mx-auto">
