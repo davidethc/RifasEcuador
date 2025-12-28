@@ -170,12 +170,41 @@ export function PayphonePaymentBox({
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
         const responseUrl = `${appUrl}/payment/payphone/callback`;
 
-        // Limpiar número de teléfono: quitar espacios, paréntesis, guiones
-        let cleanPhone = customerData.whatsapp.startsWith('+') 
-          ? customerData.whatsapp 
-          : `+593${customerData.whatsapp.replace(/^0/, '')}`;
-        // Remover todos los caracteres no numéricos excepto el +
+        // Limpiar y validar número de teléfono de Ecuador
+        let cleanPhone = customerData.whatsapp.trim();
+
+        // Remover caracteres no numéricos (excepto +)
         cleanPhone = cleanPhone.replace(/[^\d+]/g, '');
+
+        // Si empieza con +593, usar tal cual
+        // Si empieza con 593, agregar +
+        // Si empieza con 0, reemplazar 0 por +593
+        // Si no tiene código de país, agregar +593
+        if (cleanPhone.startsWith('+593')) {
+          // Ya está bien
+        } else if (cleanPhone.startsWith('593')) {
+          cleanPhone = '+' + cleanPhone;
+        } else if (cleanPhone.startsWith('0')) {
+          cleanPhone = '+593' + cleanPhone.substring(1);
+        } else {
+          cleanPhone = '+593' + cleanPhone;
+        }
+
+        // Validar longitud (Ecuador: +593 + 9 dígitos = 13 caracteres)
+        if (cleanPhone.length !== 13) {
+          console.warn('⚠️ Número de teléfono con longitud incorrecta:', {
+            original: customerData.whatsapp,
+            cleaned: cleanPhone,
+            length: cleanPhone.length,
+            expected: 13
+          });
+        }
+
+        console.log('📱 Número de teléfono procesado:', {
+          original: customerData.whatsapp,
+          cleaned: cleanPhone,
+          isValid: cleanPhone.length === 13 && cleanPhone.startsWith('+593')
+        });
 
         console.log('🚀 Inicializando Cajita de Pagos:', {
           orderId,
