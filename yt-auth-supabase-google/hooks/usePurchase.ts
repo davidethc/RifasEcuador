@@ -41,6 +41,7 @@ export function usePurchase(raffleId: string) {
       setError(null);
       
       try {
+        // Compra aleatoria (legacy logic)
         const result = await purchaseService.createPurchaseWithCustomer(
           raffleId,
           quantity,

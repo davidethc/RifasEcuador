@@ -17,6 +17,7 @@ interface AnimatedTextGenerateProps {
   linkHrefs?: string[];
   linkClassNames?: string[];
   letterColors?: Record<string, string[]>; // Palabra -> array de colores por letra
+  contentClassName?: string;
 }
 
 export const AnimatedTextGenerate = ({
@@ -31,6 +32,7 @@ export const AnimatedTextGenerate = ({
   linkHrefs = [],
   linkClassNames = [],
   letterColors = {},
+  contentClassName,
 }: AnimatedTextGenerateProps) => {
   const [visibleCount, setVisibleCount] = useState(0);
   const splitWords = text.split(" ");
@@ -51,7 +53,7 @@ export const AnimatedTextGenerate = ({
 
   const generateWords = () => {
     return (
-      <div className="flex flex-wrap items-center gap-1">
+      <div className={cn("flex flex-wrap items-center gap-1", contentClassName)}>
         {splitWords.map((word, idx) => {
           const isVisible = idx < visibleCount;
           const remaining = splitWords.length - visibleCount;

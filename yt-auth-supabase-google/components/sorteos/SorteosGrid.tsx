@@ -99,25 +99,33 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
       if (raffles.length === 0) return;
 
       try {
-        const counts: Record<string, number> = {};
+        console.log('🔍 [SOLD_COUNTS] Iniciando conteo para', raffles.length, 'sorteos');
         
-        for (const raffle of raffles) {
-          const { count, error } = await supabase
-            .from('tickets')
-            .select('*', { count: 'exact', head: true })
-            .eq('raffle_id', raffle.id)
-            .eq('status', 'paid');
+        // Usar endpoint API que bypass RLS usando service role
+        const raffleIds = raffles.map(r => r.id).join(',');
+        const response = await fetch(`/api/stats/sold-by-raffle?raffleIds=${raffleIds}`);
+        const data = await response.json();
 
-          if (!error && count !== null) {
-            counts[raffle.id] = count;
-          } else {
-            counts[raffle.id] = 0;
-          }
+        if (data.success && data.counts) {
+          console.log('✅ [SOLD_COUNTS] Conteos recibidos:', data.counts);
+          setSoldCounts(data.counts);
+        } else {
+          console.error('❌ [SOLD_COUNTS] Error al obtener conteos:', data.error);
+          // Fallback: poner todos en 0
+          const counts: Record<string, number> = {};
+          raffles.forEach(r => {
+            counts[r.id] = 0;
+          });
+          setSoldCounts(counts);
         }
-
-        setSoldCounts(counts);
       } catch (err) {
-        console.error('Error al obtener conteo de boletos:', err);
+        console.error('❌ [SOLD_COUNTS] Error al obtener conteo de boletos:', err);
+        // Fallback: poner todos en 0
+        const counts: Record<string, number> = {};
+        raffles.forEach(r => {
+          counts[r.id] = 0;
+        });
+        setSoldCounts(counts);
       }
     }
 
@@ -128,7 +136,11 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
 
   // Datos de fallback si no hay en Supabase o está cargando
   const sorteosDestacados: (Sorteo & { totalNumbers?: number; soldNumbers?: number })[] = sorteos && sorteos.length > 0
-    ? sorteos.map(s => ({ ...s, totalNumbers: 1000, soldNumbers: 0 }))
+    ? sorteos.map(s => ({ 
+        ...s, 
+        totalNumbers: 1000, 
+        soldNumbers: soldCounts[s.id] || 0  // Usar soldCounts en lugar de 0
+      }))
     : raffles.length > 0
     ? raffles.map((raffle) => ({
         id: raffle.id,

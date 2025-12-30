@@ -3,13 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --background: #e0f8f8;
-  --foreground: #14532d;
-}
-
-.dark {
-  --background: #0a1f0f;
-  --foreground: #dcfce7;
+  /* Paleta oficial del proyecto - Dark Neon Futuristic */
+  --bg-1: #100235;           /* Deep purple/black-blue - fondo principal */
+  --bg-2: #360254;           /* Dark purple - fondo secundario */
+  --bg-3: #683DF5;           /* Bright purple - acentos */
+  --bg-4: #5A0B5C;           /* Alternative purple */
+  --bg-5: #b92163;           /* Pink/magenta - hero base */
+  
+  /* Text colors */
+  --text-white: #ffffff;     /* Texto principal */
+  --text-light-gray: #e5e7eb; /* Texto secundario */
+  --text-gray: #9ca3af;      /* Texto cuerpo */
+  --text-gold: #FFB200;      /* CTA y destacados */
+  
+  /* Accent colors */
+  --accent-purple: #A83EF5;  /* Neon purple */
+  --accent-pink: #f02080;    /* Controlled pink/fuchsia */
+  --accent-gold: #FFB200;    /* Gold/yellow CTA */
+  
+  /* Button gradients */
+  --btn-gradient-start: #ffb200;
+  --btn-gradient-end: #f02080;
+  --btn-purple: #A83EF5;
+  
+  /* Component colors */
+  --comp-purple: #A83EF5;
+  --comp-orange: #EC6624;
+  --comp-blue: #128ECE;
+  
+  /* Background system */
+  --background: #100235;
+  --foreground: #ffffff;
+  
+  /* Neon glow intensities */
+  --glow-soft: 0.3;
+  --glow-medium: 0.5;
+  --glow-strong: 0.7;
 }
 
 body {
@@ -33,20 +62,12 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3ab795;
+  background: #A83EF5;
   border-radius: 4px;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #3ab795;
-}
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #2e9277;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #2e9277;
+  background: #683DF5;
 }
 
 /* Animación suave para el botón de WhatsApp */
@@ -66,4 +87,418 @@ html {
 
 .whatsapp-pulse-smooth {
   animation: whatsapp-pulse-smooth 3s ease-in-out infinite;
+}
+
+/* =========================================
+   LEGACY TEMPLATE ANIMATIONS & EFFECTS
+   ========================================= */
+
+/* Sunburst Effect */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* Sparkles / Diamonds */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.animate-twinkle {
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.diamond-shape {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* Text shadows for better contrast */
+.text-shadow-soft {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.text-shadow-high {
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.text-shadow-hero {
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 16px 50px rgba(0, 0, 0, 0.65);
+}
+
+.twinkle-strong {
+  animation: twinkle 1.8s ease-in-out infinite;
+}
+
+.diamond-glow {
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.95), 0 0 48px rgba(255, 255, 255, 0.6);
+}
+
+/* =========================================
+   PREMIUM DARK-NEON FUTURISTIC SYSTEM
+   ========================================= */
+
+/* Base gradient backgrounds - nunca fondos planos */
+.bg-gradient-dark-primary {
+  background: linear-gradient(180deg, #100235 0%, #1a0a3d 50%, #360254 100%);
+}
+
+.bg-gradient-dark-secondary {
+  background: linear-gradient(180deg, #360254 0%, #4a0f6b 50%, #5A0B5C 100%);
+}
+
+.bg-gradient-hero {
+  background: linear-gradient(180deg, #b92163 0%, #360254 100%);
+}
+
+/* Neon glow effects - suaves y controlados */
+.neon-glow-pink {
+  box-shadow: 
+    0 0 8px rgba(185, 33, 99, 0.4),
+    0 0 16px rgba(185, 33, 99, 0.3),
+    0 0 24px rgba(240, 32, 128, 0.2),
+    inset 0 0 8px rgba(185, 33, 99, 0.1);
+}
+
+.neon-glow-purple {
+  box-shadow: 
+    0 0 8px rgba(168, 62, 245, 0.4),
+    0 0 16px rgba(168, 62, 245, 0.3),
+    0 0 24px rgba(104, 61, 245, 0.2),
+    inset 0 0 8px rgba(168, 62, 245, 0.1);
+}
+
+.neon-glow-gold {
+  box-shadow: 
+    0 0 10px rgba(255, 178, 0, 0.5),
+    0 0 20px rgba(255, 178, 0, 0.4),
+    0 0 30px rgba(255, 178, 0, 0.3),
+    inset 0 0 10px rgba(255, 178, 0, 0.15);
+}
+
+/* Neon glow hover states */
+.neon-glow-pink:hover {
+  box-shadow: 
+    0 0 12px rgba(185, 33, 99, 0.5),
+    0 0 24px rgba(185, 33, 99, 0.4),
+    0 0 36px rgba(240, 32, 128, 0.3),
+    inset 0 0 12px rgba(185, 33, 99, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-glow-purple:hover {
+  box-shadow: 
+    0 0 12px rgba(168, 62, 245, 0.5),
+    0 0 24px rgba(168, 62, 245, 0.4),
+    0 0 36px rgba(104, 61, 245, 0.3),
+    inset 0 0 12px rgba(168, 62, 245, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-glow-gold:hover {
+  box-shadow: 
+    0 0 14px rgba(255, 178, 0, 0.6),
+    0 0 28px rgba(255, 178, 0, 0.5),
+    0 0 42px rgba(255, 178, 0, 0.4),
+    inset 0 0 14px rgba(255, 178, 0, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-text-pink {
+  text-shadow: 
+    0 0 10px rgba(185, 33, 99, 0.8),
+    0 0 20px rgba(240, 32, 128, 0.6),
+    0 0 30px rgba(185, 33, 99, 0.4);
+}
+
+.neon-text-purple {
+  text-shadow: 
+    0 0 10px rgba(168, 62, 245, 0.8),
+    0 0 20px rgba(104, 61, 245, 0.6),
+    0 0 30px rgba(168, 62, 245, 0.4);
+}
+
+.neon-text-gold {
+  text-shadow: 
+    0 0 10px rgba(255, 178, 0, 0.9),
+    0 0 20px rgba(255, 178, 0, 0.7),
+    0 0 30px rgba(255, 178, 0, 0.5);
+}
+
+/* Sparkle animation */
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Pulse glow animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(255, 16, 240, 0.4),
+      0 0 20px rgba(255, 16, 240, 0.3),
+      0 0 30px rgba(255, 16, 240, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(255, 16, 240, 0.6),
+      0 0 40px rgba(255, 16, 240, 0.5),
+      0 0 60px rgba(255, 16, 240, 0.4);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Premium floating cards - dark semi-transparent con glow sutil */
+.card-floating {
+  background: rgba(22, 2, 53, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 62, 245, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-floating:hover {
+  transform: translateY(-6px);
+  border-color: rgba(168, 62, 245, 0.4);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 24px rgba(168, 62, 245, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Glass morphism premium */
+.glass-card {
+  background: rgba(16, 2, 53, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 62, 245, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 62, 245, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(168, 62, 245, 0.1);
+}
+
+/* Radial light behind hero images */
+.hero-radial-glow {
+  position: relative;
+}
+
+.hero-radial-glow::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+    circle at center,
+    rgba(168, 62, 245, 0.2) 0%,
+    rgba(185, 33, 99, 0.15) 30%,
+    transparent 70%
+  );
+  z-index: -1;
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.bg-legacy-bursts {
+  background-image:
+    radial-gradient(circle 500px at 50% 80px, rgba(236,72,153,0.25), transparent 70%),
+    radial-gradient(circle 600px at 80% 120px, rgba(56,8,180,0.18), transparent 75%),
+    radial-gradient(circle 600px at 20% 140px, rgba(56,8,180,0.18), transparent 75%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 10px, transparent 10px 22px);
+}
+
+.ray-lines {
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 18px);
+}
+
+.star-dust {
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 1px, transparent 3px),
+    radial-gradient(circle at 30% 40%, rgba(255,255,255,0.7) 1.5px, transparent 4px),
+    radial-gradient(circle at 60% 25%, rgba(255,255,255,0.6) 1px, transparent 3px),
+    radial-gradient(circle at 80% 50%, rgba(255,255,255,0.7) 1.5px, transparent 4px),
+    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.6) 1px, transparent 3px);
+  background-size: cover;
+}
+
+.card-purple-gradient {
+  background: linear-gradient(180deg, rgba(104, 61, 245, 0.35), rgba(185, 33, 99, 0.25));
+}
+
+.card-glow {
+  box-shadow: 0 12px 30px rgba(168, 62, 245, 0.25), inset 0 0 24px rgba(185, 33, 99, 0.15);
+}
+
+.faq-card {
+  background: linear-gradient(135deg, rgba(104, 61, 245, 0.3), rgba(185, 33, 99, 0.22));
+  color: #ffffff;
+}
+
+/* FAQ items con color naranja */
+.faq-item-orange[open] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 237, 213, 0.9) 100%) !important;
+  border-color: rgba(236, 102, 36, 0.5) !important;
+}
+
+/* Botones con gradiente oficial */
+.btn-gradient-gold-pink {
+  background: linear-gradient(135deg, #ffb200 0%, #f02080 100%);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.btn-gradient-gold-pink:hover {
+  background: linear-gradient(135deg, #f02080 0%, #ffb200 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(240, 32, 128, 0.4);
+}
+
+.btn-purple {
+  background: #A83EF5;
+  color: #ffffff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(168, 62, 245, 0.3);
+}
+
+.btn-purple:hover {
+  background: #683DF5;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 20px rgba(168, 62, 245, 0.4),
+    0 0 16px rgba(168, 62, 245, 0.3);
+}
+
+/* Premium CTA buttons - Gold with glow */
+.btn-cta-primary {
+  background: linear-gradient(135deg, #ffb200 0%, #f02080 100%);
+  color: #ffffff;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 16px rgba(255, 178, 0, 0.3),
+    0 0 12px rgba(240, 32, 128, 0.2);
+  border: none;
+}
+
+.btn-cta-primary:hover {
+  background: linear-gradient(135deg, #f02080 0%, #ffb200 100%);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 24px rgba(255, 178, 0, 0.4),
+    0 0 20px rgba(240, 32, 128, 0.3);
+}
+
+/* Secondary neon purple button */
+.btn-cta-secondary {
+  background: #A83EF5;
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 16px rgba(168, 62, 245, 0.3),
+    0 0 12px rgba(168, 62, 245, 0.2);
+  border: 1px solid rgba(168, 62, 245, 0.4);
+}
+
+.btn-cta-secondary:hover {
+  background: #683DF5;
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 24px rgba(168, 62, 245, 0.4),
+    0 0 20px rgba(104, 61, 245, 0.3);
+}
+
+/* Neutral dark button */
+.btn-neutral {
+  background: rgba(22, 2, 53, 0.8);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-neutral:hover {
+  background: rgba(54, 2, 84, 0.9);
+  border-color: rgba(168, 62, 245, 0.3);
+  color: #ffffff;
+}
+
+/* Scroll reveal animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-reveal {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }

@@ -56,7 +56,7 @@ export default function ErrorPage() {
         </div>
 
         {/* Información adicional */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-8">
+        <div className="bg-gray-50 dark:bg-legacy-purple-deep rounded-xl p-4 mb-8">
           <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
             No te preocupes, tu información está segura. Puedes intentar nuevamente o contactar
             con nuestro soporte si el problema persiste.
@@ -88,14 +88,14 @@ export default function ErrorPage() {
 
           <button
             onClick={() => router.push('/')}
-            className="w-full px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-[var(--font-dm-sans)]"
+            className="w-full px-6 py-3 bg-white dark:bg-legacy-purple-deep text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-white/10 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-legacy-purple-light transition-colors font-[var(--font-dm-sans)]"
           >
             Volver al inicio
           </button>
         </div>
 
         {/* Información de contacto */}
-        <div className="mt-8 pt-8 border-t-2 border-gray-200 dark:border-gray-700">
+        <div className="mt-8 pt-8 border-t-2 border-gray-200 dark:border-white/10">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-[var(--font-dm-sans)]">
             ¿Necesitas ayuda?
           </p>
@@ -127,7 +127,6 @@ export default function ErrorPage() {
     </div>
   );
 }
-
 
 
 

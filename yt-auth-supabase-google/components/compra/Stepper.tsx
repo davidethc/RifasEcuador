@@ -28,10 +28,10 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${
                     currentStep > step.id
-                      ? 'bg-primary-500 text-white'
+                      ? 'bg-[#7C6DFF] text-white'
                       : currentStep === step.id
-                      ? 'bg-primary-500 text-white ring-4 ring-primary-200'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                      ? 'bg-[#7C6DFF] text-white ring-4 ring-[#7C6DFF]/30'
+                      : 'bg-[#1E2030] text-[#8B8FAF]'
                   }`}
                 >
                   {currentStep > step.id ? (
@@ -50,14 +50,14 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   <p
                     className={`text-sm font-semibold font-[var(--font-comfortaa)] ${
                       currentStep >= step.id
-                        ? 'text-gray-900 dark:text-white'
-                        : 'text-gray-500 dark:text-gray-400'
+                        ? 'text-white'
+                        : 'text-[#8B8FAF]'
                     }`}
                   >
                     {step.title}
                   </p>
                   {step.description && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-[var(--font-dm-sans)]">
+                    <p className="text-xs text-[#8B8FAF] mt-1 font-[var(--font-dm-sans)]">
                       {step.description}
                     </p>
                   )}
@@ -67,13 +67,13 @@ export function Stepper({ steps, currentStep }: StepperProps) {
               {/* Line connector */}
               {index < steps.length - 1 && (
                 <div className="flex-1 h-1 mx-4 relative">
-                  <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div className="absolute inset-0 bg-[#1E2030] rounded"></div>
                   <div
                     className={`absolute inset-0 rounded transition-all duration-500 ${
                       currentStep > step.id
-                        ? 'bg-primary-500 w-full'
+                        ? 'bg-[#7C6DFF] w-full'
                         : currentStep === step.id
-                        ? 'bg-primary-500 w-1/2'
+                        ? 'bg-[#7C6DFF] w-1/2'
                         : 'w-0'
                     }`}
                   ></div>
@@ -91,19 +91,19 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                 key={step.id}
                 className={`h-2 flex-1 rounded-full transition-all ${
                   currentStep > step.id
-                    ? 'bg-primary-500'
+                    ? 'bg-[#7C6DFF]'
                     : currentStep === step.id
-                    ? 'bg-primary-500'
-                    : 'bg-gray-200 dark:bg-gray-700'
+                    ? 'bg-[#7C6DFF]'
+                    : 'bg-[#1E2030]'
                 }`}
               ></div>
             ))}
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400 font-[var(--font-dm-sans)]">
+            <p className="text-sm text-[#8B8FAF] font-[var(--font-dm-sans)]">
               Paso {currentStep} de {steps.length}
             </p>
-            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1 font-[var(--font-comfortaa)]">
+            <p className="text-lg font-bold text-white mt-1 font-[var(--font-comfortaa)]">
               {steps.find((s) => s.id === currentStep)?.title}
             </p>
           </div>

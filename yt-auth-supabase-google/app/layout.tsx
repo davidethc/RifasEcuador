@@ -22,6 +22,7 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+
 export const metadata: Metadata = {
   title: "Rifas Ecuador",
   description: "Participa en nuestros sorteos y gana increíbles premios",
@@ -39,39 +40,22 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${comfortaa.variable} ${dmSans.variable} antialiased`} suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/* Light Mode: Teal Corner Cool Background */}
-          <div className="min-h-screen w-full bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:bg-[#020617] relative overflow-hidden">
-            {/* Light Mode Background - Teal Corners with better visibility */}
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false} disableTransitionOnChange>
+          {/* Fondo global con paleta oficial */}
+          <div className="min-h-screen w-full bg-gradient-to-b from-brand-bg-1 via-brand-bg-2 to-brand-bg-1 relative overflow-hidden">
+            {/* Glow superior con colores oficiales */}
             <div
-              className="absolute inset-0 z-0 dark:hidden"
+              className="absolute inset-0 z-0"
               style={{
                 backgroundImage: `
-                  radial-gradient(circle 800px at 0% 0%, rgba(167, 243, 208, 0.4), transparent),
-                  radial-gradient(circle 800px at 100% 0%, rgba(167, 243, 208, 0.4), transparent),
-                  radial-gradient(circle 600px at 50% 100%, rgba(134, 239, 172, 0.2), transparent)
+                  radial-gradient(circle 500px at 50% 80px, rgba(185,33,99,0.25), transparent),
+                  radial-gradient(circle 600px at 80% 120px, rgba(104,61,245,0.15), transparent),
+                  radial-gradient(circle 600px at 20% 140px, rgba(168,62,245,0.15), transparent)
                 `,
               }}
             />
 
-            {/* Dark Mode Background - Enhanced Grid with Magenta/Purple Orb */}
-            <div
-              className="absolute inset-0 z-0 hidden dark:block"
-              style={{
-                background: "#020617",
-                backgroundImage: `
-                  linear-gradient(to right, rgba(71,85,105,0.3) 1px, transparent 1px),
-                  linear-gradient(to bottom, rgba(71,85,105,0.3) 1px, transparent 1px),
-                  radial-gradient(circle at 50% 50%, rgba(236,72,153,0.25) 0%, rgba(168,85,247,0.15) 40%, transparent 70%)
-                `,
-                backgroundSize: "40px 40px, 40px 40px, 100% 100%",
-              }}
-            />
+            {/* Fondo oscuro eliminado */}
 
 
             {/* Contenido de la app */}

@@ -27,7 +27,7 @@ export function LoginForm({
   };
 
   return (
-    <div className="max-w-md w-full space-y-8 p-8 md:p-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+    <div className="max-w-md w-full space-y-8 p-8 md:p-10 bg-white dark:bg-legacy-purple-deep rounded-xl shadow-lg border border-gray-200 dark:border-white/10">
       <div className="text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)]">
           {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
@@ -55,7 +55,7 @@ export function LoginForm({
             onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
               required
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-amber-400 focus:border-blue-500 dark:focus:border-amber-400 transition-colors font-[var(--font-dm-sans)]"
+              className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-gray-300 dark:border-white/10 placeholder-gray-400 text-gray-900 dark:text-white dark:bg-legacy-purple-deep focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-amber-400 focus:border-blue-500 dark:focus:border-amber-400 transition-colors font-[var(--font-dm-sans)]"
           />
           </div>
           <div>
@@ -69,7 +69,7 @@ export function LoginForm({
             onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-amber-400 focus:border-blue-500 dark:focus:border-amber-400 transition-colors font-[var(--font-dm-sans)]"
+              className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-gray-300 dark:border-white/10 placeholder-gray-400 text-gray-900 dark:text-white dark:bg-legacy-purple-deep focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-amber-400 focus:border-blue-500 dark:focus:border-amber-400 transition-colors font-[var(--font-dm-sans)]"
           />
           </div>
         </div>
@@ -121,10 +121,10 @@ export function LoginForm({
       {/* Separador */}
       <div className="relative mt-8">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+          <div className="w-full border-t border-gray-300 dark:border-white/10"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-[var(--font-dm-sans)]">
+          <span className="px-4 bg-white dark:bg-legacy-purple-deep text-gray-500 dark:text-gray-400 font-[var(--font-dm-sans)]">
             O continúa con
           </span>
         </div>
@@ -135,7 +135,7 @@ export function LoginForm({
         <button
           onClick={onGoogleSignIn}
           disabled={isLoading}
-          className="w-full py-3 px-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg shadow-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] font-semibold text-base font-[var(--font-dm-sans)] flex items-center justify-center gap-3"
+          className="w-full py-3 px-4 border-2 border-gray-300 dark:border-white/10 rounded-lg shadow-md text-gray-700 dark:text-gray-300 bg-white dark:bg-legacy-purple-deep hover:bg-gray-50 dark:hover:bg-legacy-purple-light hover:border-gray-400 dark:hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] font-semibold text-base font-[var(--font-dm-sans)] flex items-center justify-center gap-3"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path

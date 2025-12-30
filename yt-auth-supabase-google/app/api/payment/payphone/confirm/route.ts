@@ -205,6 +205,34 @@ export async function POST(request: NextRequest) {
       } else {
         console.log('✅ Orden actualizada a completada');
         
+        // Actualizar todos los tickets de esta orden a 'paid'
+        console.log('🔄 Actualizando tickets a "paid" para orden:', orderId);
+        const { data: orderData } = await supabase
+          .from('orders')
+          .select('raffle_id, numbers')
+          .eq('id', orderId)
+          .single();
+        
+        if (orderData && orderData.numbers && orderData.numbers.length > 0) {
+          // Los números en orders.numbers son strings, y en tickets.number también son strings
+          const ticketNumbers = orderData.numbers as string[];
+          
+          const { error: ticketsUpdateError } = await supabase
+            .from('tickets')
+            .update({ 
+              status: 'paid',
+              payment_id: existingPayment?.id || null
+            })
+            .eq('raffle_id', orderData.raffle_id)
+            .in('number', ticketNumbers);
+          
+          if (ticketsUpdateError) {
+            console.error('❌ Error al actualizar tickets a "paid":', ticketsUpdateError);
+          } else {
+            console.log(`✅ ${ticketNumbers.length} tickets actualizados a "paid"`);
+          }
+        }
+        
         // Enviar correo de confirmación (no bloquea si falla)
         try {
           console.log('📧 Intentando enviar correo de confirmación para orden:', orderId);

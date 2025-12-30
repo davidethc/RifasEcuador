@@ -148,7 +148,7 @@ export default function MisBoletosPage() {
             {tickets.map((ticket) => (
               <div
                 key={ticket.order_id}
-                className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6 md:p-8 lg:p-10 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-white dark:bg-legacy-purple-deep rounded-2xl border-2 border-gray-200 dark:border-white/10 p-6 md:p-8 lg:p-10 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* Imagen del sorteo */}
@@ -239,7 +239,7 @@ export default function MisBoletosPage() {
           <div className="mt-12 md:mt-16 text-center">
             <Link
               href="/"
-              className="inline-block px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-[var(--font-dm-sans)]"
+              className="inline-block px-6 py-3 bg-white dark:bg-legacy-purple-deep text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-white/10 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-legacy-purple-light transition-colors font-[var(--font-dm-sans)]"
             >
               ← Volver al inicio
             </Link>
@@ -249,4 +249,3 @@ export default function MisBoletosPage() {
     </div>
   );
 }
-
