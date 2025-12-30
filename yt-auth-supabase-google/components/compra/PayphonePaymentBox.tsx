@@ -86,7 +86,7 @@ export function PayphonePaymentBox({
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'NO DEFINIDO',
       }
     });
-  }, []);
+  }, [token, storeId]);
 
   useEffect(() => {
     if (!token || !storeId) {

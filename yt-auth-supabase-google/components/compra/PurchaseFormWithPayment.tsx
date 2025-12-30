@@ -179,7 +179,7 @@ export function PurchaseFormWithPayment({
     return `${baseClass} border-[#2C2F4A] bg-[#0F1328] text-[#EDEDED] placeholder-[#6B7280]`;
   };
 
-  const getInputStyle = (field: keyof PurchaseFormData) => {
+  const getInputStyle = (_field: keyof PurchaseFormData) => {
     return {};
   };
 
