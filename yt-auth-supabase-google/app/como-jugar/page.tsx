@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 /**
  * Página "Cómo jugar"
  * Muestra una guía paso a paso para participar en los sorteos
@@ -40,7 +42,31 @@ export default function ComoJugarPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen">
+    <div className="w-full min-h-screen relative overflow-hidden" style={{ 
+      background: 'linear-gradient(180deg, #1F1935 0%, #2A1F3D 30%, #360254 70%, #4A1F5C 100%)'
+    }}>
+      {/* Silueta de fondo - Integrada con el fondo morado */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative w-full h-full" style={{ maxWidth: '2000px', maxHeight: '100vh' }}>
+            <Image
+              src="/silueta2.png"
+              alt="Silueta de fondo"
+              fill
+              className="object-contain"
+              style={{ 
+                opacity: 0.1,
+                filter: 'brightness(0) invert(1)',
+                mixBlendMode: 'screen'
+              }}
+              priority
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Contenido con z-index superior */}
+      <div className="relative" style={{ zIndex: 1 }}>
       {/* Sección principal */}
       <section className="relative py-12 md:py-16 lg:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -63,13 +89,13 @@ export default function ComoJugarPage() {
                 </svg>
               </div>
             </div>
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 dark:text-gray-300 mb-2 font-[var(--font-dm-sans)]">
+            <h2 className="text-2xl md:text-3xl font-semibold mb-2 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               Guía rápida
             </h2>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-[var(--font-comfortaa)]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
               Cómo jugar
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-[var(--font-dm-sans)]">
+            <p className="text-lg md:text-xl max-w-2xl mx-auto font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               Sigue estos simples pasos para participar en nuestros sorteos
             </p>
           </div>
@@ -79,23 +105,39 @@ export default function ComoJugarPage() {
             {pasos.map((paso) => (
               <div
                 key={paso.numero}
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary-500 dark:hover:border-accent-500"
+                className="rounded-xl p-6 md:p-8 border shadow-sm hover:shadow-lg transition-all duration-300"
+                style={{ 
+                  background: 'rgba(28, 32, 58, 0.6)',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.3)';
+                }}
               >
                 <div className="flex items-start gap-4">
                   {/* Número del paso */}
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary-100 dark:bg-accent-900/30 flex items-center justify-center">
-                      <span className="text-xl md:text-2xl font-bold text-primary-600 dark:text-accent-500 font-[var(--font-comfortaa)]">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center" style={{ 
+                      background: 'rgba(168, 62, 245, 0.2)',
+                      border: '1px solid rgba(168, 62, 245, 0.3)'
+                    }}>
+                      <span className="text-xl md:text-2xl font-bold font-[var(--font-comfortaa)]" style={{ color: '#A83EF5' }}>
                         {paso.numero}
                       </span>
                     </div>
                   </div>
                   {/* Contenido */}
                   <div className="flex-1">
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 font-[var(--font-comfortaa)]">
+                    <h3 className="text-xl md:text-2xl font-bold mb-3 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
                       {paso.titulo}
                     </h3>
-                    <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed font-[var(--font-dm-sans)]">
+                    <p className="text-base md:text-lg leading-relaxed font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
                       {paso.descripcion}
                     </p>
                   </div>
@@ -109,13 +151,21 @@ export default function ComoJugarPage() {
       {/* Sección de preguntas */}
       <section className="relative py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-gray-200 dark:border-gray-700 shadow-lg">
+          <div className="rounded-2xl p-8 md:p-12 border shadow-lg" style={{ 
+            background: 'rgba(28, 32, 58, 0.6)',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+          }}>
             <div className="text-center">
               {/* Ícono de chat */}
               <div className="inline-flex items-center justify-center mb-6">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary-100 dark:bg-accent-900/30 flex items-center justify-center">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center" style={{ 
+                  background: 'rgba(168, 62, 245, 0.2)',
+                  border: '1px solid rgba(168, 62, 245, 0.3)'
+                }}>
                   <svg
-                    className="w-8 h-8 md:w-10 md:h-10 text-primary-600 dark:text-accent-500"
+                    className="w-8 h-8 md:w-10 md:h-10"
+                    style={{ color: '#A83EF5' }}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -129,16 +179,17 @@ export default function ComoJugarPage() {
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-primary-600 dark:text-accent-500 mb-4 font-[var(--font-comfortaa)]">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 font-[var(--font-comfortaa)]" style={{ color: '#FFB200' }}>
                 ¿Tienes preguntas?
               </h3>
-              <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 font-[var(--font-dm-sans)]">
+              <p className="text-lg md:text-xl font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
                 Contáctanos a través de WhatsApp o por correo electrónico. Estamos aquí para ayudarte.
               </p>
             </div>
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }

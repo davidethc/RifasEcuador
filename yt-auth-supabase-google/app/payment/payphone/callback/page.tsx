@@ -113,10 +113,10 @@ function PayphoneCallbackContent() {
   }, [searchParams, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-legacy-purple-deep p-4">
       <div className="max-w-md w-full">
         {status === 'loading' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
+          <div className="bg-white dark:bg-legacy-purple-deep rounded-2xl shadow-xl p-8 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 dark:border-accent-500 mx-auto mb-6"></div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-[var(--font-comfortaa)]">
               Procesando pago
@@ -133,7 +133,7 @@ function PayphoneCallbackContent() {
         )}
 
         {status === 'success' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
+          <div className="bg-white dark:bg-legacy-purple-deep rounded-2xl shadow-xl p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-green-500 dark:bg-green-600 flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -149,7 +149,7 @@ function PayphoneCallbackContent() {
         )}
 
         {status === 'error' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
+          <div className="bg-white dark:bg-legacy-purple-deep rounded-2xl shadow-xl p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-red-500 dark:bg-red-600 flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
@@ -174,8 +174,8 @@ function PayphoneCallbackContent() {
 export default function PayphoneCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 dark:border-accent-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-legacy-purple-deep">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600"></div>
       </div>
     }>
       <PayphoneCallbackContent />

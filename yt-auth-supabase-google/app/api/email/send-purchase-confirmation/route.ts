@@ -116,6 +116,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // IMPORTANTE: Calcular el total correcto basado en tickets PAGADOS (no todos los tickets)
+    // Los combos incluyen tickets gratis:
+    // - Combo 10: 15 tickets totales (10 pagados + 5 gratis)
+    // - Combo 20: 27 tickets totales (20 pagados + 7 gratis)
+    // - Otros: cantidad exacta pagada
+    const totalTickets = ticketNumbers.length;
+    let paidQuantity = totalTickets;
+    
+    if (totalTickets === 15) {
+      // Combo 10: 10 pagados + 5 gratis
+      paidQuantity = 10;
+    } else if (totalTickets === 27) {
+      // Combo 20: 20 pagados + 7 gratis
+      paidQuantity = 20;
+    }
+    
+    // Calcular el total correcto: cantidad pagada * precio por ticket
+    const correctTotal = paidQuantity * (raffle?.price_per_ticket || 0);
+    
+    console.log('💰 [EMAIL_PRICE_CORRECTION] Corrigiendo total en correo:', {
+      totalTickets,
+      paidQuantity,
+      pricePerTicket: raffle?.price_per_ticket,
+      totalDeOrden: orderData.total,
+      totalCorrecto: correctTotal,
+    });
+
     // Verificar que Resend esté configurado
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
@@ -166,6 +193,7 @@ export async function POST(request: NextRequest) {
               
               <div style="margin: 15px 0;">
                 <strong>Cantidad de boletos:</strong> ${ticketNumbers.length}
+                ${totalTickets !== paidQuantity ? ` <span style="color: #059669; font-size: 14px;">(${paidQuantity} pagados + ${totalTickets - paidQuantity} gratis 🎁)</span>` : ''}
               </div>
               
               <div style="margin: 15px 0;">
@@ -175,7 +203,7 @@ export async function POST(request: NextRequest) {
               <div style="margin: 15px 0;">
                 <strong>Total pagado:</strong> 
                 <span style="font-size: 20px; font-weight: bold; color: #059669;">
-                  $${orderData.total.toFixed(2)}
+                  $${correctTotal.toFixed(2)}
                 </span>
               </div>
               

@@ -99,7 +99,7 @@ export function Lamphome({
         initial={{ width: "95%" }}
         animate={{ width: "95%" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative flex items-center justify-between w-full max-w-4xl h-auto py-3 px-3 [@media(min-width:768px)]:px-6 bg-white/80 dark:bg-neutral-950 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+        className="relative flex items-center justify-between w-full max-w-4xl h-auto py-3 px-3 [@media(min-width:768px)]:px-6 bg-white/80 dark:bg-legacy-purple-deep backdrop-blur-sm border border-gray-200 dark:border-white/10 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
       >
         {logoSrc && (
           <div className="flex-shrink-0">
@@ -129,7 +129,7 @@ export function Lamphome({
         <div className="flex items-center space-x-2">
           <button
             onClick={toggleMobileMenu}
-            className="[@media(min-width:640px)]:hidden flex justify-center items-center p-2 bg-gray-100 dark:bg-neutral-900 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors duration-200"
+            className="[@media(min-width:640px)]:hidden flex justify-center items-center p-2 bg-gray-100 dark:bg-legacy-purple-light rounded-lg hover:bg-gray-200 dark:hover:bg-legacy-purple-deep transition-colors duration-200"
           >
             <motion.svg
               width="18"
@@ -307,7 +307,7 @@ export function Lamphome({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 right-0 mt-2 [@media(min-width:640px)]:hidden bg-white dark:bg-neutral-950 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg backdrop-blur-sm z-50"
+              className="absolute top-full left-0 right-0 mt-2 [@media(min-width:640px)]:hidden bg-white dark:bg-[#5B3DF5]/12 border border-gray-200 dark:border-white/10 rounded-xl shadow-lg backdrop-blur-sm z-50"
             >
               <nav className="flex flex-col py-2">
                 {navItems.map((item, index) => (

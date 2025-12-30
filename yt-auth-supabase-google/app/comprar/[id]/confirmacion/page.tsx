@@ -93,7 +93,7 @@ export default function ConfirmacionPage() {
   // Estado de carga
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-legacy-purple-deep">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 dark:border-accent-500 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
@@ -107,7 +107,7 @@ export default function ConfirmacionPage() {
   // Estado de error
   if (error || !order) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-legacy-purple-deep px-4">
         <div className="max-w-md w-full text-center">
           <div className="mb-6">
             <svg
@@ -194,7 +194,7 @@ export default function ConfirmacionPage() {
               {order.numbers.map((num) => (
                 <div
                   key={num}
-                  className="px-6 py-3 bg-white dark:bg-gray-800 border-2 border-green-500 dark:border-green-400 rounded-xl font-bold text-2xl text-gray-900 dark:text-white font-[var(--font-comfortaa)] shadow-lg"
+                  className="px-6 py-3 bg-white dark:bg-legacy-purple-deep border-2 border-green-500 dark:border-green-400 rounded-xl font-bold text-2xl text-gray-900 dark:text-white font-[var(--font-comfortaa)] shadow-lg"
                 >
                   {num}
                 </div>
@@ -206,7 +206,7 @@ export default function ConfirmacionPage() {
         {/* Detalles de la compra */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Información del sorteo */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-legacy-purple-deep rounded-2xl border-2 border-gray-200 dark:border-white/10 p-6">
             {order.raffles?.image_url && (
               <div className="mb-4 rounded-xl overflow-hidden relative w-full h-48">
                 <Image
@@ -249,14 +249,14 @@ export default function ConfirmacionPage() {
           </div>
 
           {/* Información de la orden */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-legacy-purple-deep rounded-2xl border-2 border-gray-200 dark:border-white/10 p-6">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 font-[var(--font-comfortaa)]">
               Información de la Orden
             </h3>
             <div className="space-y-3 text-sm">
               <div>
                 <p className="text-gray-600 dark:text-gray-400 mb-1">ID de Orden</p>
-                <p className="font-mono text-xs text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                <p className="font-mono text-xs text-gray-900 dark:text-white bg-gray-100 dark:bg-legacy-purple-light p-2 rounded">
                   {order.id}
                 </p>
               </div>
@@ -275,7 +275,7 @@ export default function ConfirmacionPage() {
               {transactionId && (
                 <div>
                   <p className="text-gray-600 dark:text-gray-400 mb-1">ID de Transacción</p>
-                  <p className="font-mono text-xs text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                  <p className="font-mono text-xs text-gray-900 dark:text-white bg-gray-100 dark:bg-legacy-purple-light p-2 rounded">
                     {transactionId}
                   </p>
                 </div>
@@ -305,7 +305,7 @@ export default function ConfirmacionPage() {
           </button>
           <button
             onClick={() => router.push('/')}
-            className="px-8 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-[var(--font-dm-sans)]"
+            className="px-8 py-3 bg-white dark:bg-legacy-purple-deep text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-white/10 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-legacy-purple-light transition-colors font-[var(--font-dm-sans)]"
           >
             Volver al inicio
           </button>

@@ -16,6 +16,8 @@ interface HeroCarouselProps {
   autoplayInterval?: number;
   className?: string;
   showIndicators?: boolean;
+  transparent?: boolean;
+  objectFit?: "object-contain" | "object-cover" | "object-fill" | "object-none" | "object-scale-down";
 }
 
 export function HeroCarousel({
@@ -24,6 +26,8 @@ export function HeroCarousel({
   autoplayInterval = 5000,
   className,
   showIndicators = true,
+  transparent = false,
+  objectFit,
 }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -45,8 +49,8 @@ export function HeroCarousel({
 
   return (
     <div className={cn("relative w-full", className)}>
-      <AspectRatio ratio={ratio} className="rounded-3xl overflow-hidden shadow-2xl relative">
-        <div className="relative w-full h-full bg-white dark:bg-gray-800">
+      <AspectRatio ratio={ratio} className={cn("rounded-3xl overflow-hidden relative", !transparent && "shadow-2xl")}>
+        <div className={cn("relative w-full h-full", !transparent && "bg-white dark:bg-legacy-purple-deep")}>
           {validImages.map((image, idx) => (
             <div
               key={`${image.src}-${idx}`}
@@ -56,7 +60,7 @@ export function HeroCarousel({
                 src={image.src}
                 alt={image.alt ?? `Imagen ${idx + 1}`}
                 fill
-                className="object-cover"
+                className={cn(objectFit || (transparent ? "object-contain" : "object-cover"))}
                 priority={idx === 0}
               />
             </div>
@@ -82,4 +86,3 @@ export function HeroCarousel({
     </div>
   );
 }
-

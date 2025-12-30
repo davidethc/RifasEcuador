@@ -30,7 +30,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full border-t border-gray-200 dark:border-gray-800">
+    <footer className="w-full border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.1)', backgroundColor: '#100235' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
         {/* 1. Certificaciones - Primero */}
         <div className="mb-6 md:mb-10">
@@ -52,14 +52,14 @@ export function Footer() {
                 />
               </div>
             </Link>
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)] leading-relaxed">
+            <p className="text-sm font-[var(--font-dm-sans)] leading-relaxed" style={{ color: '#ffffff' }}>
               Participa en sorteos legales y gana increíbles premios. Tu oportunidad de ganar está aquí.
             </p>
           </div>
 
           {/* Navegación */}
           <div>
-            <h3 className="text-sm md:text-base font-bold text-gray-900 dark:text-white mb-3 md:mb-4 font-[var(--font-dm-sans)]">
+            <h3 className="text-sm md:text-base font-bold mb-3 md:mb-4 font-[var(--font-dm-sans)]" style={{ color: '#FFB200' }}>
               Navegación
             </h3>
             <ul className="space-y-2 md:space-y-3">
@@ -67,7 +67,9 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
+                    className="text-sm text-gray-400 hover:transition-colors font-[var(--font-dm-sans)]"
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#A83EF5'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}
                   >
                     {link.label}
                   </Link>
@@ -86,7 +88,9 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
+                    className="text-sm text-gray-400 hover:transition-colors font-[var(--font-dm-sans)]"
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#A83EF5'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}
                   >
                     {link.label}
                   </Link>
@@ -105,7 +109,9 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors font-[var(--font-dm-sans)]"
+                    className="text-sm text-gray-400 hover:transition-colors font-[var(--font-dm-sans)]"
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#A83EF5'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}
                   >
                     {link.label}
                   </Link>
@@ -116,7 +122,9 @@ export function Footer() {
             <div className="mt-6 flex gap-4">
               <a
                 href="#"
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-primary-500 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center transition-colors"
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#A83EF5'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
                 aria-label="Facebook"
               >
                 <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -125,7 +133,9 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-primary-500 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center transition-colors"
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#A83EF5'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
                 aria-label="Twitter"
               >
                 <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -134,7 +144,9 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-primary-500 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center transition-colors"
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#A83EF5'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -146,12 +158,12 @@ export function Footer() {
         </div>
 
         {/* 3. Copyright pequeño - Más abajo */}
-        <div className="pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div className="pt-4 md:pt-6 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
           <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-500 font-[var(--font-dm-sans)]">
+            <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#ffffff' }}>
               © {currentYear} RIOBAMMBA. Todos los derechos reservados.
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500 font-[var(--font-dm-sans)] mt-1">
+            <p className="text-xs font-[var(--font-dm-sans)] mt-1" style={{ color: '#ffffff' }}>
               RUC: 0706567344001 • RIOMBAMBA, ECUADOR
             </p>
           </div>

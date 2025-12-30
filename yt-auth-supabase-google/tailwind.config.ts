@@ -12,50 +12,41 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        // Paleta profesional para rifas - diseñada estratégicamente
-        // PRIMARY (#3ab795): Verde esmeralda - Confianza, acciones principales, éxito
-        primary: {
-          50: '#e6f7f3',   // Muy claro
-          100: '#cceee7',  // Claro
-          200: '#99ddcf',  // Suave
-          300: '#66ccb7',  // Medio claro
-          400: '#4abfa3',  // Medio
-          500: '#3ab795',  // PRINCIPAL - Botones CTAs, elementos principales
-          600: '#2e9277',  // Oscuro - Hover, estados activos
-          700: '#236d59',  // Más oscuro
-          800: '#17483b',  // Muy oscuro
-          900: '#0c231d',  // Casi negro
+        // Paleta oficial del proyecto
+        brand: {
+          // Fondos principales
+          'bg-1': '#100235',      // Fondo oscuro principal
+          'bg-2': '#360254',      // Fondo oscuro secundario
+          'bg-3': '#683DF5',      // Fondo morado brillante
+          'bg-4': '#5A0B5C',     // Fondo morado oscuro
+          'bg-5': '#b92163',      // Fondo rosa/magenta
+          // Textos
+          'text-white': '#ffffff', // Texto blanco
+          'text-gold': '#FFB200',  // Texto amarillo/dorado
+          // Botones
+          'btn-gradient-start': '#ffb200',  // Inicio gradiente botón
+          'btn-gradient-end': '#f02080',   // Fin gradiente botón
+          'btn-purple': '#A83EF5',         // Botón morado
+          // Componentes
+          'comp-purple': '#A83EF5',        // Componente morado
+          'comp-orange': '#EC6624',        // Componente naranja
+          'comp-blue': '#128ECE',          // Componente azul
         },
-        // SECONDARY (#a0e8af): Verde menta claro - Fondos suaves, elementos secundarios
-        secondary: {
-          50: '#f0fdf4',   // Muy claro
-          100: '#e6f9eb',  // Claro
-          200: '#ccf3d7',  // Suave
-          300: '#b3edc3',  // Medio claro
-          400: '#a0e8af',  // PRINCIPAL - Fondos, hover states, elementos secundarios
-          500: '#8de19f',  // Medio
-          600: '#7ada8f',  // Oscuro
-          700: '#5cb371',  // Más oscuro
-          800: '#3d8c52',  // Muy oscuro
-          900: '#1e4633',  // Casi negro
-        },
-        // ACCENT (#ffcf56): Amarillo dorado - Urgencia, premios, destacados (texto negro)
-        accent: {
-          50: '#fffbf0',   // Muy claro
-          100: '#fff7e0',  // Claro
-          200: '#ffefc1',  // Suave
-          300: '#ffe7a2',  // Medio claro
-          400: '#ffdf83',  // Medio
-          500: '#ffcf56',  // PRINCIPAL - Premios, urgencia, destacados
-          600: '#ffc633',  // Oscuro
-          700: '#e6b025',  // Más oscuro
-          800: '#cc9918',  // Muy oscuro
-          900: '#99720c',  // Casi negro
+        // Legacy Template Colors (mantener compatibilidad)
+        legacy: {
+          'purple-deep': '#100235',
+          'purple-light': '#360254',
+          'purple-medium': '#5A0B5C',
+          'purple-bright': '#683DF5',
+          'pink': '#b92163',
+          'neon': '#f02080',
+          'gold': '#FFB200',
         },
       },
       fontFamily: {
         comfortaa: ['var(--font-comfortaa)', 'sans-serif'],
         'dm-sans': ['var(--font-dm-sans)', 'sans-serif'],
+        'josefin': ['var(--font-josefin)', 'sans-serif'],
       },
     },
   },

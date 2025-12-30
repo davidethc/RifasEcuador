@@ -289,13 +289,17 @@ export function PayphonePaymentBox({
     setLoadError('No se pudo cargar el sistema de pagos. Intenta recargar la página.');
   };
 
-  // Estado de error
+  // Estado de error - Consistente con formulario
   if (loadError) {
     return (
-      <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-6">
+      <div className="rounded-lg border p-6" style={{ 
+        background: 'rgba(239, 68, 68, 0.1)',
+        borderColor: 'rgba(239, 68, 68, 0.3)'
+      }}>
         <div className="flex gap-3">
           <svg
-            className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0"
+            className="w-6 h-6 flex-shrink-0"
+            style={{ color: '#FCA5A5' }}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -306,15 +310,16 @@ export function PayphonePaymentBox({
             />
           </svg>
           <div>
-            <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-1 font-[var(--font-dm-sans)]">
+            <p className="text-sm font-semibold mb-1 font-[var(--font-dm-sans)]" style={{ color: '#FCA5A5' }}>
               Error al cargar el sistema de pagos
             </p>
-            <p className="text-xs text-red-700 dark:text-red-300 font-[var(--font-dm-sans)]">
+            <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               {loadError}
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-3 text-xs font-semibold text-red-800 dark:text-red-200 underline hover:no-underline"
+              className="mt-3 text-xs font-semibold underline hover:no-underline"
+              style={{ color: '#A83EF5' }}
             >
               Recargar página
             </button>
@@ -341,13 +346,16 @@ export function PayphonePaymentBox({
       />
 
       <div className="space-y-4">
-        {/* Información del monto */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4">
+        {/* Información del monto - Consistente con formulario */}
+        <div className="rounded-lg border p-4" style={{ 
+          background: 'rgba(28, 32, 58, 0.6)',
+          borderColor: 'rgba(255, 255, 255, 0.1)'
+        }}>
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 font-[var(--font-dm-sans)]">
+            <span className="text-sm font-semibold font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               Monto a pagar:
             </span>
-            <span className="text-2xl font-bold text-blue-600 dark:text-amber-400 font-[var(--font-comfortaa)]">
+            <span className="text-2xl font-bold font-[var(--font-comfortaa)]" style={{ color: '#FFB200' }}>
               ${amount.toFixed(2)}
             </span>
           </div>
@@ -357,8 +365,8 @@ export function PayphonePaymentBox({
         {!isScriptLoaded && (
           <div className="flex items-center justify-center p-8">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-amber-400 mx-auto mb-4"></div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#A83EF5' }}></div>
+              <p className="text-sm font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
                 Cargando sistema de pagos...
               </p>
             </div>
@@ -369,13 +377,20 @@ export function PayphonePaymentBox({
         <div
           ref={containerRef}
           id="pp-button"
-          className="min-h-[200px] flex justify-center items-center"
+          className="min-h-[200px] flex justify-center items-center rounded-lg"
+          style={{ 
+            background: 'rgba(15, 17, 23, 0.4)',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}
         />
 
-        {/* Información adicional */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-          <p className="text-xs text-gray-600 dark:text-gray-400 text-center font-[var(--font-dm-sans)]">
-            <strong>🔒 Pago 100% seguro</strong><br />
+        {/* Información adicional - Consistente */}
+        <div className="rounded-lg border p-4" style={{ 
+          background: 'rgba(15, 17, 23, 0.4)',
+          borderColor: 'rgba(255, 255, 255, 0.1)'
+        }}>
+          <p className="text-xs text-center font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+            <strong style={{ color: '#E5E7EB' }}>🔒 Pago 100% seguro</strong><br />
             Puedes pagar con tarjeta de crédito/débito o con tu cuenta Payphone.
             Tu información está protegida.
           </p>

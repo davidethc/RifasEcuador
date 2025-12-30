@@ -166,140 +166,225 @@ export function PurchaseFormWithPayment({
 
   const getInputClassName = (field: keyof PurchaseFormData) => {
     const baseClass =
-      'w-full px-4 py-3.5 md:py-3 text-base md:text-sm border-2 rounded-xl focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-[var(--font-dm-sans)] transition-colors';
+      'w-full px-4 py-3.5 text-base border rounded-lg focus:outline-none font-[var(--font-dm-sans)] transition-all duration-200';
     
     if (errors[field] && touched.has(field)) {
-      return `${baseClass} border-red-500 focus:border-red-600`;
+      return `${baseClass} border-red-500/50 bg-[#1A0F0F] text-red-100 placeholder-red-400/40 focus:border-red-400`;
     }
     
     if (formData[field] && !errors[field] && touched.has(field)) {
-      return `${baseClass} border-green-500 focus:border-green-600`;
+      return `${baseClass} border-green-500/40 bg-[#0F1A0F] text-green-50 placeholder-green-400/30 focus:border-green-400`;
     }
     
-    return `${baseClass} border-gray-300 dark:border-gray-600 focus:border-primary-600 dark:focus:border-accent-500`;
+    return `${baseClass} border-[#2C2F4A] bg-[#0F1328] text-[#EDEDED] placeholder-[#6B7280]`;
+  };
+
+  const getInputStyle = (field: keyof PurchaseFormData) => {
+    return {};
   };
 
   // Mostrar formulario y método de pago en la misma vista
   return (
     <div className="space-y-6">
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 font-[var(--font-comfortaa)]">
-          Completa tus datos y pago
-        </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
-          Necesitamos tu información para procesar tu compra
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Columna izquierda: Formulario */}
-        <div className={`bg-white dark:bg-gray-800 rounded-2xl border-2 ${isFormSubmitted ? 'border-green-200 dark:border-green-800 opacity-75' : 'border-gray-200 dark:border-gray-700'} p-6 space-y-4`}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        {/* Columna izquierda: Formulario - Integrado al mismo universo visual */}
+        <div className={`rounded-lg border ${isFormSubmitted ? 'border-green-500/30 opacity-75' : 'border-white/10'} p-6 md:p-8 space-y-6 transition-all duration-300`} style={{ 
+          backgroundColor: 'rgba(28, 32, 58, 0.6)', 
+          borderColor: isFormSubmitted ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+        }}>
           {/* Nombre */}
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
-              Nombre(s) *
+            <label htmlFor="name" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
+              Nombre(s) <span className="text-red-400 font-bold">*</span>
             </label>
             <input
               id="name"
               type="text"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              onBlur={() => handleBlur('name')}
               placeholder="Ingresa tu nombre"
               disabled={isFormSubmitted}
               className={getInputClassName('name')}
+              style={getInputStyle('name')}
+              onFocus={(e) => {
+                if (!errors.name) {
+                  e.currentTarget.style.borderColor = '#8F6AE1';
+                  e.currentTarget.style.outline = 'none';
+                }
+              }}
+              onBlur={(e) => {
+                handleBlur('name');
+                if (!errors.name) {
+                  e.currentTarget.style.borderColor = formData.name ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
+                }
+              }}
             />
             {errors.name && touched.has('name') && (
-              <p className="text-sm text-red-500 mt-1 font-[var(--font-dm-sans)]">{errors.name}</p>
+              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{errors.name}</span>
+              </p>
             )}
           </div>
 
           {/* Apellido */}
           <div>
-            <label htmlFor="lastName" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
-              Apellido(s) *
+            <label htmlFor="lastName" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
+              Apellido(s) <span className="text-red-400 font-bold">*</span>
             </label>
             <input
               id="lastName"
               type="text"
               value={formData.lastName}
               onChange={(e) => handleChange('lastName', e.target.value)}
-              onBlur={() => handleBlur('lastName')}
               placeholder="Ingresa tu apellido"
               disabled={isFormSubmitted}
               className={getInputClassName('lastName')}
+              style={getInputStyle('lastName')}
+              onFocus={(e) => {
+                if (!errors.lastName) {
+                  e.currentTarget.style.borderColor = '#8F6AE1';
+                  e.currentTarget.style.outline = 'none';
+                }
+              }}
+              onBlur={(e) => {
+                handleBlur('lastName');
+                if (!errors.lastName) {
+                  e.currentTarget.style.borderColor = formData.lastName ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
+                }
+              }}
             />
             {errors.lastName && touched.has('lastName') && (
-              <p className="text-sm text-red-500 mt-1 font-[var(--font-dm-sans)]">{errors.lastName}</p>
+              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{errors.lastName}</span>
+              </p>
             )}
           </div>
 
           {/* WhatsApp */}
           <div>
-            <label htmlFor="whatsapp" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
-              Número WhatsApp *
+            <label htmlFor="whatsapp" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
+              Número WhatsApp <span className="text-red-400 font-bold">*</span>
             </label>
             <input
               id="whatsapp"
               type="text"
               value={formData.whatsapp}
               onChange={(e) => handleChange('whatsapp', e.target.value)}
-              onBlur={() => handleBlur('whatsapp')}
               placeholder="Ej: +593 939039191 o 0939039191"
               disabled={isFormSubmitted}
               className={getInputClassName('whatsapp')}
+              style={getInputStyle('whatsapp')}
+              onFocus={(e) => {
+                if (!errors.whatsapp) {
+                  e.currentTarget.style.borderColor = '#8F6AE1';
+                  e.currentTarget.style.outline = 'none';
+                }
+              }}
+              onBlur={(e) => {
+                handleBlur('whatsapp');
+                if (!errors.whatsapp) {
+                  e.currentTarget.style.borderColor = formData.whatsapp ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
+                }
+              }}
             />
             {errors.whatsapp && touched.has('whatsapp') && (
-              <p className="text-sm text-red-500 mt-1 font-[var(--font-dm-sans)]">{errors.whatsapp}</p>
+              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{errors.whatsapp}</span>
+              </p>
             )}
           </div>
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
-              Correo Electrónico *
+            <label htmlFor="email" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
+              Correo Electrónico <span className="text-red-400 font-bold">*</span>
             </label>
             <input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
-              onBlur={() => handleBlur('email')}
               placeholder="tu@email.com"
               disabled={isFormSubmitted}
               className={getInputClassName('email')}
+              style={getInputStyle('email')}
+              onFocus={(e) => {
+                if (!errors.email) {
+                  e.currentTarget.style.borderColor = '#8F6AE1';
+                  e.currentTarget.style.outline = 'none';
+                }
+              }}
+              onBlur={(e) => {
+                handleBlur('email');
+                if (!errors.email) {
+                  e.currentTarget.style.borderColor = formData.email ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
+                }
+              }}
             />
             {errors.email && touched.has('email') && (
-              <p className="text-sm text-red-500 mt-1 font-[var(--font-dm-sans)]">{errors.email}</p>
+              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{errors.email}</span>
+              </p>
             )}
           </div>
 
           {/* Confirmar Email */}
           <div>
-            <label htmlFor="confirmEmail" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
-              Confirma el Correo Electrónico *
+            <label htmlFor="confirmEmail" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
+              Confirma el Correo Electrónico <span className="text-red-400 font-bold">*</span>
             </label>
             <input
               id="confirmEmail"
               type="email"
               value={formData.confirmEmail}
               onChange={(e) => handleChange('confirmEmail', e.target.value)}
-              onBlur={() => handleBlur('confirmEmail')}
               placeholder="Confirma tu correo"
               disabled={isFormSubmitted}
               className={getInputClassName('confirmEmail')}
+              style={getInputStyle('confirmEmail')}
+              onFocus={(e) => {
+                if (!errors.confirmEmail) {
+                  e.currentTarget.style.borderColor = '#8F6AE1';
+                  e.currentTarget.style.outline = 'none';
+                }
+              }}
+              onBlur={(e) => {
+                handleBlur('confirmEmail');
+                if (!errors.confirmEmail) {
+                  e.currentTarget.style.borderColor = formData.confirmEmail ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
+                }
+              }}
             />
             {errors.confirmEmail && touched.has('confirmEmail') && (
-              <p className="text-sm text-red-500 mt-1 font-[var(--font-dm-sans)]">{errors.confirmEmail}</p>
+              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{errors.confirmEmail}</span>
+              </p>
             )}
           </div>
 
           {/* Documento de Identidad (Opcional) */}
           <div>
-            <label htmlFor="documentId" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
+            <label htmlFor="documentId" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
               Cédula/Documento de Identidad
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(Opcional)</span>
+              <span className="text-xs text-[#9CA3AF] ml-2 font-normal">(Opcional)</span>
             </label>
             <input
               id="documentId"
@@ -309,47 +394,68 @@ export function PurchaseFormWithPayment({
               placeholder="Ej: 1234567890"
               disabled={isFormSubmitted}
               className={getInputClassName('documentId')}
+              style={getInputStyle('documentId')}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#8F6AE1';
+                e.currentTarget.style.outline = 'none';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = formData.documentId ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
+              }}
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-[var(--font-dm-sans)]">
+            <p className="text-xs text-[#9CA3AF] mt-2 font-[var(--font-dm-sans)]">
               Si no lo ingresas, Payphone lo solicitará durante el pago
             </p>
           </div>
         </div>
 
-        {/* Columna derecha: Resumen */}
+          {/* Columna derecha: Resumen - Zona segura de pago */}
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl border-2 border-secondary-200 dark:border-gray-600 p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 font-[var(--font-comfortaa)]">
+          <div className="rounded-lg border p-6 md:p-8 transition-all duration-300" style={{ 
+            background: 'rgba(28, 32, 58, 0.7)',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+          }}>
+            <h3 className="text-xl font-bold mb-6 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
               Resumen de la compra
             </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm font-[var(--font-dm-sans)]">
-                <span className="text-gray-600 dark:text-gray-400">Cantidad de boletos:</span>
-                <span className="font-semibold text-gray-900 dark:text-white">{quantity}</span>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+                <span style={{ color: '#9CA3AF' }}>Cantidad de boletos:</span>
+                <span className="font-semibold" style={{ color: '#E5E7EB' }}>{quantity}</span>
               </div>
-              <div className="flex justify-between text-sm font-[var(--font-dm-sans)]">
-                <span className="text-gray-600 dark:text-gray-400">Precio unitario:</span>
-                <span className="font-medium text-gray-900 dark:text-white">
+              <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+                <span style={{ color: '#9CA3AF' }}>Precio unitario:</span>
+                <span className="font-medium" style={{ color: '#E5E7EB' }}>
                   {formatPrice(totalAmount / quantity)}
                 </span>
               </div>
-              <div className="flex justify-between text-lg font-bold pt-3 border-t-2 border-gray-300 dark:border-gray-600 font-[var(--font-comfortaa)]">
-                <span className="text-gray-900 dark:text-white">Total a pagar:</span>
-                <span className="text-gray-900 font-bold">{formatPrice(totalAmount)}</span>
+              <div className="flex justify-between items-center text-lg font-bold pt-4 border-t font-[var(--font-comfortaa)]" style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }}>
+                <span style={{ color: '#E5E7EB' }}>Total a pagar:</span>
+                <span className="font-bold text-2xl" style={{ color: '#FFB200' }}>{formatPrice(totalAmount)}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-accent-100 border-2 border-accent-300 rounded-2xl p-4">
-            <div className="flex gap-3">
-              <svg className="w-5 h-5 text-gray-900 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
+          <div className="rounded-lg p-5 border" style={{ 
+            background: 'rgba(15, 17, 23, 0.4)',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+          }}>
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ 
+                background: 'rgba(168, 62, 245, 0.15)',
+                border: '1px solid rgba(168, 62, 245, 0.2)'
+              }}>
+                <svg className="w-5 h-5" style={{ color: '#A83EF5' }} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900 mb-1 font-[var(--font-dm-sans)]">
+                <p className="text-sm font-semibold mb-2 font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
                   Nota importante
                 </p>
-                <p className="text-xs text-gray-800 font-[var(--font-dm-sans)]">
+                <p className="text-xs leading-relaxed font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
                   Tus números de boletos se asignarán automáticamente después de completar el pago. Los recibirás por correo y WhatsApp.
                 </p>
               </div>
@@ -366,7 +472,8 @@ export function PurchaseFormWithPayment({
               type="button"
               onClick={onBack}
               disabled={isSubmitting || isLoading}
-              className="px-8 py-4 md:py-3 text-base md:text-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-[var(--font-dm-sans)] min-h-[48px]"
+              className="px-8 py-4 md:py-3 text-base md:text-lg border-2 rounded-xl font-bold transition-all font-[var(--font-dm-sans)] min-h-[48px] text-white hover:bg-[#2A2D45]"
+              style={{ borderColor: '#2A2D45' }}
             >
               Volver
             </button>
@@ -374,7 +481,23 @@ export function PurchaseFormWithPayment({
           <button
             type="submit"
             disabled={isSubmitting || isLoading}
-            className="px-8 py-4 md:py-3 text-base md:text-lg bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-bold transition-all transform hover:scale-[1.02] shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-dm-sans)] flex items-center justify-center gap-2 min-h-[48px]"
+            className="px-8 py-4 text-base rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-dm-sans)] flex items-center justify-center gap-2 min-h-[48px] w-full"
+            style={{
+              background: 'linear-gradient(135deg, #F2C94C, #F2994A)',
+              color: '#1A1A1A',
+              border: 'none',
+              boxShadow: '0 4px 12px rgba(242, 201, 76, 0.25)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting && !isLoading) {
+                e.currentTarget.style.filter = 'brightness(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(242, 201, 76, 0.35)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.filter = 'brightness(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(242, 201, 76, 0.25)';
+            }}
           >
             {(isSubmitting || isLoading) ? (
               <>
@@ -386,7 +509,7 @@ export function PurchaseFormWithPayment({
               </>
             ) : (
               <>
-                <span>Reservar números y continuar al pago</span>
+                <span>Continuar al pago</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -402,16 +525,16 @@ export function PurchaseFormWithPayment({
       <div className="space-y-6 mt-8">
         {/* Mostrar números reservados */}
         {ticketNumbers.length > 0 && (
-          <div className="max-w-4xl mx-auto bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl border-2 border-green-200 dark:border-green-800 p-6">
+          <div className="max-w-4xl mx-auto bg-[rgba(34,197,94,0.1)] rounded-2xl border border-green-800/30 p-6 shadow-xl">
             <div className="flex items-center gap-3 mb-4">
-              <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)]">
+                <h3 className="text-xl font-bold text-white font-[var(--font-comfortaa)]">
                   ¡Tus números han sido reservados!
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
+                <p className="text-sm text-green-200 font-[var(--font-dm-sans)]">
                   Estos números están reservados por 10 minutos. Completa el pago para confirmarlos.
                 </p>
               </div>
@@ -420,7 +543,7 @@ export function PurchaseFormWithPayment({
               {ticketNumbers.map((num) => (
                 <div
                   key={num}
-                  className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-green-500 dark:border-green-400 rounded-lg font-bold text-lg text-gray-900 dark:text-white font-[var(--font-comfortaa)]"
+                  className="px-4 py-2 bg-[#1A1C28] border border-green-500/50 rounded-lg font-bold text-lg font-[var(--font-comfortaa)] shadow-md hover:scale-105 transition-transform text-white"
                 >
                   {num}
                 </div>
@@ -446,7 +569,7 @@ export function PurchaseFormWithPayment({
         <div className="flex justify-center">
           <button
             onClick={() => setIsFormSubmitted(false)}
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors font-[var(--font-dm-sans)] flex items-center gap-2"
+            className="text-[#8B8FAF] transition-colors font-[var(--font-dm-sans)] flex items-center gap-2 hover:text-white"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -459,4 +582,3 @@ export function PurchaseFormWithPayment({
     </div>
   );
 }
-

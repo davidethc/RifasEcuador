@@ -250,11 +250,29 @@ export const purchaseService = {
         return { success: false, error: 'Error al crear o encontrar cliente' };
       }
 
-      // 3. Reservar tickets aleatoriamente usando la función SQL
+      // 3. Calcular cantidad total de tickets (incluyendo regalos)
+      // Combo 10: regalamos 5 tickets adicionales (total 15)
+      // Combo 20: regalamos 7 tickets adicionales (total 27)
+      let totalTicketsToReserve = quantity;
+      let bonusTickets = 0;
+      
+      if (quantity === 10) {
+        bonusTickets = 5;
+        totalTicketsToReserve = 15;
+        console.log('🎁 [BONUS] Combo 10: agregando 5 tickets adicionales (total: 15)');
+      } else if (quantity === 20) {
+        bonusTickets = 7;
+        totalTicketsToReserve = 27;
+        console.log('🎁 [BONUS] Combo 20: agregando 7 tickets adicionales (total: 27)');
+      }
+
+      // 4. Reservar tickets aleatoriamente usando la función SQL
       // Esto creará automáticamente la orden (order) y reservará los tickets
       console.log('🔍 [DEBUG] Llamando a reserve_tickets_random:', {
         raffleId,
-        quantity,
+        quantity: totalTicketsToReserve,
+        originalQuantity: quantity,
+        bonusTickets,
         customerId,
       });
 
@@ -263,7 +281,7 @@ export const purchaseService = {
         {
           p_raffle_id: raffleId,
           p_client_id: customerId,
-          p_quantity: quantity,
+          p_quantity: totalTicketsToReserve,
         }
       );
 
@@ -286,10 +304,41 @@ export const purchaseService = {
       const reservation = reservationResult[0];
       const ticketNumbers = reservation.ticket_numbers || [];
       
+      // IMPORTANTE: Corregir el total de la orden
+      // El total debe ser quantity * price_per_ticket (no totalTicketsToReserve)
+      // porque los tickets adicionales son GRATIS
+      const correctTotal = quantity * raffle.price_per_ticket;
+      
+      console.log('💰 [PRICE_CORRECTION] Corrigiendo total de la orden:', {
+        orderId: reservation.order_id,
+        totalCalculadoPorSQL: reservation.total_amount,
+        totalCorrecto: correctTotal,
+        quantity: quantity,
+        totalTicketsToReserve: totalTicketsToReserve,
+        bonusTickets: bonusTickets,
+        pricePerTicket: raffle.price_per_ticket
+      });
+
+      // Actualizar la orden con el total correcto
+      const { error: updateTotalError } = await supabase
+        .from('orders')
+        .update({ total: correctTotal })
+        .eq('id', reservation.order_id);
+
+      if (updateTotalError) {
+        console.error('❌ [ERROR] Error al actualizar total de la orden:', updateTotalError);
+        // No fallamos la compra por esto, pero lo registramos
+      } else {
+        console.log('✅ [PRICE_CORRECTION] Total de la orden actualizado correctamente a:', correctTotal);
+      }
+      
       console.log('✅ [SUCCESS] Tickets reservados:', {
         orderId: reservation.order_id,
         ticketNumbers,
-        totalAmount: reservation.total_amount,
+        totalAmount: correctTotal, // Usar el total correcto
+        ticketsReservados: totalTicketsToReserve,
+        ticketsPagados: quantity,
+        ticketsGratis: bonusTickets,
       });
 
       return { 

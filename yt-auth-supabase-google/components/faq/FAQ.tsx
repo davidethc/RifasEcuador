@@ -71,7 +71,7 @@ export function FAQ() {
   };
 
   return (
-    <section className="w-full py-8 md:py-12 lg:py-16 bg-white dark:bg-gray-900">
+    <section className="w-full py-8 md:py-12 lg:py-16 bg-white dark:bg-[#5B3DF5]/10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado */}
         <div className="text-center mb-8 md:mb-12">
@@ -94,7 +94,7 @@ export function FAQ() {
           {faqs.map((faq) => (
             <div
               key={faq.id}
-              className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden transition-all hover:border-primary-500"
+              className="bg-white dark:bg-[#5B3DF5]/10 rounded-xl border-2 border-gray-200 dark:border-white/10 overflow-hidden transition-all hover:border-primary-500"
             >
               <button
                 onClick={() => toggleItem(faq.id)}
@@ -130,4 +130,3 @@ export function FAQ() {
     </section>
   );
 }
-
