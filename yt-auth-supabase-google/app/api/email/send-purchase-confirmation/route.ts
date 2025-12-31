@@ -102,11 +102,52 @@ export async function POST(request: NextRequest) {
     const typedOrderData = orderData as unknown as OrderWithRelations;
     const client = typedOrderData.clients;
     const raffle = typedOrderData.raffles;
-    const ticketNumbers = typedOrderData.numbers || [];
+    
+    // Asegurar que numbers sea un array
+    let ticketNumbers: string[] = [];
+    if (Array.isArray(typedOrderData.numbers)) {
+      ticketNumbers = typedOrderData.numbers;
+    } else if (typedOrderData.numbers) {
+      // Si viene como string o otro formato, intentar convertirlo
+      try {
+        if (typeof typedOrderData.numbers === 'string') {
+          ticketNumbers = JSON.parse(typedOrderData.numbers);
+        } else {
+          ticketNumbers = [String(typedOrderData.numbers)];
+        }
+      } catch {
+        console.warn('⚠️ [EMAIL] No se pudo parsear numbers, usando array vacío');
+        ticketNumbers = [];
+      }
+    }
+    
+    // Si aún no hay números, intentar obtenerlos de la tabla tickets usando los números de la orden
+    // Los tickets se relacionan por raffle_id y number (que debe estar en orders.numbers)
+    if (ticketNumbers.length === 0) {
+      console.log('⚠️ [EMAIL] No se encontraron números en orders.numbers');
+      console.log('⚠️ [EMAIL] Verificando si la orden tiene números en otro formato...');
+      
+      // Intentar obtener la orden nuevamente con más detalle
+      const { data: orderDataRetry } = await supabase
+        .from('orders')
+        .select('numbers, raffle_id')
+        .eq('id', orderId)
+        .single();
+      
+      if (orderDataRetry?.numbers) {
+        console.log('📧 [EMAIL] Reintento - Numbers encontrados:', orderDataRetry.numbers);
+        if (Array.isArray(orderDataRetry.numbers)) {
+          ticketNumbers = orderDataRetry.numbers.map(n => String(n));
+        }
+      }
+    }
 
     console.log('📧 [EMAIL] Cliente:', client?.name, 'Email:', client?.email);
     console.log('📧 [EMAIL] Sorteo:', raffle?.title);
     console.log('📧 [EMAIL] Números de boletos:', ticketNumbers);
+    console.log('📧 [EMAIL] Cantidad de números:', ticketNumbers.length);
+    console.log('📧 [EMAIL] Tipo de numbers:', typeof typedOrderData.numbers);
+    console.log('📧 [EMAIL] Numbers raw:', typedOrderData.numbers);
 
     if (!client?.email) {
       console.error('❌ [EMAIL] Email del cliente no encontrado');
@@ -155,12 +196,37 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ [EMAIL] RESEND_API_KEY configurado');
 
-    // Formatear números de boletos - mostrar todos los números
-    const numbersText = ticketNumbers.length === 0
-      ? 'No asignados'
-      : ticketNumbers.length === 1
-      ? ticketNumbers[0]
-      : ticketNumbers.join(', ');
+    // Formatear números de boletos - mostrar todos los números de forma clara
+    let numbersText = 'No asignados';
+    let numbersHtml = '<p style="color: #dc2626;">⚠️ No se asignaron números de boletos</p>';
+    
+    if (ticketNumbers.length > 0) {
+      // Formato para texto plano (separado por comas)
+      numbersText = ticketNumbers.join(', ');
+      
+      // Formato HTML más visual con cada número en su propia línea o caja
+      if (ticketNumbers.length <= 10) {
+        // Si son pocos números, mostrarlos en cajas individuales
+        numbersHtml = ticketNumbers.map(num => 
+          `<span style="display: inline-block; background: #059669; color: white; padding: 8px 12px; margin: 4px; border-radius: 6px; font-weight: bold; font-size: 16px;">${num}</span>`
+        ).join('');
+      } else {
+        // Si son muchos números, mostrarlos en una lista más compacta
+        const chunkSize = 5;
+        const chunks = [];
+        for (let i = 0; i < ticketNumbers.length; i += chunkSize) {
+          chunks.push(ticketNumbers.slice(i, i + chunkSize));
+        }
+        numbersHtml = chunks.map(chunk => 
+          `<div style="margin: 8px 0;">${chunk.map(num => 
+            `<span style="display: inline-block; background: #059669; color: white; padding: 6px 10px; margin: 2px; border-radius: 4px; font-weight: bold;">${num}</span>`
+          ).join(' ')}</div>`
+        ).join('');
+      }
+    }
+    
+    console.log('📧 [EMAIL] Numbers text formateado:', numbersText);
+    console.log('📧 [EMAIL] Numbers HTML generado:', numbersHtml.substring(0, 200) + '...');
 
     // Crear template HTML del correo
     const emailHtml = `
@@ -185,10 +251,11 @@ export async function POST(request: NextRequest) {
               <h2 style="margin-top: 0; color: #3b82f6;">${raffle?.title || 'Sorteo'}</h2>
               
               <div style="margin: 15px 0;">
-                <strong>Números de boletos asignados:</strong>
-                <div style="font-size: ${ticketNumbers.length > 3 ? '18px' : '24px'}; font-weight: bold; color: #059669; margin-top: 10px; word-break: break-word;">
-                  ${numbersText}
+                <strong style="font-size: 16px; color: #1f2937;">🎟️ Números de boletos asignados:</strong>
+                <div style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 2px solid #059669;">
+                  ${numbersHtml}
                 </div>
+                ${ticketNumbers.length > 0 ? `<p style="margin-top: 10px; font-size: 14px; color: #6b7280;">Total: <strong>${ticketNumbers.length} número${ticketNumbers.length !== 1 ? 's' : ''}</strong></p>` : ''}
               </div>
               
               <div style="margin: 15px 0;">
