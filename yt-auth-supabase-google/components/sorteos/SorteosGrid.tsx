@@ -109,7 +109,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         if (data.success && data.counts) {
           console.log('✅ [SOLD_COUNTS] Conteos recibidos:', data.counts);
           setSoldCounts(data.counts);
-        } else {
+          } else {
           console.error('❌ [SOLD_COUNTS] Error al obtener conteos:', data.error);
           // Fallback: poner todos en 0
           const counts: Record<string, number> = {};

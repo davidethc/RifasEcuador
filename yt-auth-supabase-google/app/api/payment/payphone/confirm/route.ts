@@ -19,15 +19,30 @@ const getSupabaseAdmin = () => {
 };
 
 /**
- * API Route para confirmar transacciones de la Cajita de Pagos
+ * API Route para confirmar transacciones de Payphone
  * 
  * Este endpoint se llama después de que el usuario complete el pago
- * y sea redirigido con los parámetros id y clientTransactionId
+ * y sea redirigido con los parámetros id y clientTransactionId en la URL.
+ * 
+ * Realiza una solicitud POST al endpoint de confirmación de Payphone:
+ * POST https://pay.payphonetodoesposible.com/api/button/V2/Confirm
+ * 
+ * Cuerpo de la solicitud:
+ * {
+ *   "id": 0,                    // Transaction ID de Payphone (número entero)
+ *   "clientTxId": "string"      // Identificador único generado por tu plataforma
+ * }
+ * 
+ * Respuesta incluye:
+ * - statusCode: 2 = Cancelado, 3 = Aprobada
+ * - transactionStatus: "Approved" o "Canceled"
+ * - transactionId, authorizationCode, amount, etc.
  * 
  * ⚠️ IMPORTANTE: Debe ejecutarse dentro de los primeros 5 minutos
- * o Payphone reversará automáticamente la transacción
+ * o Payphone reversará automáticamente la transacción para proteger
+ * tanto al comercio como al cliente.
  * 
- * Documentación: https://docs.payphone.app/confirmar-boton-de-pago
+ * Documentación oficial: https://www.docs.payphone.app/boton-de-pago-por-redireccion#sect4
  */
 export async function POST(request: NextRequest) {
   try {
