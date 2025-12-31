@@ -35,7 +35,7 @@ export default function SorteosPage() {
 
       {/* Contenido con z-index superior */}
       <div className="relative" style={{ zIndex: 1 }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
         {/* Título principal compacto */}
         <div className="mb-6 md:mb-10">
           {/* Título y subtítulo - Centrado en móvil */}

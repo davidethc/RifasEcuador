@@ -21,15 +21,17 @@ const getSupabaseAdmin = () => {
 /**
  * Callback de Payphone después de completar el pago
  * 
- * Payphone redirige aquí con los siguientes parámetros:
- * - id: Transaction ID de Payphone
- * - clientTransactionId: ID único generado por nosotros (order-{orderId}-{timestamp})
+ * Payphone redirige aquí con los siguientes parámetros en la URL:
+ * - id: Número entero que representa el identificador único de la transacción generado por Payphone
+ * - clientTransactionId: Cadena de texto definida como identificador único por tu plataforma al iniciar el pago
  * 
- * Documentación: https://docs.payphone.app/cajita-de-pagos-payphone
+ * ⚠️ IMPORTANTE: Debe ejecutarse la confirmación dentro de los primeros 5 minutos
+ * o Payphone reversará automáticamente la transacción.
+ * 
+ * Documentación oficial: https://www.docs.payphone.app/boton-de-pago-por-redireccion#sect4
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = getSupabaseAdmin();
     const searchParams = request.nextUrl.searchParams;
     const transactionId = searchParams.get('id');
     const clientTransactionId = searchParams.get('clientTransactionId');
@@ -37,6 +39,7 @@ export async function GET(request: NextRequest) {
     console.log('📥 Callback de Payphone recibido:', {
       transactionId,
       clientTransactionId,
+      timestamp: new Date().toISOString(),
     });
 
     // Validar parámetros
@@ -47,65 +50,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Extraer orderId del clientTransactionId
-    // Formato nuevo: ord-{8chars}-{timestamp}
-    // Formato antiguo: order-{orderId}-{timestamp}
-    let orderId: string | null = null;
-    
-    // Intentar formato nuevo primero
-    const newFormatMatch = clientTransactionId.match(/^ord-([a-f0-9]{8})-/);
-    if (newFormatMatch) {
-      // Solo tenemos los primeros 8 caracteres, necesitamos buscar la orden completa
-      const orderPrefix = newFormatMatch[1];
-      console.log('🔍 Buscando orden con prefijo:', orderPrefix);
-      
-      // Buscar en las últimas 50 órdenes (usando admin client - bypass RLS)
-      // No podemos usar ILIKE directamente con UUID, así que obtenemos órdenes recientes y filtramos en JS
-      const { data: orders, error: searchError } = await supabase
-        .from('orders')
-        .select('id')
-        .order('created_at', { ascending: false })
-        .limit(50);
-      
-      if (searchError) {
-        console.error('❌ Error al buscar orden:', searchError);
-      } else {
-        console.log('📊 Órdenes recientes obtenidas:', orders?.length || 0);
-        
-        // Filtrar en JavaScript por el prefijo del UUID
-        const matchingOrder = orders?.find(order => 
-          order.id.toLowerCase().startsWith(orderPrefix.toLowerCase())
-        );
-        
-        if (matchingOrder) {
-          orderId = matchingOrder.id;
-          console.log('✅ Orden encontrada:', orderId);
-        } else {
-          console.log('⚠️ No se encontró orden con prefijo:', orderPrefix);
-        }
-      }
-    } else {
-      // Intentar formato antiguo
-      const oldFormatMatch = clientTransactionId.match(/order-([a-f0-9-]+)-/);
-      if (oldFormatMatch) {
-        orderId = oldFormatMatch[1];
-      }
-    }
-    
-    if (!orderId) {
-      console.error('❌ No se pudo encontrar orderId para:', clientTransactionId);
-      return NextResponse.redirect(
-        new URL('/comprar/error?message=ID de orden inválido', request.url)
-      );
-    }
-
-    console.log('✅ Order ID completo recuperado:', orderId);
-
-    // Confirmar el pago con la API de Payphone
+    // ⚠️ CRÍTICO: Confirmar PRIMERO con Payphone (debe ser rápido, dentro de 5 minutos)
+    // Si no confirmamos rápido, Payphone reversará automáticamente la transacción
+    console.log('⚡ Confirmando transacción con Payphone INMEDIATAMENTE...');
     const confirmationResult = await confirmPayphoneTransaction(transactionId, clientTransactionId);
 
     if (!confirmationResult.success) {
       console.error('❌ Error al confirmar transacción:', confirmationResult.error);
+      // Aún así redirigimos, pero con error
       return NextResponse.redirect(
         new URL(`/comprar/error?message=${encodeURIComponent(confirmationResult.error || 'Error al confirmar pago')}`, request.url)
       );
@@ -114,15 +66,38 @@ export async function GET(request: NextRequest) {
     const transaction = confirmationResult.data;
     const transactionStatus = transaction?.transactionStatus || 'Pending';
 
-    console.log('✅ Transacción confirmada:', {
+    console.log('✅ Transacción confirmada con Payphone:', {
       transactionId,
       status: transactionStatus,
+      statusCode: transaction?.statusCode,
       amount: transaction?.amount,
-      optionalParameter3: transaction?.optionalParameter3,
+      timestamp: new Date().toISOString(),
     });
 
-    // PRIMERO: Intentar usar optionalParameter3 (tiene el orderId completo según docs)
-    const finalOrderId = transaction?.optionalParameter3 || orderId;
+    // Ahora procesar la actualización de base de datos (después de confirmar con Payphone)
+    const supabase = getSupabaseAdmin();
+
+    // Extraer orderId del clientTransactionId
+    // Formato: order-{orderId}-{timestamp}
+    let orderId: string | null = null;
+    const orderMatch = clientTransactionId.match(/order-([a-f0-9-]+)-/);
+    if (orderMatch) {
+      orderId = orderMatch[1];
+    } else {
+      // Si no encontramos el orderId en el clientTransactionId, intentar usar optionalParameter3
+      orderId = transaction?.optionalParameter3 || null;
+    }
+
+    if (!orderId) {
+      console.error('❌ No se pudo extraer orderId de:', clientTransactionId);
+      // Aún así redirigimos, pero registramos el error
+      return NextResponse.redirect(
+        new URL('/comprar/error?message=ID de orden inválido', request.url)
+      );
+    }
+
+    console.log('✅ Order ID recuperado:', orderId);
+    const finalOrderId = orderId;
     
     console.log('🔍 OrderId final a usar:', {
       fromOptionalParameter3: transaction?.optionalParameter3,
@@ -130,158 +105,30 @@ export async function GET(request: NextRequest) {
       final: finalOrderId,
     });
 
-    // Actualizar o crear registro en la tabla payments (usando admin client)
-    const { data: existingPayment } = await supabase
-      .from('payments')
-      .select('id')
-      .eq('order_id', finalOrderId)
-      .maybeSingle();
+    // Actualizar base de datos (esto puede tomar más tiempo, pero ya confirmamos con Payphone)
+    // Procesar de forma asíncrona para no bloquear la respuesta
+    processPaymentUpdate(supabase, finalOrderId, transactionId, transactionStatus, transaction).catch(err => {
+      console.error('❌ Error en actualización asíncrona de pago:', err);
+      // No bloqueamos el flujo, solo registramos el error
+    });
 
-    const paymentData = {
-      order_id: finalOrderId,
-      provider: 'payphone',
-      provider_reference: transactionId,
-      amount: transaction?.amount || 0,
-      status: transactionStatus.toLowerCase(),
-      created_at: new Date().toISOString(),
-    };
-
-    if (existingPayment) {
-      // Actualizar pago existente
-      console.log('🔄 Actualizando pago existente:', existingPayment.id);
-      const { error: updatePaymentError } = await supabase
-        .from('payments')
-        .update({
-          provider_reference: transactionId,
-          status: transactionStatus.toLowerCase(),
-        })
-        .eq('id', existingPayment.id);
-      
-      if (updatePaymentError) {
-        console.error('❌ Error al actualizar payment:', updatePaymentError);
-      } else {
-        console.log('✅ Payment actualizado');
-      }
-    } else {
-      // Crear nuevo registro de pago
-      console.log('✨ Creando nuevo registro en payments...');
-      const { error: insertError } = await supabase
-        .from('payments')
-        .insert(paymentData);
-      
-      if (insertError) {
-        console.error('❌ Error al insertar en payments:', insertError);
-      } else {
-        console.log('✅ Registro creado en payments');
-      }
-    }
-
-    // Actualizar el estado de la orden según el resultado
+    // Redirigir INMEDIATAMENTE según el estado (sin esperar actualizaciones de BD)
+    // Las actualizaciones de BD se hacen de forma asíncrona
     if (transactionStatus === 'Approved') {
-      // Pago aprobado: actualizar orden a completada
-      console.log('🔄 Actualizando orden a completed...');
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({
-          status: 'completed',
-          payment_method: 'payphone',
-        })
-        .eq('id', finalOrderId);
-
-      if (updateError) {
-        console.error('❌ Error al actualizar orden:', updateError);
-      } else {
-        console.log('✅ Orden actualizada a completada');
-        
-        // Actualizar todos los tickets de esta orden a 'paid'
-        console.log('🔄 Actualizando tickets a "paid" para orden:', finalOrderId);
-        const { data: orderData } = await supabase
-          .from('orders')
-          .select('raffle_id, numbers')
-          .eq('id', finalOrderId)
-          .single();
-        
-        if (orderData && orderData.numbers && orderData.numbers.length > 0) {
-          // Los números en orders.numbers son strings, y en tickets.number también son strings
-          const ticketNumbers = orderData.numbers as string[];
-          
-          // Obtener el payment_id del pago existente o recién creado
-          const { data: paymentData } = await supabase
-            .from('payments')
-            .select('id')
-            .eq('order_id', finalOrderId)
-            .single();
-          
-          const { error: ticketsUpdateError } = await supabase
-            .from('tickets')
-            .update({ 
-              status: 'paid',
-              payment_id: paymentData?.id || null
-            })
-            .eq('raffle_id', orderData.raffle_id)
-            .in('number', ticketNumbers);
-          
-          if (ticketsUpdateError) {
-            console.error('❌ Error al actualizar tickets a "paid":', ticketsUpdateError);
-          } else {
-            console.log(`✅ ${ticketNumbers.length} tickets actualizados a "paid"`);
-          }
-        }
-        
-        // Enviar correo de confirmación (no bloquea si falla)
-        try {
-          console.log('📧 Intentando enviar correo de confirmación para orden:', finalOrderId);
-          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-          const emailUrl = `${baseUrl}/api/email/send-purchase-confirmation`;
-          console.log('📧 URL del correo:', emailUrl);
-          
-          const emailResponse = await fetch(emailUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ orderId: finalOrderId }),
-          });
-          
-          const emailData = await emailResponse.json();
-          
-          if (emailResponse.ok) {
-            console.log('✅ Correo de confirmación enviado exitosamente:', emailData);
-          } else {
-            console.error('⚠️ Error al enviar correo:', emailData);
-            console.warn('⚠️ No se pudo enviar correo de confirmación');
-          }
-        } catch (emailError) {
-          console.error('❌ Error al enviar correo (no crítico):', emailError);
-          // No lanzamos error para no bloquear el flujo
-        }
-      }
-
-      // Redirigir a página de confirmación exitosa
+      // Pago aprobado: redirigir inmediatamente
+      console.log('✅ Pago aprobado - Redirigiendo inmediatamente');
       return NextResponse.redirect(
         new URL(`/comprar/${finalOrderId}/confirmacion?status=success&transactionId=${transactionId}`, request.url)
       );
     } else if (transactionStatus === 'Canceled') {
       // Pago cancelado
-      console.log('❌ Actualizando orden a expired...');
-      await supabase
-        .from('orders')
-        .update({
-          status: 'expired',
-        })
-        .eq('id', finalOrderId);
-
-      console.log('⚠️ Orden marcada como expirada (pago cancelado)');
-
-      // Redirigir a página de error
+      console.log('❌ Pago cancelado - Redirigiendo');
       return NextResponse.redirect(
         new URL(`/comprar/error?message=Pago cancelado&orderId=${finalOrderId}`, request.url)
       );
     } else {
       // Pago pendiente u otro estado
-      console.log('⏳ Orden en estado pendiente');
-
-      // Redirigir a página de espera
+      console.log('⏳ Pago pendiente - Redirigiendo');
       return NextResponse.redirect(
         new URL(`/comprar/${finalOrderId}/confirmacion?status=pending&transactionId=${transactionId}`, request.url)
       );
@@ -297,8 +144,33 @@ export async function GET(request: NextRequest) {
 /**
  * Confirma una transacción con la API de Payphone
  * 
+ * Este método realiza una solicitud POST al endpoint de confirmación de Payphone
+ * para verificar si una transacción fue aprobada, cancelada o fallida.
+ * 
  * Endpoint: POST https://pay.payphonetodoesposible.com/api/button/V2/Confirm
- * Documentación: https://docs.payphone.app/confirmar-boton-de-pago
+ * 
+ * Cuerpo de la solicitud (JSON):
+ * {
+ *   "id": 0,                    // Transaction ID de Payphone (número entero)
+ *   "clientTxId": "string"      // Identificador único generado por tu plataforma
+ * }
+ * 
+ * Headers requeridos:
+ * - Authorization: Bearer TU_TOKEN
+ * - Content-Type: application/json
+ * 
+ * Respuesta exitosa incluye:
+ * - statusCode: 2 = Cancelado, 3 = Aprobada
+ * - transactionStatus: "Approved" o "Canceled"
+ * - transactionId: Identificador de transacción asignado por Payphone
+ * - authorizationCode: Código de autorización bancario
+ * - amount: Monto total pagado
+ * - Y otros campos según documentación oficial
+ * 
+ * ⚠️ IMPORTANTE: Si no se ejecuta dentro de los primeros 5 minutos,
+ * Payphone reversará automáticamente la transacción.
+ * 
+ * Documentación oficial: https://www.docs.payphone.app/boton-de-pago-por-redireccion#sect4
  */
 async function confirmPayphoneTransaction(
   transactionId: string, 
@@ -393,5 +265,161 @@ async function confirmPayphoneTransaction(
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido',
     };
+  }
+}
+
+/**
+ * Procesa la actualización de la base de datos de forma asíncrona
+ * Esto se ejecuta después de confirmar con Payphone para no bloquear la respuesta
+ */
+async function processPaymentUpdate(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  orderId: string,
+  transactionId: string,
+  transactionStatus: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transaction: any
+) {
+  try {
+    console.log('🔄 Procesando actualización de base de datos para orden:', orderId);
+
+    // Actualizar o crear registro en la tabla payments
+    const { data: existingPayment } = await supabase
+      .from('payments')
+      .select('id')
+      .eq('order_id', orderId)
+      .maybeSingle();
+
+    const paymentData = {
+      order_id: orderId,
+      provider: 'payphone',
+      provider_reference: transactionId,
+      amount: transaction?.amount ? transaction.amount / 100 : 0, // Convertir centavos a dólares
+      status: transactionStatus.toLowerCase(),
+      created_at: new Date().toISOString(),
+    };
+
+    let paymentId: string | null = null;
+
+    if (existingPayment) {
+      // Actualizar pago existente
+      console.log('🔄 Actualizando pago existente:', existingPayment.id);
+      const { error: updatePaymentError } = await supabase
+        .from('payments')
+        .update({
+          provider_reference: transactionId,
+          status: transactionStatus.toLowerCase(),
+          amount: paymentData.amount,
+        })
+        .eq('id', existingPayment.id);
+      
+      if (updatePaymentError) {
+        console.error('❌ Error al actualizar payment:', updatePaymentError);
+      } else {
+        console.log('✅ Payment actualizado');
+        paymentId = existingPayment.id;
+      }
+    } else {
+      // Crear nuevo registro de pago
+      console.log('✨ Creando nuevo registro en payments...');
+      const { data: newPayment, error: insertError } = await supabase
+        .from('payments')
+        .insert(paymentData)
+        .select('id')
+        .single();
+      
+      if (insertError) {
+        console.error('❌ Error al insertar en payments:', insertError);
+      } else {
+        console.log('✅ Registro creado en payments');
+        paymentId = newPayment?.id || null;
+      }
+    }
+
+    // Actualizar el estado de la orden según el resultado
+    if (transactionStatus === 'Approved') {
+      // Pago aprobado: actualizar orden a completada
+      console.log('🔄 Actualizando orden a completed...');
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          status: 'completed',
+          payment_method: 'payphone',
+        })
+        .eq('id', orderId);
+
+      if (updateError) {
+        console.error('❌ Error al actualizar orden:', updateError);
+      } else {
+        console.log('✅ Orden actualizada a completada');
+        
+        // Actualizar todos los tickets de esta orden a 'paid'
+        console.log('🔄 Actualizando tickets a "paid" para orden:', orderId);
+        const { data: orderData } = await supabase
+          .from('orders')
+          .select('raffle_id, numbers')
+          .eq('id', orderId)
+          .single();
+        
+        if (orderData && orderData.numbers && orderData.numbers.length > 0) {
+          const ticketNumbers = orderData.numbers as string[];
+          
+          const { error: ticketsUpdateError } = await supabase
+            .from('tickets')
+            .update({ 
+              status: 'paid',
+              payment_id: paymentId
+            })
+            .eq('raffle_id', orderData.raffle_id)
+            .in('number', ticketNumbers);
+          
+          if (ticketsUpdateError) {
+            console.error('❌ Error al actualizar tickets a "paid":', ticketsUpdateError);
+          } else {
+            console.log(`✅ ${ticketNumbers.length} tickets actualizados a "paid"`);
+          }
+        }
+        
+        // Enviar correo de confirmación (no bloquea si falla)
+        try {
+          console.log('📧 Intentando enviar correo de confirmación para orden:', orderId);
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+          const emailUrl = `${baseUrl}/api/email/send-purchase-confirmation`;
+          
+          const emailResponse = await fetch(emailUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId }),
+          });
+          
+          if (emailResponse.ok) {
+            const emailData = await emailResponse.json();
+            console.log('✅ Correo de confirmación enviado exitosamente:', emailData);
+          } else {
+            const emailData = await emailResponse.json();
+            console.error('⚠️ Error al enviar correo:', emailData);
+          }
+        } catch (emailError) {
+          console.error('❌ Error al enviar correo (no crítico):', emailError);
+        }
+      }
+    } else if (transactionStatus === 'Canceled') {
+      // Pago cancelado
+      console.log('❌ Actualizando orden a expired...');
+      await supabase
+        .from('orders')
+        .update({
+          status: 'expired',
+        })
+        .eq('id', orderId);
+      console.log('⚠️ Orden marcada como expirada (pago cancelado)');
+    }
+
+    console.log('✅ Actualización de base de datos completada para orden:', orderId);
+  } catch (error) {
+    console.error('❌ Error en processPaymentUpdate:', error);
+    // No lanzamos el error para no afectar el flujo principal
   }
 }

@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>RifaMania</title>
+
+     <link rel="icon" href="img/icon.png">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+
+	<!-- Latest compiled and minified CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/imask@7.6.1/dist/imask.js"></script>
+	
+</head>
+<body>
+
+<!--=================================
+TOP
+==================================-->
+
+<div class="container-fluid p-0" id="top">
+
+    <div class="container p-0">
+
+        <div class="row row-cols-2">
+
+            <div class="col">
+
+               <div class="h3 p-3 mt-1 mb-0">
+                   <a href="index.html"><i class="bi bi-amd"></i> RifaManía</a>
+               </div>
+
+            </div>
+
+            <div class="col">
+
+                <div class="d-flex">
+
+                    <div class="ms-auto h5 p-3 mt-2">
+                        <a href="https://wa.me/573001234567?text=duda" target="_blank"><i class="bi bi-whatsapp"></i> Atención al cliente</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+    </div>
+
+</div> 
+
+<!--=================================
+HERO
+==================================-->
+
+<div class="container-fluid p-0" id="heroCheckout">
+
+    <div class="container-fluid">
+
+        <div class="container">
+
+            <div class="row row-cols-1 pt-4">
+
+                <div class="offset-3 col-6 textAlign text-dark text-center">
+
+                    <h1 class="josefin-sans-700 text-uppercase py-2 px-1 b1 pt-3 mb-0 mb-lg-3 rounded">Gracias por tu compra</h1>
+
+                    <h2 class="p-2">Estos son tus números elegidos</h2>
+
+                    <div class="text-center position-relative" style="z-index:1">
+                        
+                        <div class="d-flex flex-wrap w-100 justify-content-center p-2 rounded">
+
+                            
+                                <div class="h3 text-center numbers rounded-circle m-1" item="0" number="5"><span class=" p-2">5</span></div>    
+                                
+                            
+                                <div class="h3 text-center numbers rounded-circle m-1" item="0" number="18"><span class=" p-2">18</span></div>    
+                                
+                            
+                                <div class="h3 text-center numbers rounded-circle m-1" item="0" number="30"><span class=" p-2">30</span></div>    
+                                
+                                        
+                            
+                        </div>
+
+                    </div>
+
+                    <div class="col p-1 mb-5 py-lg-5 px-lg-5 position-relative" >
+
+                        <figure class="position-absolute" style="top:0;left:0">
+                            <img src="img/car-star.png" class="img-fluid">
+                        </figure>
+
+                        <figure class="position-absolute ray" style="top:0;left:0">
+                            <img src="img/car-ray.png" class="img-fluid">
+                        </figure>
+
+                        <figure class="position-absolute" style="top:0;left:0">
+                            <img src="img/car-light.png" class="img-fluid">
+                        </figure>
+                        
+                        <figure class="mt-5 p-3 text-center position-relative" style="z-index:1000">
+                            <img src="img/hero-car.png" class="img-fluid rounded">
+                        </figure>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+     <div class="position-relative">
+
+        <svg class="position-absolute" style="bottom:5px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#5A0B5C" fill-opacity="1" d="M0,288L60,282.7C120,277,240,267,360,245.3C480,224,600,192,720,176C840,160,960,160,1080,176C1200,192,1320,224,1380,240L1440,256L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path></svg>
+
+        <svg class="position-absolute" style="bottom:-10px"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#100235" fill-opacity="1" d="M0,224L60,213.3C120,203,240,181,360,154.7C480,128,600,96,720,112C840,128,960,192,1080,202.7C1200,213,1320,171,1380,149.3L1440,128L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path></svg>
+
+    </div>
+
+</div>
+
+<!--=================================
+MAIN
+==================================-->
+
+<div class="container-fluid p-0 position-relative" id="main">
+
+    <div class="text-center position-relative">
+        <div class="countdown">
+            <h3>Recuerda que este sorteo juega en</h3>
+            <div class="timer display-1 josefin-sans-700" id="timer" time="2027-03-29">00:00:00</div>
+            <small>Por las dos últimas cifras de la lotería del Paísita - Canal Teleantioquia</small>
+        </div>
+    </div>
+</div>
+
+<!--=================================
+FOOTER
+==================================-->
+
+<footer class="container-fluid p-0 position-relative mt-5 pt-3">
+
+    <div class="container">
+        
+        <div class="row">
+
+            <div class="offset-lg-2 col-lg-8">
+
+                <div class="d-flex justify-content-between">
+                    
+                    <div class="text-center">
+                        <a href="#terms" data-bs-toggle="modal">Términos y condiciones</a>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="#policy" data-bs-toggle="modal">Políticas de Privacidad</a>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="#contact" data-bs-toggle="modal">Atención al cliente</a>
+                    </div>
+
+                </div>
+            
+            </div>
+
+        </div>
+   
+    </div>
+
+    <hr style="border: 1px solid #fff">
+
+    <h4 class="text-center py-5"><i class="bi bi-c-circle"></i> 2025 | <i class="bi bi-amd"></i> RifaManía</h4>
+    
+</footer>
+
+<!-- ======================================
+Términos y condiciones
+======================================= -->
+<div class="modal fade" id="terms">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded bg">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Términos y condiciones</h4>
+         <button type="button" class="h4 bg-transparent ms-auto border-0" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body px-5">
+
+        <p class="my-3">Los Términos y condiciones fueron actualizados por última vez el 21 febrero, 2025</p>
+        
+        <div>
+        <ul>
+        <li> 
+        <h5 class="my-3">1. Introducción</h5>
+        <p class="my-3">Estos Términos y Condiciones se aplican a este sitio web y a las transacciones
+        relacionadas con nuestros productos y servicios. Usted puede estar obligado por contratos
+        adicionales relacionados con su relación con nosotros o con cualquier producto o servicio
+        que reciba de nosotros. Si alguna de las disposiciones de los contratos adicionales entra
+        en conflicto con alguna de las disposiciones de estas Condiciones, las disposiciones de
+        estos contratos adicionales prevalecerán.</p></li>
+        <li><h5 class="my-3">2. Vinculación</h5>
+        <p class="my-3">Al registrarse en este sitio web, acceder a él o utilizarlo de cualquier otro modo, usted
+        acepta someterse a las condiciones que se exponen a continuación. El mero uso de este
+        sitio web implica el conocimiento y la aceptación de estos Términos y condiciones. En
+        algunos casos particulares, también podemos pedirle que lo acepte explícitamente.</p></li>
+        <li><h5 class="my-3">3. Comunicación electrónica</h5>
+        <p class="my-3">Al utilizar este sitio web o comunicarse con nosotros por medios electrónicos, usted
+        acepta y reconoce que podemos comunicarnos con usted electrónicamente en nuestro
+        sitio web o enviarle un correo electrónico, y acepta que todos los acuerdos, avisos,
+        divulgaciones y otras comunicaciones que le proporcionemos electrónicamente satisfacen
+        cualquier requisito legal, incluido, entre otros, el requisito de que dichas comunicaciones
+        sean por escrito.</p></li>
+        <li><h5 class="my-3">4. Propiedad intelectual</h5>
+        <p class="my-3">Nosotros o nuestros licenciantes poseemos y controlamos todos los derechos de autor y
+        otros derechos de propiedad intelectual en el sitio web, y los datos, la información y otros
+        recursos mostrados por o accesibles dentro del sitio web.</p></li>
+        <li><h5 class="my-3">4.1 Todos los derechos están reservados</h5>
+        <p class="my-3">A menos que el contenido específico indique lo contrario, no se le concede una licencia ni
+        ningún otro derecho en virtud de los derechos de autor, marcas comerciales, patentes u
+        otros derechos de propiedad intelectual. Esto significa que usted no utilizará, copiará,
+        reproducirá, ejecutará, mostrará, distribuirá, incrustará en cualquier medio electrónico,
+        alterará, realizará ingeniería inversa, descompilará, transferirá, descargará, transmitirá,
+        monetizará, venderá, comercializará o hará uso de cualquier recurso de este sitio web en
+        cualquier forma, sin nuestro permiso previo por escrito, excepto y sólo en la medida en que
+        se estipule lo contrario en normas de leyes obligatorias (como el derecho de cita).</p></li>
+        <li><h5 class="my-3">5. Boletín de noticias</h5>
+       <p class="my-3"> No obstante lo anterior, usted puede reenviar nuestro boletín de noticias en formato
+        electrónico a otras personas que puedan estar interesadas en visitar nuestro sitio web.</p></li>
+        <li><h5 class="my-3">6. Propiedad de terceros</h5>
+        <p class="my-3">Nuestro sitio web puede incluir hipervínculos u otras referencias a sitios web de terceros.
+        No controlamos ni revisamos el contenido de los sitios web de terceros a los que se
+        accede desde este sitio web. Los productos o servicios ofrecidos por otros sitios web
+        estarán sujetos a los Términos y Condiciones aplicables de esos terceros. Las opiniones
+        expresadas o el material que aparece en esos sitios web no son necesariamente
+        compartidas o respaldadas por nosotros.
+        No seremos responsables de las prácticas de privacidad o del contenido de estos sitios.
+        Usted asume todos los riesgos asociados al uso de estos sitios web y de cualquier servicio
+        de terceros relacionado. No aceptaremos ninguna responsabilidad por cualquier pérdida o
+        daño, sea cual sea la forma en que se produzca, que resulte de la divulgación por su parte
+        de información personal a terceros.</p></li>
+
+        <li><h5 class="my-3">7. Uso responsable</h5>
+        <p class="my-3">Al visitar nuestro sitio web, usted se compromete a utilizarlo sólo para los fines previstos y
+        según lo permitido por estos Términos, cualquier contrato adicional con nosotros, y
+        aplicables leyes, reglamentos y prácticas en línea generalmente aceptadas y directrices de
+        la industria. No debe usar nuestro sitio web o nuestros servicios para utilizar, publicar o
+        distribuir cualquier material que consista en (o esté vinculado a) software informático
+        malicioso; utilizar los datos recogidos en nuestro sitio web para cualquier actividad de
+        marketing directo, o llevar a cabo cualquier actividad de recopilación de datos sistemática
+        o automatizada en o en relación con nuestro sitio web.
+        Está estrictamente prohibido realizar cualquier actividad que provoque o pueda provocar
+        daños en el sitio web o que interfiera en su funcionamiento, disponibilidad o accesibilidad.</p></li>
+        <li><h5 class="my-3">8. Registro</h5>
+        <p class="my-3">Puede registrarse para obtener una cuenta en nuestro sitio web. Durante este proceso, es
+        posible que se le pida que elija una contraseña. Usted es responsable de mantener la
+        confidencialidad de las contraseñas y la información de la cuenta y se compromete a no
+        compartir sus contraseñas, la información de la cuenta o el acceso seguro a nuestro sitio
+        web o servicios con ninguna otra persona. No debe permitir que ninguna otra persona use
+        su cuenta para acceder al sitio web porque usted es responsable de todas las actividades
+        que ocurren a través del uso de sus contraseñas o cuentas. Debe notificarnos
+        inmediatamente si tiene conocimiento de la divulgación de su contraseña.
+        Después de la cancelación de la cuenta, usted no intentará registrar una nueva cuenta sin
+        nuestro permiso.</p></li>
+        <li><h5 class="my-3">9. Contenido publicado por usted</h5>
+        <p class="my-3">Podemos ofrecer varias herramientas de comunicación abierta en nuestro sitio web, como
+        comentarios en el blog, publicaciones en el blog, foros, tableros de mensajes, valoraciones
+        y reseñas, y varios servicios de redes sociales. Puede que no nos resulte factible filtrar o
+        supervisar todo el contenido que usted u otros puedan compartir o enviar en o a través de
+        nuestro sitio web. Sin embargo, nos reservamos el derecho de revisar el contenido y de
+        supervisar todo el uso y la actividad en nuestro sitio web, y de eliminar o rechazar cualquier
+        contenido a nuestra entera discreción. Al publicar información o utilizar cualquier
+        herramienta de comunicación abierta tal y como se menciona, usted acepta que su
+        contenido cumplirá con estos Términos y Condiciones y no debe ser ilícito o ilegal, ni
+        infringir los derechos legales de ninguna persona.</p></li>
+        <li><h5 class="my-3">10. Envío de ideas</h5>
+        <p class="my-3">No envíe ideas, inventos, trabajos de autoría u otra información que pueda considerarse su
+        propia propiedad intelectual y que le gustaría presentarnos, a menos que primero hayamos
+        firmado un acuerdo con respecto a la propiedad intelectual o un acuerdo de no
+        divulgación. Si nos lo comunica en ausencia de dicho acuerdo por escrito, nos concede
+        una licencia mundial, irrevocable, no exclusiva y libre de derechos de autor para utilizar,
+        reproducir, almacenar, adaptar, publicar, traducir y distribuir su contenido en cualquier
+        medio existente o futuro.</p></li>
+        <li><h5 class="my-3">11. Terminación de uso</h5>
+        <p class="my-3">Podemos, a nuestra entera discreción, modificar o interrumpir en cualquier momento el
+        acceso, temporal o permanentemente, al sitio web o a cualquier Servicio del mismo. Usted
+        acepta que no seremos responsables ante usted ni ante ningún tercero por cualquier
+        modificación, suspensión o interrupción de su acceso o uso del sitio web o de cualquier
+        contenido que pueda haber compartido en el sitio web. Usted no tendrá derecho a ninguna
+        compensación ni a ningún otro pago, ni siquiera si se pierden de forma permanente
+        determinadas funciones, configuraciones y/o cualquier Contenido con el que haya
+        contribuido o en el que haya confiado. No debe eludir o evitar, o intentar eludir o evitar,
+        cualquier medida de restricción de acceso en nuestro sitio web.</p></li>
+
+        <li><h5 class="my-3">12. Garantías y responsabilidad</h5>
+        <p class="my-3">Nada de lo dispuesto en esta sección limitará o excluirá cualquier garantía implícita por ley
+        que fuera ilegal limitar o excluir. Este sitio web y todo su contenido se proporcionan «tal
+        cual» y «según disponibilidad» y pueden incluir inexactitudes o errores tipográficos.
+        Renunciamos expresamente a toda garantía de cualquier tipo, ya sea expresa o implícita,
+        en cuanto a la disponibilidad, precisión o integridad del Contenido. No garantizamos que:
+        este sitio web o nuestros contenidos cumplirán con sus necesidades;
+        este sitio web estará disponible de forma ininterrumpida, oportuna, segura o sin errores.
+        Nada de lo contenido en este sitio web constituye o pretende constituir un asesoramiento
+        jurídico, financiero o médico de ningún tipo. Si necesita asesoramiento, debe consultar a
+        un profesional adecuado.
+        Las siguientes disposiciones de esta sección se aplicarán en la medida máxima permitida
+        por la ley aplicable y no limitarán ni excluirán nuestra responsabilidad con respecto a
+        cualquier asunto que sería ilícito o ilegal para nosotros limitar o excluir nuestra
+        responsabilidad. En ningún caso seremos responsables de cualquier daño directo o
+        indirecto (incluyendo cualquier daño por pérdida de beneficios o ingresos, pérdida o
+        corrupción de datos, software o base de datos, o pérdida o daño a la propiedad o a los
+        datos) incurridos por usted o por cualquier tercero, que surja de su acceso o uso de
+        nuestro sitio web.
+        Salvo en la medida en que cualquier contrato adicional establezca expresamente lo
+        contrario, nuestra responsabilidad máxima hacia usted por todos los daños que surjan o
+        estén relacionados con el sitio web o con cualquier producto o servicio comercializado o
+        vendido a través del sitio web, independientemente de la forma de acción legal que
+        imponga la responsabilidad (ya sea por contrato, equidad, negligencia, conducta
+        intencionada, agravio o cualquier otra forma) se limitará al precio total que usted nos pagó
+        para comprar dichos productos o servicios o utilizar el sitio web. Dicho límite se aplicará
+        en conjunto a todas sus reclamaciones, acciones y causas de acción de cualquier tipo y
+        naturaleza.</p></li>
+        <li><h5 class="my-3">13. Privacidad</h5>
+        <p class="my-3">Para acceder a nuestro sitio web y/o servicios, es posible que se le pida que proporcione
+        cierta información sobre usted como parte del proceso de registro. Usted se compromete
+        a que toda la información que proporcione sea siempre precisa, correcta y actualizada.
+        Hemos desarrollado una política para abordar cualquier preocupación sobre la privacidad
+        que pueda tener. Para más información, consulte nuestra Declaración de privacidad y
+        nuestra Política de cookies.</p></li>
+        <li><h5 class="my-3">14. Accesibilidad</h5>
+        <p class="my-3">Nos comprometemos a que los contenidos que ofrecemos sean accesibles para las
+        personas con discapacidad. Si tiene una discapacidad y no puede acceder a cualquier
+        parte de nuestro sitio web debido a su discapacidad, le pedimos que nos avise incluyendo
+        una descripción detallada del problema que ha encontrado. Si el problema es fácilmente
+        identificable y se puede resolver de acuerdo con las herramientas y técnicas de la
+        tecnología de la información estándar del sector, lo resolveremos rápidamente.
+        <li><h5 class="my-3">15. Restricciones a la exportación / Cumplimiento legal</h5>
+        <p class="my-3">Se prohíbe el acceso al sitio web desde territorios o países donde el Contenido o la compra
+        de los productos o Servicios vendidos en el sitio web es ilegal. No puede utilizar este sitio
+        web infringiendo las leyes y reglamentos de exportación de Gibraltar.</p></li>
+        <li><h5 class="my-3">16. Marketing de afiliados</h5>
+        <p class="my-3">A través de este sitio web podemos realizar actividades de marketing de afiliación por las
+        que recibimos un porcentaje o una comisión por la venta de servicios o productos en este
+        sitio web o a través de él. También podemos aceptar patrocinios u otras formas de
+        compensación publicitaria de empresas. Esta información pretende cumplir con los
+
+        requisitos legales sobre marketing y publicidad que puedan ser de aplicación, como las
+        normas de la Comisión Federal de Comercio de Estados Unidos.</p></li>
+        <li><h5 class="my-3">17. Asignación y cesiones</h5>
+       <p class="my-3">Usted no puede ceder, transferir o subcontratar ninguno de sus derechos y/u obligaciones
+        en virtud de estos Términos y condiciones, en su totalidad o en parte, a ningún tercero sin
+        nuestro consentimiento previo por escrito. Cualquier supuesta cesión en violación de esta
+        Sección será nula y sin efecto.</p></li>
+        <li><h5 class="my-3">18. Incumplimientos de estos Términos y condiciones</h5>
+        <p class="my-3">Sin perjuicio de los demás derechos que nos asisten en virtud de los presentes Términos y
+        Condiciones, si usted incumple estos Términos y Condiciones de cualquier manera,
+        podremos tomar las medidas que consideremos oportunas para hacer frente al
+        incumplimiento, incluyendo la suspensión temporal o permanente de su acceso al sitio
+        web, poniéndonos en contacto con su proveedor de servicios de Internet para solicitarle
+        que bloquee su acceso al sitio web, y/o iniciar acciones legales contra usted.</p></li>
+        <li><h5 class="my-3">19. Indemnización</h5>
+        <p class="my-3">Usted se compromete a indemnizarnos, defendernos y eximirnos de toda reclamación,
+        responsabilidad, daños, pérdidas y gastos, relacionados con la violación de estas
+        condiciones y de las leyes aplicables, incluidos los derechos de propiedad intelectual y los
+        derechos de privacidad. Usted nos reembolsará sin demora los daños, pérdidas, costes y
+        gastos relacionados con dichas reclamaciones o derivados de ellas.</p></li>
+        <li><h5 class="my-3">20. Renuncia</h5>
+        <p class="my-3">El incumplimiento de cualquiera de las disposiciones establecidas en estos Términos y
+        condiciones y en cualquier Acuerdo, o la falta de ejercicio de cualquier opción de
+        interrupción, no se interpretará como una renuncia a dichas disposiciones y no afectará a
+        la validez de estos Términos y Condiciones o de cualquier Acuerdo o cualquier parte del
+        mismo, ni al derecho posterior de hacer cumplir todas y cada una de las disposiciones.</p></li>
+        <li><h5 class="my-3">21. Idioma</h5>
+        <p class="my-3">Estos Términos y Condiciones se interpretarán y analizarán exclusivamente en Español;
+        castellano. Todas las notificaciones y la correspondencia se redactarán exclusivamente en
+        ese idioma.</p></li>
+        <li><h5 class="my-3">22. Acuerdo completo</h5>
+        <p class="my-3">Estos términos y condiciones, junto con nuestra declaración de privacidad y nuestra
+        política de cookies, constituyen el acuerdo completo entre Oktoper Limited y tú en relación
+        con tu uso de esta web.</p></li>
+        <li><h5 class="my-3">23. Actualización de los presentes Términos y Condiciones</h5>
+        <p class="my-3"> Es posible que actualicemos estos Términos y Condiciones de vez en cuando. La fecha
+        indicada al principio de estas Condiciones Generales es la última fecha de revisión. Le
+        notificaremos por escrito cualquier cambio o actualización, y los Términos y Condiciones
+        revisados entrarán en vigor a partir de la fecha en que le enviemos dicha notificación. El
+        uso continuado de este sitio web tras la publicación de cambios o actualizaciones se
+        considerará un aviso de su aceptación de cumplir y estar sujeto por estos Términos y
+        Condiciones. Para solicitar una versión anterior de estos Términos y condiciones, póngase
+        en contacto con nosotros.</p></li></ul></div>
+
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="h6 bg-transparent border-0 rounded-pill" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div><!-- ======================================
+Políticas de privacidad
+======================================= -->
+<div class="modal fade" id="policy">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded bg">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Políticas de Privacidad</h4>
+        <button type="button" class="h4 bg-transparent ms-auto border-0" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body px-5">
+
+        <div><ul><li>
+        <h5 class="my-3">1. Introducción</h5>
+        <p class="my-3">Nuestra web, https://rifamania.com (en adelante: «la web») utiliza cookies y otras
+        tecnologías relacionadas (para mayor comodidad, todas las tecnologías se denominan
+        «cookies»). Las cookies también son colocadas por terceros a los que hemos contratado.
+        En el siguiente documento te informamos sobre el uso de cookies en nuestra web.</p></li>
+        <li><h5 class="my-3">2. ¿Qué son las cookies?</h5>
+        <p class="my-3">Una cookie es un pequeño archivo que se envía junto con las páginas de esta web y que su
+        navegador almacena en el disco duro de su ordenador u otro dispositivo. La información
+        almacenada puede ser devuelta a nuestros servidores o a los servidores de terceros
+        apropiados durante una visita posterior.</p></li>
+        <li><h5 class="my-3">3. ¿Qué son los scripts?</h5>
+        <p class="my-3">Un script es un fragmento de código de programa que se utiliza para hacer que nuestra
+        web funcione correctamente y de forma interactiva. Este código se ejecuta en nuestro
+        servidor o en su dispositivo.</p></li>
+        <li><h5 class="my-3">4. ¿Qué es un web beacon?</h5>
+        <p class="my-3">Una baliza web (o una etiqueta de píxel) es una pequeña e invisible pieza de texto o imagen
+        en una web que se utiliza para monitorear el tráfico en una web. Para ello, se almacenan
+        varios datos sobre usted mediante estas balizas web.</p></li>
+        <li><h5 class="my-3">5. Cookies</h5>
+        <li><h5 class="my-3 ml-3">5.1 Cookies técnicas o funcionales</h5>
+        <p class="my-3 ml-3">Algunas cookies aseguran que ciertas partes de la web funcionen correctamente y que tus
+        preferencias de usuario sigan recordándose. Al colocar cookies funcionales, te facilitamos
+        la visita a nuestra web. De esta manera, no necesitas introducir repetidamente la misma
+        información cuando visitas nuestra web y, por ejemplo, los artículos permanecen en tu
+        cesta de la compra hasta que hayas pagado. Podemos colocar estas cookies sin tu
+        consentimiento.</p></li>
+        <li><h5 class="my-3 ml-3">5.2 Cookies de estadísticas</h5>
+        <p class="my-3 ml-3">Utilizamos cookies estadísticas para optimizar la experiencia de la web para nuestros
+        usuarios. Con estas cookies estadísticas obtenemos información sobre el uso de nuestra
+        web. Te pedimos tu permiso para colocar cookies de estadísticas.</p></li>
+        <li><h5 class="my-3 ml-3">5.3 Cookies publicitarias</h5>
+        <p class="my-3 ml-3">En esta web usamos cookies de publicidad, permitiéndonos obtener información sobre los
+        resultados de la campaña. Esto sucede en base a un perfil que creamos basado en tu
+        comportamiento en https://rifamania.com. Con estas cookies tú, como visitante de la
+        web, estás asociado a un ID único, pero estas cookies no crearán un perfil de tu
+        comportamiento e intereses para presentarte anuncios personalizados.</p></li>
+        <li><h5 class="my-3 ml-3">5.4 Cookies de Marketing/Seguimiento</h5>
+
+        <p class="my-3 ml-3">Las cookies de marketing/seguimiento son cookies, o cualquier otra forma de
+        almacenamiento local, usadas para crear perfiles de usuario para mostrar publicidad o
+        para hacer el seguimiento del usuario en esta web o en varias webs con fines de marketing
+        similares.
+        Debido a que estas cookies están marcadas como cookies de seguimiento, te pedimos tu
+        permiso para colocarlas.</p></li>
+        <li><h5 class="my-3 ml-3">5.5 Redes sociales</h5>
+        <p class="my-3 ml-3">En nuestra web hemos incluido contenido de Facebook, Twitter, LinkedIn, Instagram y
+        TikTok para promover páginas web (p.ej.: «Me gusta», «Pinear») o compartir (p.ej.:
+        «tuitear») en redes sociales como Facebook, Twitter, LinkedIn, Instagram y TikTok. Este
+        contenido está incrustado con código derivado de Facebook, Twitter, LinkedIn, Instagram y
+        TikTok y guarda cookies. Este contenido podría procesar cierta información para anuncios
+        personalizados.
+        Por favor lea la política de privacidad de estas redes sociales (que puede cambiar
+        frecuentemente) para saber que hacen con sus datos (personales) que procesan usando
+        estas cookies. Los datos que reciben son anonimizados lo máximo posible. Facebook,
+        Twitter, LinkedIn, Instagram y TikTok están ubicados en los Estados Unidos.</p></li>
+        <li><h5 class="my-3">6. Consentimiento</h5>
+        <p class="my-3">Cuando visites nuestra web por primera vez, te mostraremos una ventana emergente con
+        una explicación sobre las cookies. Tan pronto como hagas clic en «Aceptar», aceptas que
+        usemos todas las cookies y plugins tal como se describe en la ventana emergente y en
+        esta política de cookies. Puedes desactivar el uso de cookies a través de tu navegador,
+        pero, por favor, ten en cuenta que nuestra web puede dejar de funcionar correctamente.</p></li>
+        <li><h5 class="my-3">7. Activación/desactivación y eliminación de
+        cookies</h5>
+        <p class="my-3">Puedes utilizar tu navegador de Internet para eliminar las cookies de forma automática o
+        manual. También puedes especificar que ciertas cookies no pueden ser colocadas. Otra
+        opción es cambiar los ajustes de tu navegador de Internet para que recibas un mensaje
+        cada vez que se coloca una cookie. Para obtener más información sobre estas opciones,
+        consulta las instrucciones de la sección «Ayuda» de tu navegador.
+        Ten en cuenta que nuestra web puede no funcionar correctamente si todas las cookies
+        están desactivadas. Si borras las cookies de tu navegador, se volverán a colocar después
+        de tu consentimiento cuando vuelvas a visitar nuestras webs.</p></li>
+        <li><h5 class="my-3">8. Tus derechos con respecto a los datos
+        personales</h5>
+        <p class="my-3">Tienes los siguientes derechos con respecto a tus datos personales:
+        • Tiene derecho a saber por qué se necesitan tus datos personales, qué sucederá
+        con ellos y durante cuánto tiempo se conservarán.
+        • Derecho de acceso: tienes derecho a acceder a tus datos personales que
+        conocemos.
+
+        • Derecho de rectificación: tienes derecho a completar, rectificar, borrar o bloquear
+        tus datos personales cuando lo desees.
+        • Si nos das tu consentimiento para procesar tus datos, tienes derecho a revocar
+        dicho consentimiento y a que se eliminen tus datos personales.
+        • Derecho de cesión de tus datos: tienes derecho a solicitar todos tus datos
+        personales al responsable del tratamiento y a transferirlos íntegramente a otro
+        responsable del tratamiento.
+        • Derecho de oposición: puedes oponerte al tratamiento de tus datos. Nosotros
+        cumplimos con esto, a menos que existan motivos justificados para el
+        procesamiento.
+        Para ejercer estos derechos, por favor, contacta con nosotros. Por favor, consulta los
+        detalles de contacto en la parte inferior de esta política de cookies. Si tienes alguna queja
+        sobre cómo gestionamos tus datos, nos gustaría que nos la hicieras saber, pero también
+        tienes derecho a enviar una queja a la autoridad supervisora (la autoridad de protección de
+        datos).</p></li>
+        <li><h5 class="my-3">9. Datos de contacto</h5>
+        <p class="my-3">Para preguntas y/o comentarios sobre nuestra política de cookies y esta declaración, por
+        favor, contacta con nosotros usando los siguientes datos de contacto: admin@rifamania.com</p></li>
+        </ul></div>
+        </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="h6 bg-transparent border-0 rounded-pill" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div><!-- ======================================
+Términos y condiciones
+======================================= -->
+<div class="modal fade" id="contact">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded bg">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Contáctenos</h4>
+         <button type="button" class="h4 bg-transparent ms-auto border-0" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body px-5">
+
+        <h5 class="my-3 text-center">Envíanos un email a admin@rifamania.com y te responderemos lo antes posible<br>O escríbenos a nuestro WhatsApp <i class="bi bi-whatsapp"></i> <a href="https://wa.me/573001234567?text=duda" target="_blank">haciendo clic aquí</a></h5>
+
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="h6 bg-transparent border-0 rounded-pill" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/countdown/countdown.js"></script>
+
+</body>
+</html>

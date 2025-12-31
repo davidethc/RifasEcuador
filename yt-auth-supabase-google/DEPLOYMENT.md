@@ -11,7 +11,7 @@ Configura estas variables en Vercel (Settings → Environment Variables):
 NEXT_PUBLIC_PAYPHONE_TOKEN=tu_token_completo_de_produccion
 NEXT_PUBLIC_PAYPHONE_STORE_ID=tu_store_id
 NEXT_PUBLIC_PAYPHONE_ENVIRONMENT=production
-NEXT_PUBLIC_APP_URL=https://tu-dominio.vercel.app
+NEXT_PUBLIC_APP_URL=https://rifas-ecuador-ians.vercel.app
 ```
 
 #### Supabase (Obligatorias)
@@ -65,9 +65,11 @@ npm run build
 En el panel de Payphone (https://appdeveloper.payphonetodoesposible.com):
 
 1. **Ambiente**: Producción (no Sandbox)
-2. **Dominio web**: `https://tu-dominio.vercel.app`
-3. **Url de respuesta**: `https://tu-dominio.vercel.app/api/payment/payphone/callback`
+2. **Dominio web**: `https://rifas-ecuador-ians.vercel.app`
+3. **Url de respuesta**: `https://rifas-ecuador-ians.vercel.app/api/payment/payphone/callback`
 4. **Tipo**: Web
+
+**⚠️ IMPORTANTE**: Si actualmente tienes configurado `http://localhost:3000/` en el panel de Payphone, debes cambiarlo a la URL de producción arriba indicada.
 
 ### 6. Configuración en Supabase
 

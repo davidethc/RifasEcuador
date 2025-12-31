@@ -88,9 +88,9 @@ export function SorteoCard({
                     className="w-full btn-cta-primary rounded-lg px-4 py-3 flex items-center justify-center gap-2 font-semibold"
                 >
                     <Ticket className="w-4 h-4" />
-                    Comprar Boletos
+                        Comprar Boletos
                     <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
-                </Link>
+                    </Link>
             </div>
         </motion.div>
     );
