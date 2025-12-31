@@ -33,12 +33,18 @@ export default function ConfirmacionPage() {
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
 
   const transactionId = searchParams.get('transactionId');
 
-  const fetchOrderDetails = useCallback(async () => {
+  const fetchOrderDetails = useCallback(async (isPollingRequest = false) => {
     try {
-      setLoading(true);
+      // Solo mostrar loading inicial, no en polling
+      if (!isPollingRequest) {
+        setLoading(true);
+      } else {
+        setIsPolling(true);
+      }
       setError(null);
 
       // Usar el endpoint API que tiene acceso admin a la base de datos
@@ -57,20 +63,67 @@ export default function ConfirmacionPage() {
         return;
       }
 
-      setOrder(result.data as OrderDetails);
+      const previousStatus = order?.status;
+      const newOrder = result.data as OrderDetails;
+      setOrder(newOrder);
+
+      // Si el estado cambió de pendiente a completado, mostrar notificación
+      if (previousStatus && previousStatus !== 'completed' && newOrder.status === 'completed') {
+        console.log('✅ ¡Estado actualizado a completado!');
+      }
     } catch (err) {
       console.error('Error inesperado:', err);
       setError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
+      setIsPolling(false);
     }
-  }, [orderId]);
+  }, [orderId, order?.status]);
 
   useEffect(() => {
     if (orderId) {
       fetchOrderDetails();
     }
   }, [orderId, fetchOrderDetails]);
+
+  // Polling automático para actualizar el estado si está pendiente
+  useEffect(() => {
+    // Solo hacer polling si la orden está pendiente o reservada
+    if (!order || (order.status !== 'reserved' && order.status !== 'pending')) {
+      return;
+    }
+
+    console.log('🔄 Iniciando polling para actualizar estado de la orden...');
+
+    // Polling cada 3 segundos
+    const intervalId = setInterval(() => {
+      console.log('🔄 Actualizando estado de la orden...');
+      // Usar fetch directamente para evitar dependencias circulares
+      fetch(`/api/orders/${orderId}`)
+        .then(res => res.json())
+        .then(result => {
+          if (result.success && result.data) {
+            const newOrder = result.data as OrderDetails;
+            const previousStatus = order.status;
+            setOrder(newOrder);
+            
+            // Si el estado cambió a completado, detener el polling
+            if (previousStatus !== 'completed' && newOrder.status === 'completed') {
+              console.log('✅ ¡Estado actualizado a completado!');
+            }
+          }
+        })
+        .catch(err => {
+          console.error('Error en polling:', err);
+        });
+    }, 3000);
+
+    // Limpiar intervalo cuando el componente se desmonte o cuando la orden se complete
+    return () => {
+      console.log('🛑 Deteniendo polling...');
+      clearInterval(intervalId);
+    };
+  }, [order?.status, orderId]); // Solo dependemos del status, no del objeto completo
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-EC', {
@@ -158,10 +211,13 @@ export default function ConfirmacionPage() {
             </div>
           )}
           {isPending && (
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-yellow-100 dark:bg-yellow-900/20 rounded-full mb-4">
-              <svg className="w-12 h-12 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+            <div className="relative inline-flex items-center justify-center w-20 h-20 bg-yellow-100 dark:bg-yellow-900/20 rounded-full mb-4">
+              <svg className={`w-12 h-12 text-yellow-600 dark:text-yellow-400 ${isPolling ? 'animate-spin' : ''}`} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
               </svg>
+              {isPolling && (
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+              )}
             </div>
           )}
           {isExpired && (
@@ -179,7 +235,16 @@ export default function ConfirmacionPage() {
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
             {isCompleted && 'Tu compra ha sido confirmada exitosamente'}
-            {isPending && 'Estamos esperando la confirmación de tu pago'}
+            {isPending && (
+              <span className="flex items-center justify-center gap-2">
+                Estamos esperando la confirmación de tu pago
+                {isPolling && (
+                  <span className="text-sm text-green-600 dark:text-green-400 animate-pulse">
+                    (Actualizando...)
+                  </span>
+                )}
+              </span>
+            )}
             {isExpired && 'Esta orden ha expirado o fue cancelada'}
           </p>
         </div>
