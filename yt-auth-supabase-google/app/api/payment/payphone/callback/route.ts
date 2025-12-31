@@ -39,6 +39,8 @@ export async function GET(request: NextRequest) {
     console.log('📥 Callback de Payphone recibido:', {
       transactionId,
       clientTransactionId,
+      url: request.url,
+      searchParams: Object.fromEntries(searchParams.entries()),
       timestamp: new Date().toISOString(),
     });
 
@@ -71,6 +73,10 @@ export async function GET(request: NextRequest) {
       status: transactionStatus,
       statusCode: transaction?.statusCode,
       amount: transaction?.amount,
+      clientTransactionId: transaction?.clientTransactionId,
+      optionalParameter: transaction?.optionalParameter,
+      optionalParameter3: transaction?.optionalParameter3,
+      optionalParameter4: transaction?.optionalParameter4,
       timestamp: new Date().toISOString(),
     });
 
@@ -78,18 +84,93 @@ export async function GET(request: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     // Extraer orderId del clientTransactionId
-    // Formato: order-{orderId}-{timestamp}
+    // Formatos posibles:
+    // 1. order-{orderId}-{timestamp} (del API route)
+    // 2. ord-{orderShort}-{timestamp} (del frontend, solo primeros 8 chars del UUID)
     let orderId: string | null = null;
-    const orderMatch = clientTransactionId.match(/order-([a-f0-9-]+)-/);
-    if (orderMatch) {
-      orderId = orderMatch[1];
+    
+    // Intentar extraer del clientTransactionId recibido en la URL
+    // Formato 1: order-{uuid completo}-{timestamp}
+    const orderMatch1 = clientTransactionId.match(/^order-([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})-/);
+    if (orderMatch1) {
+      orderId = orderMatch1[1];
+      console.log('✅ OrderId extraído del formato completo (order-{uuid}-):', orderId);
     } else {
-      // Si no encontramos el orderId en el clientTransactionId, intentar usar optionalParameter3
-      orderId = transaction?.optionalParameter3 || null;
+      // Formato 2: ord-{primeros 8 chars}-{timestamp}
+      const orderMatch2 = clientTransactionId.match(/^ord-([a-f0-9]{8})-/);
+      if (orderMatch2) {
+        const orderPrefix = orderMatch2[1];
+        console.log('🔍 Buscando orden con prefijo (ord-{8chars}-):', orderPrefix);
+        
+        // Buscar en las últimas 100 órdenes por el prefijo
+        const { data: orders, error: searchError } = await supabase
+          .from('orders')
+          .select('id')
+          .order('created_at', { ascending: false })
+          .limit(100);
+        
+        if (!searchError && orders) {
+          const matchingOrder = orders.find(order => 
+            order.id.toLowerCase().startsWith(orderPrefix.toLowerCase())
+          );
+          
+          if (matchingOrder) {
+            orderId = matchingOrder.id;
+            console.log('✅ Orden encontrada por prefijo:', orderId);
+          }
+        }
+      }
+    }
+
+    // Si aún no tenemos orderId, intentar usar el clientTransactionId de la respuesta de Payphone
+    if (!orderId && transaction?.clientTransactionId) {
+      console.log('🔍 Intentando extraer orderId del clientTransactionId de la respuesta:', transaction.clientTransactionId);
+      const responseOrderMatch1 = transaction.clientTransactionId.match(/^order-([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})-/);
+      if (responseOrderMatch1) {
+        orderId = responseOrderMatch1[1];
+        console.log('✅ OrderId extraído del clientTransactionId de la respuesta:', orderId);
+      } else {
+        const responseOrderMatch2 = transaction.clientTransactionId.match(/^ord-([a-f0-9]{8})-/);
+        if (responseOrderMatch2) {
+          const orderPrefix = responseOrderMatch2[1];
+          const { data: orders } = await supabase
+            .from('orders')
+            .select('id')
+            .order('created_at', { ascending: false })
+            .limit(100);
+          
+          if (orders) {
+            const matchingOrder = orders.find(order => 
+              order.id.toLowerCase().startsWith(orderPrefix.toLowerCase())
+            );
+            if (matchingOrder) {
+              orderId = matchingOrder.id;
+              console.log('✅ Orden encontrada por prefijo en respuesta:', orderId);
+            }
+          }
+        }
+      }
+    }
+
+    // Último recurso: usar optionalParameter3 o optionalParameter si está disponible
+    // Payphone puede devolverlo en optionalParameter3 o en optionalParameter dependiendo de la versión
+    if (!orderId) {
+      if (transaction?.optionalParameter3) {
+        orderId = transaction.optionalParameter3;
+        console.log('✅ OrderId obtenido de optionalParameter3:', orderId);
+      } else if (transaction?.optionalParameter) {
+        orderId = transaction.optionalParameter;
+        console.log('✅ OrderId obtenido de optionalParameter:', orderId);
+      }
     }
 
     if (!orderId) {
-      console.error('❌ No se pudo extraer orderId de:', clientTransactionId);
+      console.error('❌ No se pudo extraer orderId de ninguna fuente:', {
+        clientTransactionId,
+        responseClientTransactionId: transaction?.clientTransactionId,
+        optionalParameter3: transaction?.optionalParameter3,
+        transactionId,
+      });
       // Aún así redirigimos, pero registramos el error
       return NextResponse.redirect(
         new URL('/comprar/error?message=ID de orden inválido', request.url)
@@ -98,12 +179,6 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ Order ID recuperado:', orderId);
     const finalOrderId = orderId;
-    
-    console.log('🔍 OrderId final a usar:', {
-      fromOptionalParameter3: transaction?.optionalParameter3,
-      fromSearch: orderId,
-      final: finalOrderId,
-    });
 
     // Actualizar base de datos (esto puede tomar más tiempo, pero ya confirmamos con Payphone)
     // Procesar de forma asíncrona para no bloquear la respuesta
