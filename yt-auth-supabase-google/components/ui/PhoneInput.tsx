@@ -51,13 +51,13 @@ export function PhoneInput({
     } else {
       setDisplayValue('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [value]);
 
   const handleChange = (newValue: string) => {
     // Si el usuario está escribiendo "0" al inicio, permitirlo temporalmente
     // Solo formatear cuando tenga más de 1 dígito o cuando sea un formato completo
-    
+
     // Si el valor es solo "0", mantenerlo sin formatear
     if (newValue.trim() === '0' || newValue.trim() === '+') {
       setDisplayValue(newValue);
@@ -65,11 +65,11 @@ export function PhoneInput({
       onChange(newValue);
       return;
     }
-    
+
     // Formatear mientras el usuario escribe
     const formatted = formatPhoneWhileTyping(newValue);
     setDisplayValue(formatted);
-    
+
     // Normalizar y enviar el valor formateado (sin espacios para almacenamiento)
     const normalized = normalizePhoneNumber(formatted);
     onChange(normalized);
@@ -87,7 +87,7 @@ export function PhoneInput({
         onChange(normalized);
       }
     }
-    
+
     if (onBlur) {
       onBlur();
     }

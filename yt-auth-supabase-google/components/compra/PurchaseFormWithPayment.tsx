@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import type { PurchaseFormData } from '@/types/purchase.types';
 import { PaymentMethod } from './PaymentMethod';
 import { MaterialInput } from '../ui/MaterialInput';
@@ -37,7 +37,7 @@ export function PurchaseFormWithPayment({
   orderId,
   ticketNumbers,
 }: PurchaseFormWithPaymentProps) {
-  const router = useRouter();
+  // const router = useRouter();
   const [formData, setFormData] = useState<PurchaseFormData>({
     name: initialData?.name || '',
     lastName: initialData?.lastName || '',

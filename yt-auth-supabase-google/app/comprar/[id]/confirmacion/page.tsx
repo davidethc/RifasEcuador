@@ -106,7 +106,7 @@ export default function ConfirmacionPage() {
             const newOrder = result.data as OrderDetails;
             const previousStatus = order.status;
             setOrder(newOrder);
-            
+
             // Si el estado cambió a completado, detener el polling
             if (previousStatus !== 'completed' && newOrder.status === 'completed') {
               console.log('✅ ¡Estado actualizado a completado!');
@@ -123,7 +123,7 @@ export default function ConfirmacionPage() {
       console.log('🛑 Deteniendo polling...');
       clearInterval(intervalId);
     };
-  }, [order?.status, orderId]); // Solo dependemos del status, no del objeto completo
+  }, [order?.status, orderId, order]); // Solo dependemos del status, no del objeto completo
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-EC', {
