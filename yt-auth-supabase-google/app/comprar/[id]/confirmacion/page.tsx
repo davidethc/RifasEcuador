@@ -249,8 +249,9 @@ export default function ConfirmacionPage() {
           </p>
         </div>
 
-        {/* Números de boletos */}
-        {order.numbers && order.numbers.length > 0 && (
+        {/* Números de boletos - SOLO mostrar si la orden está completada */}
+        {/* ⚠️ CRÍTICO: No mostrar boletos hasta que el pago esté confirmado (status === 'completed') */}
+        {isCompleted && order.numbers && order.numbers.length > 0 && (
           <div className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-2xl border-2 border-primary-200 dark:border-primary-800 p-6 mb-8">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center font-[var(--font-comfortaa)]">
               🎟️ Tus Números de la Suerte

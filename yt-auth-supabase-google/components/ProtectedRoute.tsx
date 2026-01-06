@@ -16,7 +16,8 @@ const isPublicRoute = (pathname: string): boolean => {
   // Check if it's a sorteo detail page (matches /sorteos/[any-id])
   if (pathname.startsWith('/sorteos/')) return true;
   
-  // Comprar page requires auth but is handled by the page itself
+  // Comprar pages are public - allow guest checkout (no authentication required)
+  // Includes: /comprar/[id], /comprar/[id]/confirmacion, /comprar/error
   if (pathname.startsWith('/comprar/')) return true;
   
   return false;
