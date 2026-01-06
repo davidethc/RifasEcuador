@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { MaterialInput } from './ui/MaterialInput';
 
 interface ForgotPasswordModalProps {
   isOpen: boolean;
@@ -35,54 +36,80 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Reset Password</h2>
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+      <div className="rounded-2xl p-6 max-w-md w-full border" style={{ 
+        background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+        borderColor: '#3A2F5A',
+        boxShadow: '0 20px 60px rgba(168, 62, 245, 0.3), 0 0 40px rgba(240, 32, 128, 0.2)'
+      }}>
+        <h2 className="text-xl font-semibold mb-4" style={{ color: '#FFFFFF' }}>Restablecer contraseña</h2>
 
         {success ? (
           <div className="space-y-4">
-            <p className="text-green-600 dark:text-green-400">
-              Reset link has been sent to your email address. Please check your inbox.
+            <p className="text-sm" style={{ color: '#E5D4FF' }}>
+              Se ha enviado un enlace de restablecimiento a tu correo electrónico. Por favor revisa tu bandeja de entrada.
             </p>
             <button
               onClick={onClose}
-              className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="w-full py-3 px-4 text-white rounded-xl transition-colors font-[var(--font-dm-sans)] font-semibold"
+              style={{ background: 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)', boxShadow: '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #f02080 0%, #A83EF5 100%)';
+                e.currentTarget.style.boxShadow = '0 6px 25px rgba(168, 62, 245, 0.5), 0 0 40px rgba(240, 32, 128, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)';
+              }}
             >
-              Close
+              Cerrar
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            {error && (
-              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
-            )}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email address
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-gray-900 px-3 py-2"
-                required
-              />
-            </div>
+            <MaterialInput
+              id="email"
+              label="Correo electrónico"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="tu@email.com"
+              required
+              error={error}
+              variant="outlined"
+            />
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2 px-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                className="py-2 px-4 transition-colors font-[var(--font-dm-sans)] rounded-xl"
+                style={{ color: '#E5D4FF' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#FFFFFF';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#E5D4FF';
+                }}
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 onClick={handleResetPassword}
                 disabled={isLoading}
-                className="py-2 px-4 bg-blue-600 dark:bg-amber-400 text-white dark:text-gray-900 rounded-lg hover:bg-blue-700 dark:hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                className="py-3 px-4 text-white rounded-xl disabled:opacity-50 transition-colors font-[var(--font-dm-sans)] font-semibold"
+                style={{ background: 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)', boxShadow: '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)' }}
+                onMouseEnter={(e) => {
+                  if (!isLoading) {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #f02080 0%, #A83EF5 100%)';
+                    e.currentTarget.style.boxShadow = '0 6px 25px rgba(168, 62, 245, 0.5), 0 0 40px rgba(240, 32, 128, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)';
+                }}
               >
-                {isLoading ? 'Sending...' : 'Send Reset Link'}
+                {isLoading ? 'Enviando...' : 'Enviar enlace'}
               </button>
             </div>
           </div>

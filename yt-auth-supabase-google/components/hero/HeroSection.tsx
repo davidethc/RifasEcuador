@@ -25,6 +25,8 @@ export function HeroSection() {
     { src: "/volcan01.jpeg", alt: "Volcán Ecuador" },
   ];
 
+  const [ratio, setRatio] = useState(22 / 9);
+
   // Cargar boletos del usuario cuando esté autenticado
   useEffect(() => {
     async function loadUserTickets() {
@@ -48,14 +50,28 @@ export function HeroSection() {
     loadUserTickets();
   }, [user, authLoading]);
 
+  // Manejar ratio responsivo
+  useEffect(() => {
+    const handleResize = () => {
+      // 16/10 para móvil, 19/9 para desktop (un poco más alto que antes 22/9)
+      setRatio(window.innerWidth < 768 ? 16 / 10 : 19 / 9);
+    };
+
+    // Set initial
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <section className="relative w-full min-h-[60vh] flex items-center pt-4 md:pt-12 pb-12 md:pb-16 overflow-hidden" style={{ 
+    <section className="relative w-full min-h-[50vh] flex items-start md:items-center pt-4 md:pt-12 pb-8 md:pb-16 overflow-hidden" style={{
       background: 'linear-gradient(180deg, #1F1935 0%, #2A1F3D 30%, #360254 70%, #4A1F5C 100%)'
     }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         {/* Carrusel de imágenes */}
         <div className="mb-6 md:mb-12">
-          <HeroCarousel images={heroCarouselImages} ratio={22 / 9} />
+          <HeroCarousel images={heroCarouselImages} ratio={ratio} />
         </div>
 
         <div className="text-left w-full">
@@ -83,7 +99,7 @@ export function HeroSection() {
             <button
               onClick={() => router.push('/sorteos')}
               className="px-6 py-3.5 md:px-8 md:py-4 text-base md:text-lg font-bold font-[var(--font-dm-sans)] border-0 min-h-[44px] rounded-lg transition-all"
-              style={{ 
+              style={{
                 background: 'linear-gradient(135deg, #F2C94C, #F2994A)',
                 color: '#1A1A1A',
                 boxShadow: '0 4px 12px rgba(242, 201, 76, 0.25)'
@@ -100,7 +116,7 @@ export function HeroSection() {
             <Link
               href="/como-jugar"
               className="px-6 py-3.5 md:px-8 md:py-4 text-base md:text-lg font-semibold rounded-lg transition-all font-[var(--font-dm-sans)] min-h-[44px] flex items-center justify-center"
-              style={{ 
+              style={{
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 color: '#E5E7EB',
                 background: 'rgba(28, 32, 58, 0.4)'
@@ -120,7 +136,7 @@ export function HeroSection() {
 
           {/* Bloque de Confianza - Estilo profesional */}
           <div className="mt-8 md:mt-12 max-w-4xl mx-auto">
-            <div className="rounded-lg border p-4 md:p-6 lg:p-8" style={{ 
+            <div className="rounded-lg border p-4 md:p-6 lg:p-8" style={{
               background: 'rgba(28, 32, 58, 0.6)',
               borderColor: 'rgba(255, 255, 255, 0.1)',
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
@@ -235,7 +251,7 @@ export function HeroSection() {
         {/* Sección Mis Boletos - Solo si el usuario está autenticado */}
         {user && !authLoading && (
           <div className="mt-16 md:mt-24 max-w-6xl">
-            <div className="rounded-lg border p-6 md:p-8" style={{ 
+            <div className="rounded-lg border p-6 md:p-8" style={{
               background: 'rgba(28, 32, 58, 0.6)',
               borderColor: 'rgba(255, 255, 255, 0.1)',
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
@@ -278,7 +294,7 @@ export function HeroSection() {
                   <Link
                     href="/sorteos"
                     className="inline-block px-6 py-3 rounded-lg font-semibold transition-all font-[var(--font-dm-sans)]"
-                    style={{ 
+                    style={{
                       background: 'linear-gradient(135deg, #F2C94C, #F2994A)',
                       color: '#1A1A1A',
                       boxShadow: '0 4px 12px rgba(242, 201, 76, 0.25)'
@@ -299,7 +315,7 @@ export function HeroSection() {
                     <div
                       key={ticket.order_id}
                       className="rounded-lg border p-4 md:p-6 transition-all"
-                      style={{ 
+                      style={{
                         background: 'rgba(15, 17, 23, 0.4)',
                         borderColor: 'rgba(255, 255, 255, 0.1)'
                       }}

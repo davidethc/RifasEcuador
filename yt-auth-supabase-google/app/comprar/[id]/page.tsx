@@ -104,7 +104,10 @@ export default function ComprarPage() {
    }
 
    return (
-      <div className="min-h-screen font-josefin overflow-x-hidden" style={{ backgroundColor: '#1A0F2E' }}>
+      <div className="min-h-screen font-josefin overflow-x-hidden" style={{ 
+         background: 'linear-gradient(180deg, #1F1A2E 0%, #2A1F3D 20%, #2D2140 40%, #2A1F3D 60%, #1F1A2E 100%)',
+         backgroundAttachment: 'fixed'
+      }}>
 
          {/* =================================
           SECTION A: HERO (Gradiente suave que oscurece hacia abajo)
@@ -258,12 +261,21 @@ export default function ComprarPage() {
          </div>
 
          {/* =================================
-          SECTION C: NUMBER GRID (Continúa oscureciendo, mantiene tonos morados)
+          SECTION C: NUMBER GRID (Fondo vibrante que combina con formularios)
           ================================= */}
          <div className="relative py-16 md:py-20 overflow-hidden" id="buy-section" style={{ 
-            background: 'linear-gradient(180deg, #1A152E 0%, #1C162F 30%, #1E1832 60%, #1F1935 100%)',
+            background: 'linear-gradient(180deg, #2A1F3D 0%, #2D2140 25%, #2F2343 50%, #2D2140 75%, #2A1F3D 100%)',
             color: '#fff'
          }}>
+            {/* Overlay sutil con colores vibrantes del logo */}
+            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+               <div className="absolute top-0 left-1/4 w-[600px] h-[400px] rounded-full blur-[120px] opacity-8" style={{ 
+                  background: 'radial-gradient(circle, rgba(168, 62, 245, 0.4) 0%, transparent 70%)'
+               }}></div>
+               <div className="absolute bottom-0 right-1/4 w-[500px] h-[350px] rounded-full blur-[100px] opacity-6" style={{ 
+                  background: 'radial-gradient(circle, rgba(240, 32, 128, 0.3) 0%, transparent 70%)'
+               }}></div>
+            </div>
             <div className="container mx-auto px-4 relative" style={{ zIndex: 1 }}>
                <div className="text-center mb-12">
                   <h2 className="text-3xl md:text-5xl font-bold mb-4" style={{ color: '#F9FAFB', fontWeight: 700 }}>
@@ -301,17 +313,16 @@ export default function ComprarPage() {
                {quantity > 0 && (
                   <div id="payment-form" className="mt-16 max-w-5xl mx-auto">
                      <div className="rounded-2xl p-6 md:p-10 border" style={{ 
-                       background: 'rgba(28, 32, 58, 0.85)', 
-                       color: '#fff',
-                       borderColor: 'rgba(255, 255, 255, 0.1)',
-                       boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)'
+                       background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+                       borderColor: '#3A2F5A',
+                       boxShadow: '0 20px 60px rgba(168, 62, 245, 0.2), 0 0 40px rgba(240, 32, 128, 0.1)'
                      }}>
                         {/* Header sobrio */}
-                        <div className="text-center mb-8 md:mb-10 pb-6 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-                           <h3 className="text-2xl md:text-3xl font-bold mb-3 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
+                        <div className="text-center mb-8 md:mb-10 pb-6 border-b" style={{ borderColor: '#3A2F5A' }}>
+                           <h3 className="text-2xl md:text-3xl font-bold mb-3 font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
                               Completa tu compra
                            </h3>
-                           <p className="text-base font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                           <p className="text-base font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
                               Ingresa tus datos para continuar
                            </p>
                         </div>
@@ -327,7 +338,11 @@ export default function ComprarPage() {
                            ticketNumbers={ticketNumbers}
                         />
                         {error && (
-                           <div className="mt-4 p-4 border rounded-lg text-center font-medium" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#FCA5A5', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+                           <div className="mt-4 p-4 border rounded-xl text-center font-medium" style={{ 
+                             background: 'rgba(220, 38, 38, 0.1)', 
+                             color: '#DC2626', 
+                             borderColor: 'rgba(220, 38, 38, 0.3)' 
+                           }}>
                               {error}
                            </div>
                         )}

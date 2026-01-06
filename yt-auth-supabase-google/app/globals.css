@@ -45,6 +45,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  
+  /* Optimización de tipografía para modo claro */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 1.6;
 }
 
 /* Smooth scrolling */
@@ -87,6 +94,96 @@ html {
 
 .whatsapp-pulse-smooth {
   animation: whatsapp-pulse-smooth 3s ease-in-out infinite;
+}
+
+/* Gradiente fosforescente animado para navbar */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradient-rotate {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.navbar-phosphorescent {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(248, 250, 252, 0.98) 50%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar-phosphorescent::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    rgba(100, 150, 220, 0.06) 0%,
+    rgba(140, 110, 180, 0.08) 25%,
+    rgba(120, 160, 200, 0.07) 50%,
+    rgba(140, 110, 180, 0.08) 75%,
+    rgba(100, 150, 220, 0.06) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 10s ease infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.navbar-phosphorescent::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 160, 200, 0.05) 25%,
+    transparent 50%,
+    rgba(140, 110, 180, 0.05) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-shift 8s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.navbar-phosphorescent > * {
+  position: relative;
+  z-index: 2;
 }
 
 /* =========================================
@@ -501,4 +598,111 @@ html {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+/* =========================================
+   MATERIAL DESIGN FORM STANDARDS
+   ========================================= */
+
+/* Material Design Dark Theme Backgrounds */
+.material-bg-base {
+  background-color: #121212; /* Nivel 0 - Fondo base */
+}
+
+.material-bg-surface {
+  background-color: #1E1E1E; /* Nivel 1 - Superficie (5-8% más claro) */
+}
+
+.material-bg-card {
+  background-color: #252525; /* Nivel 2 - Tarjetas */
+}
+
+.material-bg-dialog {
+  background-color: #2C2C2C; /* Nivel 3 - Diálogos/Modales */
+}
+
+/* Material Design Text Opacity Levels */
+.material-text-high {
+  color: rgba(255, 255, 255, 0.87); /* Alto énfasis - Títulos */
+}
+
+.material-text-medium {
+  color: rgba(255, 255, 255, 0.60); /* Medio énfasis - Cuerpo */
+}
+
+.material-text-disabled {
+  color: rgba(255, 255, 255, 0.38); /* Deshabilitado */
+}
+
+/* Material Design Input States */
+.material-input-focused {
+  border-width: 2px;
+  border-color: #A83EF5; /* Color primario desaturado */
+}
+
+.material-input-error {
+  border-color: #EF4444; /* Rojo error */
+}
+
+.material-input-disabled {
+  opacity: 0.38;
+  border-style: dashed;
+}
+
+/* Material Design Form Container */
+.material-form-container {
+  background-color: #1E1E1E;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Material Design Elevation Shadows */
+.material-elevation-1 {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.material-elevation-2 {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.material-elevation-3 {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Material Design Ripple Effect */
+@keyframes material-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.material-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.material-ripple::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  top: 50%;
+  left: 50%;
+  animation: material-ripple 0.6s;
+  opacity: 0;
+}
+
+.material-ripple:active::after {
+  animation: material-ripple 0.6s;
+  opacity: 1;
 }

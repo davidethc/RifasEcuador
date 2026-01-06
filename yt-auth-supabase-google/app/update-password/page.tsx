@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { MaterialInput } from '@/components/ui/MaterialInput';
 
 export default function UpdatePasswordPage() {
   const { supabase } = useAuth();
@@ -69,67 +70,84 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ 
+      background: 'linear-gradient(180deg, #1F1A2E 0%, #2A1F3D 20%, #2D2140 40%, #2A1F3D 60%, #1F1A2E 100%)',
+      backgroundAttachment: 'fixed'
+    }}>
+      {/* Overlay sutil con colores vibrantes del logo - estilo Apple */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[400px] rounded-full blur-[120px] opacity-10" style={{ 
+          background: 'radial-gradient(circle, rgba(168, 62, 245, 0.4) 0%, transparent 70%)'
+        }}></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[350px] rounded-full blur-[100px] opacity-8" style={{ 
+          background: 'radial-gradient(circle, rgba(240, 32, 128, 0.3) 0%, transparent 70%)'
+        }}></div>
+      </div>
+      <div className="max-w-md w-full space-y-8 rounded-2xl p-8 border relative z-10" style={{ 
+        background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+        borderColor: '#3A2F5A',
+        boxShadow: '0 20px 60px rgba(168, 62, 245, 0.2), 0 0 40px rgba(240, 32, 128, 0.1)'
+      }}>
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Update Password</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
-            Please enter your new password
+          <h2 className="text-3xl font-bold font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>Actualizar contraseña</h2>
+          <p className="mt-2 font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
+            Ingresa tu nueva contraseña
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/30 text-red-500 p-4 rounded-lg">
+          <div className="p-4 rounded-xl border" style={{ background: 'rgba(220, 38, 38, 0.1)', borderColor: 'rgba(220, 38, 38, 0.3)', color: '#DC2626' }}>
             {error}
           </div>
         )}
 
         {success ? (
-          <div className="bg-green-50 dark:bg-green-900/30 text-green-500 p-4 rounded-lg">
-            Password updated successfully! Redirecting to login...
+          <div className="p-4 rounded-xl border" style={{ background: 'rgba(34, 197, 94, 0.1)', borderColor: 'rgba(34, 197, 94, 0.3)', color: '#22C55E' }}>
+            ¡Contraseña actualizada exitosamente! Redirigiendo al inicio de sesión...
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="newPassword" className="sr-only">
-                  New Password
-                </label>
-                <input
-                  id="newPassword"
-                  name="newPassword"
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
-                  placeholder="New Password"
-                  minLength={6}
-                />
-              </div>
-              <div>
-                <label htmlFor="confirmPassword" className="sr-only">
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
-                  placeholder="Confirm Password"
-                  minLength={6}
-                />
-              </div>
+            <div className="space-y-6">
+              <MaterialInput
+                id="newPassword"
+                label="Nueva contraseña"
+                type="password"
+                value={newPassword}
+                onChange={setNewPassword}
+                placeholder="Ingresa tu nueva contraseña"
+                required
+                variant="outlined"
+                helperText="Mínimo 6 caracteres"
+              />
+              <MaterialInput
+                id="confirmPassword"
+                label="Confirma la contraseña"
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                placeholder="Confirma tu nueva contraseña"
+                required
+                error={newPassword !== confirmPassword && confirmPassword.length > 0 ? 'Las contraseñas no coinciden' : undefined}
+                variant="outlined"
+              />
             </div>
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-white dark:text-gray-900 bg-blue-600 dark:bg-amber-400 hover:bg-blue-700 dark:hover:bg-amber-500 disabled:opacity-50 transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-white disabled:opacity-50 transition-colors font-[var(--font-dm-sans)] font-semibold"
+              style={{ background: 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)', boxShadow: '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)' }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #f02080 0%, #A83EF5 100%)';
+                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(168, 62, 245, 0.5), 0 0 40px rgba(240, 32, 128, 0.3)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)';
+              }}
             >
-              {isLoading ? 'Updating...' : 'Update Password'}
+              {isLoading ? 'Actualizando...' : 'Actualizar contraseña'}
             </button>
           </form>
         )}

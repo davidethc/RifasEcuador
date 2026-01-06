@@ -80,7 +80,7 @@ export const purchaseService = {
 
       // 1. Obtener información del sorteo
       console.log('🔍 [DEBUG] Buscando sorteo con ID:', raffleId);
-      
+
       const { data: raffle, error: raffleError } = await supabase
         .from('raffles')
         .select('id, price_per_ticket, title, status')
@@ -106,7 +106,7 @@ export const purchaseService = {
 
       // 2. Obtener usuario autenticado (si existe)
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      
+
       let customerId: string | null = null;
       let userId: string | null = null;
       let userEmail: string | null = null;
@@ -124,127 +124,39 @@ export const purchaseService = {
         console.log('⚠️ [createPurchaseWithCustomer] Usuario no autenticado (guest checkout)');
       }
 
-      // Crear o buscar client (nota: la tabla se llama 'clients' no 'customers')
+      // Crear o buscar client usando RPC (Security Definer para evitar problemas de RLS)
       const fullName = `${customerData.name} ${customerData.lastName}`.trim();
-      
-      // Usar el email del usuario autenticado si está disponible, sino el del formulario
       const clientEmail = userEmail || customerData.email;
-      
-      // Buscar client existente
-      // - Si está autenticado: buscar primero por auth_user_id, luego por email
-      // - Si es guest: buscar por email
-      let existingClient = null;
 
-      if (userId) {
-        // Usuario autenticado: buscar primero por auth_user_id
-        const { data: clientByAuthId } = await supabase
-          .from('clients')
-          .select('id')
-          .eq('auth_user_id', userId)
-          .maybeSingle();
-        
-        if (clientByAuthId) {
-          existingClient = clientByAuthId;
-        } else {
-          // Si no se encuentra por auth_user_id, buscar por email (case insensitive)
-          // (puede ser que el cliente se creó antes de autenticarse)
-          const { data: clientByEmail } = await supabase
-            .from('clients')
-            .select('id')
-            .ilike('email', clientEmail)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          
-          existingClient = clientByEmail;
-          if (existingClient) {
-            console.log('✅ [createPurchaseWithCustomer] Cliente encontrado por email (usuario autenticado)');
-          }
-        }
-      } else {
-        // Guest checkout: buscar por email (case insensitive)
-        const { data } = await supabase
-          .from('clients')
-          .select('id')
-          .ilike('email', clientEmail)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        existingClient = data;
-        if (existingClient) {
-          console.log('✅ [createPurchaseWithCustomer] Cliente encontrado por email (guest)');
-        }
+      console.log('🔍 [DEBUG] Llamando a get_or_create_client:', {
+        email: clientEmail,
+        name: fullName,
+        phone: customerData.whatsapp,
+        auth_user_id: userId
+      });
+
+      const { data: clientId, error: clientError } = await supabase.rpc('get_or_create_client', {
+        p_email: clientEmail,
+        p_name: fullName,
+        p_phone: customerData.whatsapp,
+        p_auth_user_id: userId
+      });
+
+      if (clientError) {
+        console.error('Error al obtener/crear client:', clientError);
+        return {
+          success: false,
+          error: `Error al procesar cliente: ${clientError.message}`
+        };
       }
 
-      if (existingClient) {
-        customerId = existingClient.id;
-        
-        // Actualizar datos del client, incluyendo auth_user_id si está autenticado
-        const updateData: {
-          name: string;
-          phone: string;
-          auth_user_id?: string | null;
-        } = {
-          name: fullName,
-          phone: customerData.whatsapp,
-        };
-
-        // Si el usuario está autenticado y el cliente no tiene auth_user_id, asignarlo
-        if (userId) {
-          updateData.auth_user_id = userId;
-        }
-
-        await supabase
-          .from('clients')
-          .update(updateData)
-          .eq('id', customerId);
-        
-        console.log('✅ [createPurchaseWithCustomer] Cliente actualizado:', {
-          customerId,
-          auth_user_id: userId || 'no asignado',
-        });
-      } else {
-        // Crear nuevo client
-        const clientInsertData: {
-          email: string;
-          name: string;
-          phone: string;
-          auth_user_id?: string | null;
-        } = {
-          email: clientEmail, // Usar el email del usuario autenticado si está disponible
-          name: fullName,
-          phone: customerData.whatsapp,
-        };
-
-        if (userId) {
-          clientInsertData.auth_user_id = userId;
-          console.log('✅ [createPurchaseWithCustomer] Creando cliente con auth_user_id:', userId);
-        } else {
-          console.log('⚠️ [createPurchaseWithCustomer] Creando cliente sin auth_user_id (guest)');
-        }
-
-        const { data: newClient, error: clientError } = await supabase
-          .from('clients')
-          .insert(clientInsertData)
-          .select('id')
-          .single();
-
-        if (clientError || !newClient) {
-          console.error('Error al crear client:', clientError);
-          console.error('Detalle del error:', {
-            code: clientError?.code,
-            message: clientError?.message,
-            details: clientError?.details,
-            hint: clientError?.hint,
-          });
-          return { 
-            success: false, 
-            error: `Error al crear cliente: ${clientError?.message || 'Tabla "clients" no existe. Por favor, ejecuta CREAR_TABLA_CLIENTS.sql'}` 
-          };
-        }
-
-        customerId = newClient.id;
+      if (!clientId) {
+        console.error('Error: get_or_create_client retornó null');
+        return { success: false, error: 'Error al procesar cliente (ID nulo)' };
       }
+
+      customerId = clientId as string;
+      console.log('✅ [SUCCESS] Cliente procesado correctamente:', customerId);
 
       if (!customerId) {
         return { success: false, error: 'Error al crear o encontrar cliente' };
@@ -255,7 +167,7 @@ export const purchaseService = {
       // Combo 20: regalamos 7 tickets adicionales (total 27)
       let totalTicketsToReserve = quantity;
       let bonusTickets = 0;
-      
+
       if (quantity === 10) {
         bonusTickets = 5;
         totalTicketsToReserve = 15;
@@ -303,12 +215,12 @@ export const purchaseService = {
 
       const reservation = reservationResult[0];
       const ticketNumbers = reservation.ticket_numbers || [];
-      
+
       // IMPORTANTE: Corregir el total de la orden
       // El total debe ser quantity * price_per_ticket (no totalTicketsToReserve)
       // porque los tickets adicionales son GRATIS
       const correctTotal = quantity * raffle.price_per_ticket;
-      
+
       console.log('💰 [PRICE_CORRECTION] Corrigiendo total de la orden:', {
         orderId: reservation.order_id,
         totalCalculadoPorSQL: reservation.total_amount,
@@ -331,7 +243,7 @@ export const purchaseService = {
       } else {
         console.log('✅ [PRICE_CORRECTION] Total de la orden actualizado correctamente a:', correctTotal);
       }
-      
+
       console.log('✅ [SUCCESS] Tickets reservados:', {
         orderId: reservation.order_id,
         ticketNumbers,
@@ -341,16 +253,16 @@ export const purchaseService = {
         ticketsGratis: bonusTickets,
       });
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         saleId: reservation.order_id, // Usamos order_id como saleId para compatibilidad
         orderId: reservation.order_id,
         ticketNumbers,
       };
     } catch (error) {
       console.error('Error al crear compra con cliente:', error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: error instanceof Error ? error.message : 'Error desconocido'
       };
     }
@@ -399,7 +311,7 @@ export const purchaseService = {
 
       // Los números están en el campo JSONB 'numbers'
       const ticketNumbers = (typedOrderData.numbers as string[]) || [];
-      
+
       // Calcular cantidad
       const quantity = ticketNumbers.length;
 
@@ -411,10 +323,10 @@ export const purchaseService = {
       const clientName = clientNameParts[0] || '';
 
       // Convertir status de order a payment_status
-      const paymentStatus: PurchaseConfirmation['payment_status'] = 
-        typedOrderData.status === 'completed' ? 'completed' : 
-        typedOrderData.status === 'expired' ? 'expired' : 
-        'pending';
+      const paymentStatus: PurchaseConfirmation['payment_status'] =
+        typedOrderData.status === 'completed' ? 'completed' :
+          typedOrderData.status === 'expired' ? 'expired' :
+            'pending';
 
       return {
         sale_id: typedOrderData.id,
@@ -432,10 +344,10 @@ export const purchaseService = {
         ticket_numbers: ticketNumbers,
         customerData: client
           ? {
-              name: clientName,
-              email: client.email || '',
-              phone: client.phone || '',
-            }
+            name: clientName,
+            email: client.email || '',
+            phone: client.phone || '',
+          }
           : undefined,
       };
     } catch (error) {
@@ -454,7 +366,7 @@ export const purchaseService = {
     try {
       // 1. Verificar autenticación
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !authUser) {
         console.log('❌ [getUserTickets] Usuario no autenticado');
         return [];
@@ -462,12 +374,12 @@ export const purchaseService = {
 
       // 2. Buscar cliente asociado al usuario
       let client = await this.findClientByUser(authUser);
-      
+
       // 3. Si no se encuentra cliente, buscar órdenes directamente por email del cliente
       if (!client && authUser.email) {
         console.log('🔄 [getUserTickets] Buscando órdenes directamente por email del cliente...');
         const ordersByEmail = await this.findOrdersByClientEmail(authUser.email);
-        
+
         if (ordersByEmail.length > 0) {
           console.log(`✅ [getUserTickets] Se encontraron ${ordersByEmail.length} órdenes por email del cliente`);
           // Obtener el cliente de la primera orden y asociarlo
@@ -478,18 +390,18 @@ export const purchaseService = {
               .from('clients')
               .update({ auth_user_id: authUser.id })
               .eq('id', firstOrder.client_id);
-            
+
             if (!updateError) {
               console.log('✅ [getUserTickets] Cliente asociado con auth_user_id');
               client = { id: firstOrder.client_id };
             }
           }
-          
+
           // Formatear y retornar las órdenes encontradas
           return this.formatOrdersToTickets(ordersByEmail);
         }
       }
-      
+
       if (!client) {
         console.log('⚠️ [getUserTickets] No se encontró cliente. El usuario puede no haber realizado compras aún.');
         return [];
@@ -497,7 +409,7 @@ export const purchaseService = {
 
       // 4. Obtener órdenes del cliente
       const orders = await this.getOrdersByClient(client.id);
-      
+
       if (!orders || orders.length === 0) {
         console.log('⚠️ [getUserTickets] No se encontraron órdenes para el cliente');
         return [];
@@ -523,76 +435,46 @@ export const purchaseService = {
       email: authUser.email,
     });
 
-    // Intentar primero por auth_user_id
-    const { data: clientByAuthId, error: errorByAuthId } = await supabase
-      .from('clients')
-      .select('id, email, auth_user_id')
-      .eq('auth_user_id', authUser.id)
-      .maybeSingle();
-
-    if (!errorByAuthId && clientByAuthId) {
-      console.log('✅ [findClientByUser] Cliente encontrado por auth_user_id:', clientByAuthId.id);
-      return { id: clientByAuthId.id };
-    }
-
-    if (errorByAuthId) {
-      console.error('❌ [findClientByUser] Error al buscar por auth_user_id:', errorByAuthId);
-    }
-
-    // Si no se encuentra y tiene email, intentar por email (case insensitive)
-    if (authUser.email) {
-      console.log('⚠️ [findClientByUser] Buscando por email como fallback:', authUser.email);
-      
-      // Buscar todos los clientes con ese email (case insensitive)
-      const { data: allClients, error: errorByEmail } = await supabase
+if (!authUser.email) {
+    // Si no tiene email, solo podemos buscar por auth_user_id via RPC (si pasamos email nulo)
+    // Pero mejor intentamos directo si solo tenemos ID
+    const { data: clientByAuthId } = await supabase
         .from('clients')
-        .select('id, email, auth_user_id')
-        .ilike('email', authUser.email)
-        .order('created_at', { ascending: false });
+        .select('id')
+        .eq('auth_user_id', authUser.id)
+        .maybeSingle();
 
-      if (errorByEmail) {
-        console.error('❌ [findClientByUser] Error al buscar por email:', errorByEmail);
-      } else if (allClients && allClients.length > 0) {
-        // Tomar el más reciente
-        const clientByEmail = allClients[0];
-        console.log('✅ [findClientByUser] Cliente encontrado por email:', {
-          clientId: clientByEmail.id,
-          clientEmail: clientByEmail.email,
-          hasAuthUserId: !!clientByEmail.auth_user_id,
-        });
+    if (clientByAuthId) {
+        return clientByAuthId;
+    }
+    return null;
+}
 
-        // Si el cliente no tiene auth_user_id, actualizarlo
-        if (!clientByEmail.auth_user_id) {
-          console.log('🔄 [findClientByUser] Actualizando auth_user_id del cliente...');
-          const { error: updateError } = await supabase
-            .from('clients')
-            .update({ auth_user_id: authUser.id })
-            .eq('id', clientByEmail.id);
+try {
+    // Usar get_or_create_client para buscar y vincular
+    // Pasamos null en nombre/telefono para no sobrescribir datos existentes
+    const { data: clientId, error } = await supabase.rpc('get_or_create_client', {
+        p_email: authUser.email,
+        p_name: null,
+        p_phone: null,
+        p_auth_user_id: authUser.id
+    });
 
-          if (updateError) {
-            console.error('❌ [findClientByUser] Error al actualizar auth_user_id:', updateError);
-          } else {
-            console.log('✅ [findClientByUser] auth_user_id actualizado correctamente');
-          }
-        }
-        
-        return { id: clientByEmail.id };
-      } else {
-        console.log('⚠️ [findClientByUser] No se encontró cliente con email:', authUser.email);
-        
-        // Debug: mostrar todos los clientes para ver qué hay
-        const { data: allClientsDebug } = await supabase
-          .from('clients')
-          .select('id, email, auth_user_id, created_at')
-          .limit(10)
-          .order('created_at', { ascending: false });
-        
-        console.log('🔍 [findClientByUser] Últimos 10 clientes en BD:', allClientsDebug);
-      }
+    if (error) {
+        console.error('❌ [findClientByUser] Error en RPC:', error);
+        return null;
     }
 
-    console.log('❌ [findClientByUser] No se encontró cliente para el usuario');
+    if (clientId) {
+        console.log('✅ [findClientByUser] Cliente encontrado/vinculado:', clientId);
+        return { id: clientId as string };
+    }
+
     return null;
+} catch (err) {
+    console.error('❌ [findClientByUser] Error inesperado:', err);
+    return null;
+}
   },
 
   /**
@@ -697,18 +579,18 @@ export const purchaseService = {
     const userOrders = (recentOrders as unknown as OrderWithClient[]).filter((order) => {
       const client = order.clients;
       if (!client) return false;
-      
+
       // Si el cliente tiene auth_user_id que coincide
       if (client.auth_user_id === authUser.id) {
         return true;
       }
-      
+
       // Si el cliente tiene el mismo email (case insensitive)
-      if (authUser.email && client.email && 
-          client.email.toLowerCase() === authUser.email.toLowerCase()) {
+      if (authUser.email && client.email &&
+        client.email.toLowerCase() === authUser.email.toLowerCase()) {
         return true;
       }
-      
+
       return false;
     });
 

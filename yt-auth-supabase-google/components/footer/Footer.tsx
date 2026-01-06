@@ -42,10 +42,10 @@ export function Footer() {
           {/* Logo y descripción */}
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center mb-3 md:mb-4">
-              <div className="relative h-12 w-auto md:h-16 lg:h-20 aspect-[2/1]">
+              <div className="relative h-12 w-auto md:h-16 lg:h-20 aspect-square">
                 <Image
-                  src="/logo1.webp"
-                  alt="La Cima Logo"
+                  src="/logosrifaweb.png"
+                  alt="Rifas Ecuador - Participa y Gana"
                   fill
                   className="object-contain"
                   priority

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
+import { MaterialInput } from './ui/MaterialInput';
 
 interface LoginFormProps {
   onSubmit: (email: string, password: string, isSignUp: boolean) => Promise<void>;
@@ -27,58 +28,61 @@ export function LoginForm({
   };
 
   return (
-    <div className="max-w-md w-full space-y-8 p-8 md:p-10 bg-white dark:bg-legacy-purple-deep rounded-xl shadow-lg border border-gray-200 dark:border-white/10">
+    <div className="max-w-md w-full space-y-8 p-8 md:p-10 rounded-2xl border" style={{ 
+      background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+      borderColor: '#3A2F5A',
+      boxShadow: '0 20px 60px rgba(168, 62, 245, 0.2), 0 0 40px rgba(240, 32, 128, 0.1)'
+    }}>
       <div className="text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white font-[var(--font-comfortaa)]">
+        <h2 className="text-3xl md:text-4xl font-bold font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
           {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
         </h2>
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-          <p className="text-sm text-red-600 dark:text-red-400 text-center font-[var(--font-dm-sans)]">
+        <div className="p-3 rounded-lg border" style={{ background: 'rgba(220, 38, 38, 0.1)', borderColor: 'rgba(220, 38, 38, 0.3)' }}>
+          <p className="text-sm text-[#DC2626] text-center font-[var(--font-dm-sans)]">
           {error}
           </p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 font-[var(--font-dm-sans)]">
-              Correo electrónico
-            </label>
-          <input
-              id="email"
+        <div className="space-y-6">
+          <MaterialInput
+            id="email"
+            label="Correo electrónico"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              required
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-gray-300 dark:border-white/10 placeholder-gray-400 text-gray-900 dark:text-white dark:bg-legacy-purple-deep focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-amber-400 focus:border-blue-500 dark:focus:border-amber-400 transition-colors font-[var(--font-dm-sans)]"
+            onChange={setEmail}
+            placeholder="tu@email.com"
+            required
+            variant="outlined"
           />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 font-[var(--font-dm-sans)]">
-              Contraseña
-            </label>
-          <input
-              id="password"
+          <MaterialInput
+            id="password"
+            label="Contraseña"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 border-2 border-gray-300 dark:border-white/10 placeholder-gray-400 text-gray-900 dark:text-white dark:bg-legacy-purple-deep focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-amber-400 focus:border-blue-500 dark:focus:border-amber-400 transition-colors font-[var(--font-dm-sans)]"
+            onChange={setPassword}
+            placeholder="••••••••"
+            required
+            variant="outlined"
           />
-          </div>
         </div>
 
         <div className="flex items-center justify-end">
           <button
             type="button"
             onClick={() => setIsForgotPasswordOpen(true)}
-            className="text-sm font-medium text-blue-600 dark:text-amber-400 hover:text-blue-700 dark:hover:text-amber-500 transition-colors font-[var(--font-dm-sans)]"
+            className="text-sm font-medium transition-colors font-[var(--font-dm-sans)]"
+            style={{ color: '#A83EF5' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#f02080';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#A83EF5';
+            }}
           >
             ¿Olvidaste tu contraseña?
           </button>
@@ -92,7 +96,22 @@ export function LoginForm({
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full py-3 px-4 border border-transparent rounded-lg shadow-lg text-white bg-blue-600 dark:bg-amber-400 hover:bg-blue-700 dark:hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] font-bold text-base font-[var(--font-dm-sans)]"
+          className="w-full py-3 px-4 border border-transparent rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] font-bold text-base font-[var(--font-dm-sans)]"
+          style={{ 
+            background: 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)',
+            boxShadow: '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)',
+            fontWeight: '600'
+          }}
+          onMouseEnter={(e) => {
+            if (!isLoading) {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #f02080 0%, #A83EF5 100%)';
+              e.currentTarget.style.boxShadow = '0 6px 25px rgba(168, 62, 245, 0.5), 0 0 40px rgba(240, 32, 128, 0.3)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)';
+          }}
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
@@ -111,7 +130,14 @@ export function LoginForm({
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-amber-400 transition-colors font-[var(--font-dm-sans)]"
+            className="text-sm font-medium transition-colors font-[var(--font-dm-sans)]"
+            style={{ color: '#E5D4FF' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#A83EF5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#E5D4FF';
+            }}
           >
             {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿Necesitas una cuenta? Regístrate'}
           </button>
@@ -121,12 +147,10 @@ export function LoginForm({
       {/* Separador */}
       <div className="relative mt-8">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300 dark:border-white/10"></div>
+          <div className="w-full border-t" style={{ borderColor: '#3A2F5A' }}></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white dark:bg-legacy-purple-deep text-gray-500 dark:text-gray-400 font-[var(--font-dm-sans)]">
-            O continúa con
-          </span>
+          <span className="px-4" style={{ background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)', color: '#B8A8D8' }}>O continúa con</span>
         </div>
       </div>
 
@@ -135,7 +159,22 @@ export function LoginForm({
         <button
           onClick={onGoogleSignIn}
           disabled={isLoading}
-          className="w-full py-3 px-4 border-2 border-gray-300 dark:border-white/10 rounded-lg shadow-md text-gray-700 dark:text-gray-300 bg-white dark:bg-legacy-purple-deep hover:bg-gray-50 dark:hover:bg-legacy-purple-light hover:border-gray-400 dark:hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] font-semibold text-base font-[var(--font-dm-sans)] flex items-center justify-center gap-3"
+          className="w-full py-3 px-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A83EF5] disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] font-semibold text-base font-[var(--font-dm-sans)] flex items-center justify-center gap-3"
+          style={{ 
+            borderColor: '#3A2F5A',
+            color: '#FFFFFF',
+            background: 'transparent'
+          }}
+          onMouseEnter={(e) => {
+            if (!isLoading) {
+              e.currentTarget.style.borderColor = '#5A4A7A';
+              e.currentTarget.style.background = 'rgba(168, 62, 245, 0.1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#3A2F5A';
+            e.currentTarget.style.background = 'transparent';
+          }}
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
