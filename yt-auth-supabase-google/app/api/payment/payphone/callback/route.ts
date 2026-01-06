@@ -67,11 +67,19 @@ export async function GET(request: NextRequest) {
 
     const transaction = confirmationResult.data;
     const transactionStatus = transaction?.transactionStatus || 'Pending';
+    const statusCode = transaction?.statusCode;
+
+    // ⚠️ VALIDACIÓN CRÍTICA: Verificar statusCode === 3 Y transactionStatus === 'Approved'
+    // statusCode 2 = Cancelado, 3 = Aprobada (pero también puede ser Rejected)
+    // Solo consideramos aprobado si statusCode === 3 Y transactionStatus === 'Approved'
+    const status = transactionStatus.toString().toLowerCase();
+    const isApproved = statusCode === 3 && status === 'approved';
 
     console.log('✅ Transacción confirmada con Payphone:', {
       transactionId,
       status: transactionStatus,
-      statusCode: transaction?.statusCode,
+      statusCode: statusCode,
+      isApproved: isApproved, // Nuevo campo para debugging
       amount: transaction?.amount,
       clientTransactionId: transaction?.clientTransactionId,
       optionalParameter: transaction?.optionalParameter,
@@ -189,21 +197,22 @@ export async function GET(request: NextRequest) {
 
     // Redirigir INMEDIATAMENTE según el estado (sin esperar actualizaciones de BD)
     // Las actualizaciones de BD se hacen de forma asíncrona
-    if (transactionStatus === 'Approved') {
+    // ⚠️ VALIDACIÓN CRÍTICA: Solo considerar aprobado si statusCode === 3 Y transactionStatus === 'Approved'
+    if (isApproved) {
       // Pago aprobado: redirigir inmediatamente
       console.log('✅ Pago aprobado - Redirigiendo inmediatamente');
       return NextResponse.redirect(
         new URL(`/comprar/${finalOrderId}/confirmacion?status=success&transactionId=${transactionId}`, request.url)
       );
-    } else if (transactionStatus === 'Canceled') {
-      // Pago cancelado
+    } else if (statusCode === 2 || transactionStatus === 'Canceled') {
+      // Pago cancelado (statusCode 2 = Cancelado)
       console.log('❌ Pago cancelado - Redirigiendo');
       return NextResponse.redirect(
-        new URL(`/comprar/error?message=Pago cancelado&orderId=${finalOrderId}`, request.url)
+        new URL(`/comprar/error?message=Pago cancelado o rechazado&orderId=${finalOrderId}`, request.url)
       );
     } else {
-      // Pago pendiente u otro estado
-      console.log('⏳ Pago pendiente - Redirigiendo');
+      // Pago pendiente, rechazado u otro estado (NO aprobado)
+      console.log('⏳ Pago pendiente/rechazado - Redirigiendo a página de espera');
       return NextResponse.redirect(
         new URL(`/comprar/${finalOrderId}/confirmacion?status=pending&transactionId=${transactionId}`, request.url)
       );
@@ -306,19 +315,14 @@ async function confirmPayphoneTransaction(
         body: errorText.substring(0, 500), // Solo primeros 500 chars
       });
       
-      // Si es error 500, podría ser que la transacción ya fue procesada
-      // Intentamos continuar de todas formas con datos mínimos
-      if (response.status === 500) {
-        console.warn('⚠️ Error 500 de Payphone - Intentando continuar con datos disponibles');
-        return {
-          success: true,
-          data: {
-            transactionId: parseInt(transactionId, 10),
-            transactionStatus: 'Approved', // Asumimos aprobado porque llegó al callback
-            clientTransactionId: clientTransactionId,
-          },
-        };
-      }
+      // ⚠️ CRÍTICO: NUNCA asumir que un pago está aprobado si hay error
+      // Un error 500 podría indicar problemas del servidor o transacciones rechazadas
+      // Es más seguro rechazar que aprobar incorrectamente
+      console.error('❌ Error HTTP de Payphone - NO podemos asumir el estado del pago');
+      return {
+        success: false,
+        error: `Error HTTP ${response.status}: No se pudo confirmar el estado de la transacción`,
+      };
       
       return {
         success: false,
@@ -412,7 +416,11 @@ async function processPaymentUpdate(
     }
 
     // Actualizar el estado de la orden según el resultado
-    if (transactionStatus === 'Approved') {
+    // ⚠️ VALIDACIÓN CRÍTICA: Solo marcar como aprobado si statusCode === 3 Y transactionStatus === 'Approved'
+    const status = transactionStatus.toString().toLowerCase();
+    const isApproved = transaction?.statusCode === 3 && status === 'approved';
+    
+    if (isApproved) {
       // Pago aprobado: actualizar orden a completada
       console.log('🔄 Actualizando orden a completed...');
       const { error: updateError } = await supabase
@@ -480,16 +488,20 @@ async function processPaymentUpdate(
           console.error('❌ Error al enviar correo (no crítico):', emailError);
         }
       }
-    } else if (transactionStatus === 'Canceled') {
-      // Pago cancelado
-      console.log('❌ Actualizando orden a expired...');
+    } else if (transaction?.statusCode === 2 || transactionStatus === 'Canceled') {
+      // Pago cancelado o rechazado (statusCode 2 = Cancelado)
+      console.log('❌ Actualizando orden a expired (pago cancelado/rechazado)...');
       await supabase
         .from('orders')
         .update({
           status: 'expired',
         })
         .eq('id', orderId);
-      console.log('⚠️ Orden marcada como expirada (pago cancelado)');
+      console.log('⚠️ Orden marcada como expirada (pago cancelado/rechazado)');
+    } else {
+      // Pago pendiente o rechazado (pero no cancelado explícitamente)
+      // Mantener estado 'reserved' para que el usuario pueda ver el estado pendiente
+      console.log('⏳ Orden permanece en estado reserved (pago pendiente/rechazado)');
     }
 
     console.log('✅ Actualización de base de datos completada para orden:', orderId);
