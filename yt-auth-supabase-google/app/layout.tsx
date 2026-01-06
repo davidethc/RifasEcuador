@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Comfortaa, DM_Sans } from "next/font/google";
+import { Comfortaa, DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -7,6 +7,7 @@ import { Header } from '@/components/header/Header';
 import { Footer } from '@/components/footer/Footer';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { ThemeProvider } from "next-themes";
+import { StructuredData } from '@/components/seo/StructuredData';
 
 const comfortaa = Comfortaa({
   subsets: ["latin"],
@@ -22,10 +23,94 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://altokeec.com';
 
 export const metadata: Metadata = {
-  title: "Rifas Ecuador",
-  description: "Participa en nuestros sorteos y gana increíbles premios",
+  metadataBase: new URL(appUrl),
+  title: {
+    default: "Rifas Ecuador - Participa y Gana Premios Increíbles",
+    template: "%s | Rifas Ecuador"
+  },
+  description: "Participa en sorteos legales en todo Ecuador y gana increíbles premios. Autos, motos y muchos premios sorpresa. Sorteos 100% transparentes y verificados.",
+  keywords: [
+    "rifas ecuador",
+    "sorteos ecuador",
+    "rifas online",
+    "sorteos legales",
+    "ganar premios",
+    "rifas autos",
+    "sorteos motos",
+    "rifas verificadas",
+    "premios ecuador",
+    "participar sorteos"
+  ],
+  authors: [{ name: "Rifas Ecuador" }],
+  creator: "Rifas Ecuador",
+  publisher: "Rifas Ecuador",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_EC",
+    url: "/",
+    siteName: "Rifas Ecuador",
+    title: "Rifas Ecuador - Participa y Gana Premios Increíbles",
+    description: "Participa en sorteos legales en todo Ecuador y gana increíbles premios. Autos, motos y muchos premios sorpresa. Sorteos 100% transparentes y verificados.",
+    images: [
+      {
+        url: "/logosrifaweb.png",
+        width: 625,
+        height: 625,
+        alt: "Rifas Ecuador - Logo",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rifas Ecuador - Participa y Gana Premios Increíbles",
+    description: "Participa en sorteos legales en todo Ecuador y gana increíbles premios. Autos, motos y muchos premios sorpresa.",
+    images: ["/logosrifaweb.png"],
+    creator: "@rifasecuador",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: `${appUrl}/logosrifaweb.png`, sizes: "any" },
+      { url: `${appUrl}/logosrifaweb.png`, sizes: "32x32", type: "image/png" },
+      { url: `${appUrl}/logosrifaweb.png`, sizes: "16x16", type: "image/png" },
+    ],
+    apple: [
+      { url: `${appUrl}/logosrifaweb.png`, sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: `${appUrl}/logosrifaweb.png`,
+  },
+  manifest: "/manifest.json",
+  alternates: {
+    canonical: "/",
+  },
+  category: "Gaming",
 };
 
 export default function RootLayout({
@@ -39,7 +124,8 @@ export default function RootLayout({
 
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${comfortaa.variable} ${dmSans.variable} antialiased`} suppressHydrationWarning>
+      <body className={`${comfortaa.variable} ${dmSans.variable} ${spaceGrotesk.variable} antialiased`} suppressHydrationWarning>
+        <StructuredData />
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false} disableTransitionOnChange>
           {/* Fondo global con paleta oficial */}
           <div className="min-h-screen w-full bg-gradient-to-b from-brand-bg-1 via-brand-bg-2 to-brand-bg-1 relative overflow-hidden">

@@ -103,132 +103,91 @@ export function Header() {
         initial={{ width: "95%" }}
         animate={{ width: "95%" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative flex items-center justify-between w-full max-w-6xl h-auto py-2.5 [@media(min-width:768px)]:py-3 px-3 [@media(min-width:640px)]:px-4 [@media(min-width:768px)]:px-5 [@media(min-width:1024px)]:px-6 border-2 rounded-3xl transition-all duration-300"
-        style={{
-          background: 'linear-gradient(180deg, #1A1F2E 0%, #1D2338 100%)',
-          border: '1px solid rgba(255, 215, 98, 0.2)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05) inset',
-          backdropFilter: 'blur(20px) saturate(180%)',
-        }}
+        className="relative flex items-center justify-between w-full max-w-7xl h-auto py-3 px-4 md:px-6 border border-white/20 rounded-full transition-all duration-300 bg-gradient-to-r from-[#1e1b4b] via-[#4c1d95] via-[#be185d] to-[#ea580c] backdrop-blur-xl shadow-lg shadow-purple-500/30"
       >
-        {/* Logo */}
-        <div className="flex-shrink-0">
-          <Link href="/">
+        {/* Logo Desktop */}
+        <div className="flex-shrink-0 hidden sm:block">
+          <Link href="/" className="flex items-center gap-3 group">
             <Image
-              src="/logo1.webp"
-              alt="La Cima Logo"
-              width={70}
-              height={70}
-              className="[@media(min-width:768px)]:w-[80px] [@media(min-width:768px)]:h-[80px] [@media(min-width:1024px)]:w-[90px] [@media(min-width:1024px)]:h-[90px] cursor-pointer hover:scale-110 transition-transform duration-200"
+              src="/logosrifaweb.png"
+              alt="ALTOKEE"
+              width={180}
+              height={72}
+              className="w-auto h-14 md:h-[4.5rem] object-contain transition-transform duration-300 group-hover:scale-105"
+              priority
             />
+            {/* Texto eliminado en desktop para dar prioridad al logo gráfico más grande */}
+            <span className="font-space-grotesk text-2xl font-medium tracking-[0.25em] text-gray-100 uppercase group-hover:text-white transition-colors hidden lg:block">
+              Altokee
+            </span>
           </Link>
         </div>
 
-        {/* Último chance - Solo móvil */}
-        <div className="[@media(min-width:640px)]:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <span
-            className="text-sm font-bold italic"
-              style={{
-                color: '#128ECE',
-                textShadow: '0 0 10px rgba(18, 142, 206, 0.5)',
-              }}
-          >
-            Ecuador andino
-          </span>
+        {/* Logo + Texto - Mobile */}
+        <div className={`sm:hidden flex items-center flex-1 min-w-0 px-2 transition-all duration-300 ${mobileMenuOpen ? 'justify-start' : 'justify-center'}`}>
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/logosrifaweb.png"
+              alt="ALTOKEE"
+              width={140}
+              height={56}
+              className="w-auto h-11 object-contain"
+              priority
+            />
+            <span
+              className={`font-space-grotesk text-lg font-medium tracking-[0.2em] text-gray-100 uppercase whitespace-nowrap transition-all duration-300 ${mobileMenuOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}
+            >
+              Altokee
+            </span>
+          </Link>
         </div>
 
         {/* Navegación Desktop */}
-        <nav className="hidden [@media(min-width:640px)]:flex items-center space-x-3 [@media(min-width:768px)]:space-x-4 [@media(min-width:1024px)]:space-x-5">
+        <nav className="hidden sm:flex items-center gap-5 lg:gap-8">
           {navLinks.map((item, index) => (
             <Link
               key={index}
               href={item.href}
-              className="text-xs [@media(min-width:768px)]:text-sm [@media(min-width:1024px)]:text-base font-semibold transition-all duration-200 relative group whitespace-nowrap"
-              style={{ color: '#FFD962' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#FFFFFF';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.textShadow = '0 0 12px rgba(255, 215, 98, 0.8)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#FFD962';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.textShadow = 'none';
-              }}
+              className="text-sm lg:text-base font-dm-sans font-medium text-gray-300 hover:text-white transition-colors relative group py-1 tracking-wide"
             >
               {item.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-[#FFD962] to-[#FFFFFF] group-hover:w-full transition-all duration-300 rounded-full"></span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#A83EF5] to-[#f02080] group-hover:w-full transition-all duration-300 rounded-full"></span>
             </Link>
           ))}
         </nav>
 
         {/* Botones de acción Desktop */}
-        <div className="hidden [@media(min-width:640px)]:flex items-center space-x-2 [@media(min-width:768px)]:space-x-3">
+        <div className="hidden sm:flex items-center gap-3 md:gap-4">
           {isAuthenticated ? (
             <>
               <Link
                 href="/mis-boletos"
-                className="px-3 [@media(min-width:768px)]:px-4 py-2 text-xs [@media(min-width:768px)]:text-sm font-semibold transition-all duration-200 font-[var(--font-dm-sans)] whitespace-nowrap rounded-lg"
-                style={{ color: '#FFD962' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#FFFFFF';
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.15)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#FFD962';
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
+                className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200 font-dm-sans whitespace-nowrap"
               >
                 Mis boletos
               </Link>
               <button
                 onClick={() => router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e")}
-                className="px-4 [@media(min-width:768px)]:px-5 [@media(min-width:1024px)]:px-6 py-2 [@media(min-width:768px)]:py-2.5 text-xs [@media(min-width:768px)]:text-sm font-bold rounded-full transition-all duration-200 font-[var(--font-dm-sans)] hover:transform hover:-translate-y-0.5 whitespace-nowrap"
-                style={{
-                  background: 'linear-gradient(135deg, #ffb200 0%, #f02080 100%)',
-                  color: '#ffffff',
-                  border: 'none',
-                  boxShadow: '0 4px 12px rgba(240,32,128,0.25)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #f02080 0%, #ffb200 100%)';
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(240,32,128,0.35)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #ffb200 0%, #f02080 100%)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(240,32,128,0.25)';
-                }}
+                className="px-5 lg:px-6 py-2.5 text-sm font-bold text-slate-900 rounded-full transition-all duration-200 font-dm-sans hover:-translate-y-0.5 whitespace-nowrap shadow-lg shadow-white/10 hover:shadow-white/20 bg-white hover:bg-gray-100"
               >
-                <span className="hidden [@media(min-width:1024px)]:inline">Participar - Desde $1.00</span>
-                <span className="[@media(min-width:1024px)]:hidden">Participar</span>
+                <span className="hidden lg:inline">Participar - Desde $1.00</span>
+                <span className="lg:hidden">Participar</span>
               </button>
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-1.5 [@media(min-width:768px)]:gap-2 px-2 [@media(min-width:768px)]:px-3 py-2 rounded-xl transition-all duration-200"
-                  style={{ backgroundColor: 'rgba(255, 215, 98, 0.15)' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.25)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.15)';
-                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 bg-white/5 hover:bg-white/10 border border-white/10"
                 >
-                  <div className="w-7 h-7 [@media(min-width:768px)]:w-8 [@media(min-width:768px)]:h-8 rounded-full flex items-center justify-center font-semibold text-xs [@media(min-width:768px)]:text-sm flex-shrink-0" style={{ 
-                    background: 'linear-gradient(135deg, #FFD962 0%, #F59E0B 100%)',
-                    color: '#1A1D29'
-                  }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0 bg-gradient-to-br from-[#A83EF5] to-[#f02080] text-white">
                     {userName?.[0]?.toUpperCase() || "U"}
                   </div>
-                  <span className="text-xs [@media(min-width:768px)]:text-sm font-medium font-[var(--font-dm-sans)] max-w-[80px] [@media(min-width:1024px)]:max-w-[120px] truncate" style={{ color: '#FFD962' }}>
+                  <span className="text-sm font-medium font-dm-sans max-w-[100px] truncate text-gray-200">
                     {getDisplayName(userName)}
                   </span>
                   <svg
-                    className={`w-3.5 h-3.5 [@media(min-width:768px)]:w-4 [@media(min-width:768px)]:h-4 transition-transform flex-shrink-0 ${isDropdownOpen ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 transition-transform flex-shrink-0 text-gray-400 ${isDropdownOpen ? "rotate-180" : ""}`}
                     fill="none"
-                    stroke="#FFD962"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path
@@ -241,39 +200,17 @@ export function Header() {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-xl shadow-2xl py-2 border z-50 backdrop-blur-xl" style={{
-                    background: 'linear-gradient(180deg, #1A1F2E 0%, #1D2338 100%)',
-                    border: '1px solid rgba(255, 215, 98, 0.2)',
-                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.05)'
-                  }}>
+                  <div className="absolute right-0 mt-2 w-48 rounded-xl shadow-2xl py-2 border z-50 backdrop-blur-xl bg-[#100235]/95 border-purple-500/30 shadow-purple-900/40">
                     <Link
                       href="/perfil"
-                      className="block px-4 py-2.5 text-sm transition-all duration-200 font-[var(--font-dm-sans)] rounded-lg mx-2"
-                      style={{ color: '#FFD962' }}
+                      className="block px-4 py-2.5 text-sm transition-all duration-200 font-dm-sans rounded-lg mx-2 text-gray-300 hover:text-[#A83EF5] hover:bg-purple-500/10"
                       onClick={() => setIsDropdownOpen(false)}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#FFFFFF';
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.2)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#FFD962';
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
                     >
                       Mi Perfil
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2.5 text-sm transition-all duration-200 font-[var(--font-dm-sans)] rounded-lg mx-2"
-                      style={{ color: '#FCA5A5' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#FFFFFF';
-                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#FCA5A5';
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
+                      className="block w-full text-left px-4 py-2.5 text-sm transition-all duration-200 font-dm-sans rounded-lg mx-2 text-red-400 hover:text-white hover:bg-red-500/20"
                     >
                       Cerrar Sesión
                     </button>
@@ -285,74 +222,34 @@ export function Header() {
             <>
               <Link
                 href="/login"
-                className="px-3 [@media(min-width:768px)]:px-4 py-2 text-xs [@media(min-width:768px)]:text-sm font-semibold rounded-xl transition-all duration-200 font-[var(--font-dm-sans)] whitespace-nowrap border-2"
-                style={{
-                  background: 'rgba(255, 215, 98, 0.15)',
-                  color: '#FFD962',
-                  border: '2px solid rgba(255, 215, 98, 0.4)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 215, 98, 0.25)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 215, 98, 0.6)';
-                  e.currentTarget.style.color = '#FFFFFF';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 215, 98, 0.15)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 215, 98, 0.4)';
-                  e.currentTarget.style.color = '#FFD962';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
+                className="px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 font-dm-sans whitespace-nowrap border border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5"
               >
                 Iniciar Sesión
               </Link>
               <button
                 onClick={() => router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e")}
-                className="px-4 [@media(min-width:768px)]:px-5 [@media(min-width:1024px)]:px-6 py-2 [@media(min-width:768px)]:py-2.5 text-xs [@media(min-width:768px)]:text-sm font-bold rounded-full transition-all duration-200 font-[var(--font-dm-sans)] hover:transform hover:-translate-y-0.5 whitespace-nowrap"
-                style={{
-                  background: 'linear-gradient(135deg, #ffb200 0%, #f02080 100%)',
-                  color: '#ffffff',
-                  border: 'none',
-                  boxShadow: '0 4px 12px rgba(240,32,128,0.25)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #f02080 0%, #ffb200 100%)';
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(240,32,128,0.35)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #ffb200 0%, #f02080 100%)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(240,32,128,0.25)';
-                }}
+                className="px-5 lg:px-6 py-2.5 text-sm font-bold text-slate-900 rounded-full transition-all duration-200 font-dm-sans hover:-translate-y-0.5 whitespace-nowrap shadow-lg shadow-white/10 hover:shadow-white/20 bg-white hover:bg-gray-100"
               >
-                <span className="hidden [@media(min-width:1024px)]:inline">Participar - Desde $1.00</span>
-                <span className="[@media(min-width:1024px)]:hidden">Participar</span>
+                <span className="hidden lg:inline">Participar - Desde $1.00</span>
+                <span className="lg:hidden">Participar</span>
               </button>
             </>
           )}
         </div>
 
         {/* Menú móvil hamburguesa */}
-        <div className="flex items-center space-x-2">
+        <div className="sm:hidden flex-shrink-0">
           <button
             onClick={toggleMobileMenu}
-            className="[@media(min-width:640px)]:hidden flex justify-center items-center p-2.5 rounded-xl transition-all duration-200"
-            style={{
-              backgroundColor: 'rgba(255, 215, 98, 0.15)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.25)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.15)';
-            }}
+            className="flex justify-center items-center p-2 rounded-xl transition-all duration-200 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10"
           >
             <motion.svg
-              width="20"
-              height="20"
+              width="24"
+              height="24"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#FFD962"
-              strokeWidth="2.5"
+              stroke="currentColor"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
               animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
@@ -365,159 +262,125 @@ export function Header() {
           </button>
         </div>
 
-        {/* Menú móvil desplegable */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute top-full left-0 right-0 mt-3 [@media(min-width:640px)]:hidden rounded-3xl shadow-2xl backdrop-blur-xl z-50 overflow-hidden border-2"
-              style={{
-                background: 'linear-gradient(180deg, #1A1F2E 0%, #1D2338 100%)',
-                border: '1px solid rgba(255, 215, 98, 0.2)',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)',
-              }}
-            >
-              <nav className="flex flex-col py-2">
-                {navLinks.map((item, index) => (
-                  <Link
-                    key={index}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="px-5 py-3.5 text-sm font-semibold transition-all duration-200 relative"
-                    style={{
-                      color: '#FFD962',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#FFFFFF';
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.2)';
-                      e.currentTarget.style.textShadow = '0 0 8px rgba(255, 215, 98, 0.6)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = '#FFD962';
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.textShadow = 'none';
-                    }}
-                  >
-                    <span className="relative z-10">{item.label}</span>
-                    <span className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FFB200] to-[#F59E0B] opacity-0 transition-opacity duration-200"
-                      style={{ opacity: 0 }}
-                      onMouseEnter={(e) => {
-                        const parent = e.currentTarget.parentElement;
-                        if (parent) {
-                          const indicator = parent.querySelector('.mobile-indicator') as HTMLElement;
-                          if (indicator) indicator.style.opacity = '1';
-                        }
-                      }}
-                    ></span>
-                  </Link>
-                ))}
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      href="/mis-boletos"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="px-5 py-3.5 text-sm font-semibold transition-all duration-200"
-                      style={{
-                        color: '#FFD962',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#FFFFFF';
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 215, 98, 0.2)';
-                        e.currentTarget.style.textShadow = '0 0 8px rgba(255, 215, 98, 0.6)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#FFD962';
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.textShadow = 'none';
-                      }}
-                    >
-                      Mis boletos
-                    </Link>
-                    <div className="px-4 py-2">
-                      <AnimatedButton
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e");
-                        }}
-                        className="w-full px-6 py-2 text-sm font-bold text-white font-[var(--font-dm-sans)]"
-                        variant="default"
-                        size="default"
-                        glow={false}
-                        textEffect="normal"
-                        uppercase={true}
-                        rounded="custom"
-                        asChild={false}
-                        hideAnimations={false}
-                        shimmerColor="#39FF14"
-                        shimmerSize="0.15em"
-                        shimmerDuration="3s"
-                        borderRadius="100px"
-                        background="linear-gradient(135deg, #ffb200 0%, #f02080 100%)"
-                      >
-                        Participar - Desde $1.00
-                      </AnimatedButton>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="px-4 py-2">
-                      <Link
-                        href="/login"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="block w-full px-4 py-2.5 text-sm font-semibold text-center rounded-xl transition-all duration-200 font-[var(--font-dm-sans)] border-2"
-                        style={{
-                          background: 'rgba(255, 215, 98, 0.15)',
-                          color: '#FFD962',
-                          border: '2px solid rgba(255, 215, 98, 0.4)',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 215, 98, 0.25)';
-                          e.currentTarget.style.borderColor = 'rgba(255, 215, 98, 0.6)';
-                          e.currentTarget.style.color = '#FFFFFF';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 215, 98, 0.15)';
-                          e.currentTarget.style.borderColor = 'rgba(255, 215, 98, 0.4)';
-                          e.currentTarget.style.color = '#FFD962';
-                        }}
-                      >
-                        Iniciar Sesión
-                      </Link>
-                    </div>
-                    <div className="px-4 py-2">
-                      <AnimatedButton
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e");
-                        }}
-                        className="w-full px-6 py-2 text-sm font-bold text-white font-[var(--font-dm-sans)]"
-                        variant="default"
-                        size="default"
-                        glow={false}
-                        textEffect="normal"
-                        uppercase={true}
-                        rounded="custom"
-                        asChild={false}
-                        hideAnimations={false}
-                        shimmerColor="#39FF14"
-                        shimmerSize="0.15em"
-                        shimmerDuration="3s"
-                        borderRadius="100px"
-                        background="linear-gradient(135deg, #ffb200 0%, #f02080 100%)"
-                      >
-                        Participar - Desde $1.00
-                      </AnimatedButton>
-                    </div>
-                  </>
-                )}
-              </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
+
+      {/* Backdrop oscuro cuando el menú móvil está abierto */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 [@media(min-width:640px)]:hidden"
+            style={{ zIndex: 35 }}
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Menú móvil desplegable - Fuera del contenedor principal */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.98, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
+            exit={{ opacity: 0, y: -10, scale: 0.98, x: "-50%" }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute left-1/2 w-[95%] max-w-md sm:hidden rounded-2xl shadow-2xl backdrop-blur-xl overflow-y-auto border border-white/10 bg-[#100235]/95 z-40 shadow-purple-900/40"
+            style={{
+              top: 'calc(100% + 0.5rem)',
+              maxHeight: '80vh',
+            }}
+          >
+            <nav className="flex flex-col py-2">
+              {navLinks.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-6 py-4 text-sm font-medium transition-all duration-200 relative active:scale-95 text-gray-300 hover:text-white hover:bg-white/5 flex items-center font-dm-sans tracking-wide"
+                >
+                  <span className="relative z-10">{item.label}</span>
+                </Link>
+              ))}
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    href="/mis-boletos"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-6 py-4 text-sm font-medium transition-all duration-200 active:scale-95 text-gray-300 hover:text-white hover:bg-white/5 flex items-center font-dm-sans tracking-wide"
+                  >
+                    Mis boletos
+                  </Link>
+                  <div className="px-6 py-4 mt-2 border-t border-white/10">
+                    <AnimatedButton
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e");
+                      }}
+                      className="w-full px-6 py-3 text-sm font-bold text-slate-900 font-dm-sans"
+                      style={{ minHeight: '48px' }}
+                      variant="default"
+                      size="default"
+                      glow={false}
+                      textEffect="normal"
+                      uppercase={true}
+                      rounded="custom"
+                      asChild={false}
+                      hideAnimations={false}
+                      shimmerColor="#cbd5e1"
+                      shimmerSize="0.15em"
+                      shimmerDuration="3s"
+                      borderRadius="100px"
+                      background="white"
+                    >
+                      Participar - Desde $1.00
+                    </AnimatedButton>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="px-6 py-4 mt-2 border-t border-white/10">
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block w-full px-4 py-3 text-sm font-semibold text-center rounded-xl transition-all duration-200 font-dm-sans border border-white/20 bg-white/5 text-white hover:bg-white/10 active:scale-95 hover:border-white/40"
+                    >
+                      Iniciar Sesión
+                    </Link>
+                  </div>
+                  <div className="px-6 pb-4">
+                    <AnimatedButton
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e");
+                      }}
+                      className="w-full px-6 py-3 text-sm font-bold text-slate-900 font-dm-sans"
+                      style={{ minHeight: '48px' }}
+                      variant="default"
+                      size="default"
+                      glow={false}
+                      textEffect="normal"
+                      uppercase={true}
+                      rounded="custom"
+                      asChild={false}
+                      hideAnimations={false}
+                      shimmerColor="#cbd5e1"
+                      shimmerSize="0.15em"
+                      shimmerDuration="3s"
+                      borderRadius="100px"
+                      background="white"
+                    >
+                      Participar - Desde $1.00
+                    </AnimatedButton>
+                  </div>
+                </>
+              )}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

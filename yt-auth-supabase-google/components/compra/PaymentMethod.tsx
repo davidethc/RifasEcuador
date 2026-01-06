@@ -45,7 +45,9 @@ export function PaymentMethod({
   };
 
   const handlePayphoneSuccess = (transactionId: string) => {
-    console.log('✅ Pago exitoso con Payphone:', transactionId);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Pago exitoso con Payphone:', transactionId);
+    }
     if (onSuccess) {
       onSuccess();
     }
@@ -61,58 +63,59 @@ export function PaymentMethod({
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-3 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
+        <h2 className="text-2xl md:text-3xl font-bold mb-3 font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
           Método de Pago
         </h2>
-        <p className="text-base font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+        <p className="text-base font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
           Selecciona cómo deseas realizar el pago
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Columna izquierda: Datos personales - Consistente con formulario principal */}
-        <div className="rounded-lg border p-6" style={{ 
-          background: 'rgba(28, 32, 58, 0.6)',
-          borderColor: 'rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+        {/* Columna izquierda: Datos personales - Vibrante con colores del logo */}
+        <div className="rounded-2xl border p-6" style={{ 
+          background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+          borderColor: '#3A2F5A',
+          boxShadow: '0 10px 30px rgba(168, 62, 245, 0.15)'
         }}>
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ 
-              background: 'rgba(168, 62, 245, 0.15)',
-              border: '1px solid rgba(168, 62, 245, 0.2)'
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ 
+              background: 'rgba(168, 62, 245, 0.2)',
+              border: '1px solid rgba(168, 62, 245, 0.4)',
+              boxShadow: '0 0 20px rgba(168, 62, 245, 0.3)'
             }}>
               <svg className="w-5 h-5" style={{ color: '#A83EF5' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
+            <h3 className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
               Datos Personales
             </h3>
           </div>
 
           <div className="space-y-4">
             <div>
-              <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#9CA3AF' }}>Nombre completo</p>
-              <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+              <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#E5D4FF' }}>Nombre completo</p>
+              <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
                 {customerData.name} {customerData.lastName}
               </p>
             </div>
             <div>
-              <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#9CA3AF' }}>Correo electrónico</p>
-              <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+              <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#E5D4FF' }}>Correo electrónico</p>
+              <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
                 {customerData.email}
               </p>
             </div>
             <div>
-              <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#9CA3AF' }}>Teléfono</p>
-              <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+              <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#E5D4FF' }}>Teléfono</p>
+              <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
                 {customerData.whatsapp}
               </p>
             </div>
             {customerData.documentId && (
               <div>
-                <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#9CA3AF' }}>Identificación</p>
-                <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+                <p className="text-sm font-[var(--font-dm-sans)] mb-1" style={{ color: '#E5D4FF' }}>Identificación</p>
+                <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
                   {customerData.documentId}
                 </p>
               </div>
@@ -122,82 +125,87 @@ export function PaymentMethod({
 
         {/* Columna derecha: Método de pago */}
         <div className="space-y-6">
-          {/* Resumen del pedido - Consistente con formulario principal */}
-          <div className="rounded-lg border p-6" style={{ 
-            background: 'rgba(28, 32, 58, 0.6)',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+          {/* Resumen del pedido - Vibrante con colores del logo */}
+          <div className="rounded-2xl border p-6" style={{ 
+            background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+            borderColor: '#3A2F5A',
+            boxShadow: '0 10px 30px rgba(168, 62, 245, 0.15)'
           }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ 
-                background: 'rgba(168, 62, 245, 0.15)',
-                border: '1px solid rgba(168, 62, 245, 0.2)'
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ 
+                background: 'rgba(168, 62, 245, 0.2)',
+                border: '1px solid rgba(168, 62, 245, 0.4)',
+                boxShadow: '0 0 20px rgba(168, 62, 245, 0.3)'
               }}>
                 <svg className="w-5 h-5" style={{ color: '#A83EF5' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
+              <h3 className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
                 Resumen del Pedido
               </h3>
             </div>
             <div className="space-y-3">
               <div className="flex justify-between text-sm font-[var(--font-dm-sans)]">
-                <span style={{ color: '#9CA3AF' }}>Sorteo:</span>
-                <span className="font-medium text-right" style={{ color: '#E5E7EB' }}>{raffleTitle}</span>
+                <span style={{ color: '#E5D4FF' }}>Sorteo:</span>
+                <span className="font-medium text-right" style={{ color: '#FFFFFF' }}>{raffleTitle}</span>
               </div>
-              <div className="flex justify-between text-lg font-bold pt-3 border-t font-[var(--font-comfortaa)]" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-                <span style={{ color: '#E5E7EB' }}>Total a Pagar:</span>
-                <span style={{ color: '#FFB200' }}>{formatPrice(amount)}</span>
+              <div className="flex justify-between text-lg font-bold pt-3 border-t font-[var(--font-comfortaa)]" style={{ borderColor: '#3A2F5A' }}>
+                <span style={{ color: '#FFFFFF' }}>Total a Pagar:</span>
+                <span style={{ color: '#A83EF5' }}>{formatPrice(amount)}</span>
               </div>
             </div>
           </div>
 
-          {/* Opciones de método de pago - Consistente con formulario principal */}
-          <div className="rounded-lg border p-6" style={{ 
-            background: 'rgba(28, 32, 58, 0.6)',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+          {/* Opciones de método de pago - Vibrante con colores del logo */}
+          <div className="rounded-2xl border p-6" style={{ 
+            background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+            borderColor: '#3A2F5A',
+            boxShadow: '0 10px 30px rgba(168, 62, 245, 0.15)'
           }}>
-            <h3 className="text-lg font-bold mb-4 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
+            <h3 className="text-lg font-bold mb-4 font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
               Selecciona un método de pago
             </h3>
             <div className="space-y-4">
               {/* Opción: Payphone */}
               <button
                 onClick={() => handleMethodSelect('payphone')}
-                className="w-full p-4 border rounded-lg transition-all text-left"
+                className="w-full p-4 border rounded-xl transition-all text-left"
                 style={selectedMethod === 'payphone' 
                   ? {
-                      borderColor: 'rgba(168, 62, 245, 0.4)',
-                      background: 'rgba(168, 62, 245, 0.1)'
+                      borderColor: '#A83EF5',
+                      background: 'rgba(168, 62, 245, 0.15)',
+                      boxShadow: '0 0 20px rgba(168, 62, 245, 0.3)'
                     }
                   : {
-                      borderColor: 'rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(15, 17, 23, 0.4)'
+                      borderColor: '#3A2F5A',
+                      background: 'rgba(26, 21, 37, 0.5)'
                     }
                 }
                 onMouseEnter={(e) => {
                   if (selectedMethod !== 'payphone') {
-                    e.currentTarget.style.borderColor = 'rgba(168, 62, 245, 0.3)';
+                    e.currentTarget.style.borderColor = '#5A4A7A';
+                    e.currentTarget.style.background = 'rgba(168, 62, 245, 0.1)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedMethod !== 'payphone') {
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.borderColor = '#3A2F5A';
+                    e.currentTarget.style.background = 'rgba(26, 21, 37, 0.5)';
                   }
                 }}
               >
                 <div className="flex items-center gap-4">
                   <div
-                    className="w-5 h-5 rounded-full border flex items-center justify-center"
+                    className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
                     style={selectedMethod === 'payphone'
                       ? {
                           borderColor: '#A83EF5',
-                          background: '#A83EF5'
+                          background: '#A83EF5',
+                          boxShadow: '0 0 10px rgba(168, 62, 245, 0.5)'
                         }
                       : {
-                          borderColor: 'rgba(107, 114, 128, 0.5)'
+                          borderColor: '#5A4A7A'
                         }
                     }
                   >
@@ -205,18 +213,19 @@ export function PaymentMethod({
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+                      <h4 className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
                         Pagar con PayPhone
                       </h4>
-                      <span className="text-xs px-2 py-0.5 rounded font-semibold font-[var(--font-dm-sans)]" style={{ 
-                        background: 'rgba(168, 62, 245, 0.2)',
+                      <span className="text-xs px-2 py-0.5 rounded-xl font-semibold font-[var(--font-dm-sans)]" style={{ 
+                        background: 'rgba(168, 62, 245, 0.3)',
                         color: '#A83EF5',
-                        border: '1px solid rgba(168, 62, 245, 0.3)'
+                        border: '1px solid rgba(168, 62, 245, 0.5)',
+                        boxShadow: '0 0 10px rgba(168, 62, 245, 0.2)'
                       }}>
                         Recomendado
                       </span>
                     </div>
-                    <p className="text-sm font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                    <p className="text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
                       Pago instantáneo con tarjeta o cuenta Payphone. Confirmación inmediata.
                     </p>
                   </div>
@@ -226,48 +235,52 @@ export function PaymentMethod({
               {/* Opción: Transferencia Bancaria */}
               <button
                 onClick={() => handleMethodSelect('transfer')}
-                className="w-full p-4 border rounded-lg transition-all text-left"
+                className="w-full p-4 border rounded-xl transition-all text-left"
                 style={selectedMethod === 'transfer' 
                   ? {
-                      borderColor: 'rgba(168, 62, 245, 0.4)',
-                      background: 'rgba(168, 62, 245, 0.1)'
+                      borderColor: '#A83EF5',
+                      background: 'rgba(168, 62, 245, 0.15)',
+                      boxShadow: '0 0 20px rgba(168, 62, 245, 0.3)'
                     }
                   : {
-                      borderColor: 'rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(15, 17, 23, 0.4)'
+                      borderColor: '#3A2F5A',
+                      background: 'rgba(26, 21, 37, 0.5)'
                     }
                 }
                 onMouseEnter={(e) => {
                   if (selectedMethod !== 'transfer') {
-                    e.currentTarget.style.borderColor = 'rgba(168, 62, 245, 0.3)';
+                    e.currentTarget.style.borderColor = '#5A4A7A';
+                    e.currentTarget.style.background = 'rgba(168, 62, 245, 0.1)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedMethod !== 'transfer') {
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.borderColor = '#3A2F5A';
+                    e.currentTarget.style.background = 'rgba(26, 21, 37, 0.5)';
                   }
                 }}
               >
                 <div className="flex items-center gap-4">
                   <div
-                    className="w-5 h-5 rounded-full border flex items-center justify-center"
+                    className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
                     style={selectedMethod === 'transfer'
                       ? {
                           borderColor: '#A83EF5',
-                          background: '#A83EF5'
+                          background: '#A83EF5',
+                          boxShadow: '0 0 10px rgba(168, 62, 245, 0.5)'
                         }
                       : {
-                          borderColor: 'rgba(107, 114, 128, 0.5)'
+                          borderColor: '#5A4A7A'
                         }
                     }
                   >
                     {selectedMethod === 'transfer' && <div className="w-2 h-2 rounded-full bg-white" />}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold mb-1 font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+                    <h4 className="font-semibold mb-1 font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
                       Transferencia Bancaria
                     </h4>
-                    <p className="text-sm font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                    <p className="text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
                       Realiza una transferencia a nuestra cuenta. Confirmación manual.
                     </p>
                   </div>

@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { PurchaseFormData } from '@/types/purchase.types';
 import { PaymentMethod } from './PaymentMethod';
+import { MaterialInput } from '../ui/MaterialInput';
+import { PhoneInput } from '../ui/PhoneInput';
+import { normalizePhoneNumber, isValidEcuadorianPhone } from '@/utils/phoneFormatter';
 
 interface PurchaseFormWithPaymentProps {
   initialData?: Partial<PurchaseFormData>;
@@ -60,9 +63,9 @@ export function PurchaseFormWithPayment({
       
       case 'whatsapp':
         if (!value.trim()) return 'El número de WhatsApp es requerido';
-        const cleaned = value.replace(/\s|-|\(|\)/g, '');
-        const isValid = /^(\+?593)?[0-9]{9,10}$/.test(cleaned) || /^0[0-9]{9}$/.test(cleaned);
-        return !isValid ? 'Formato inválido. Ej: +593 939039191 o 0939039191' : null;
+        const normalized = normalizePhoneNumber(value);
+        const isValid = isValidEcuadorianPhone(normalized);
+        return !isValid ? 'Formato inválido. Ej: 0939039191 o +593 93 903 9191' : null;
       
       case 'email':
         if (!value.trim()) return 'El correo electrónico es requerido';
@@ -71,6 +74,15 @@ export function PurchaseFormWithPayment({
       case 'confirmEmail':
         if (!value.trim()) return 'Confirma tu correo electrónico';
         return value !== formData.email ? 'Los correos no coinciden' : null;
+      
+      case 'documentId':
+        if (!value.trim()) return 'La cédula de identidad es requerida';
+        // Validar que sea numérico y tenga entre 10 y 13 dígitos (cédula ecuatoriana o pasaporte)
+        const docNumber = value.replace(/\D/g, '');
+        if (docNumber.length < 10 || docNumber.length > 13) {
+          return 'La cédula debe tener entre 10 y 13 dígitos';
+        }
+        return null;
       
       default:
         return null;
@@ -83,18 +95,16 @@ export function PurchaseFormWithPayment({
     let isValid = true;
 
     (Object.keys(formData) as Array<keyof PurchaseFormData>).forEach((field) => {
-      if (field !== 'documentId') { // documentId es opcional
-        const fieldValue = formData[field];
-        if (typeof fieldValue === 'string') {
-          const error = validateField(field, fieldValue);
-          if (error) {
-            newErrors[field] = error;
-            isValid = false;
-          }
-        } else {
-          newErrors[field] = `El campo ${field} es requerido`;
+      const fieldValue = formData[field];
+      if (typeof fieldValue === 'string') {
+        const error = validateField(field, fieldValue);
+        if (error) {
+          newErrors[field] = error;
           isValid = false;
         }
+      } else {
+        newErrors[field] = `El campo ${field} es requerido`;
+        isValid = false;
       }
     });
 
@@ -164,24 +174,6 @@ export function PurchaseFormWithPayment({
     }).format(price);
   };
 
-  const getInputClassName = (field: keyof PurchaseFormData) => {
-    const baseClass =
-      'w-full px-4 py-3.5 text-base border rounded-lg focus:outline-none font-[var(--font-dm-sans)] transition-all duration-200';
-    
-    if (errors[field] && touched.has(field)) {
-      return `${baseClass} border-red-500/50 bg-[#1A0F0F] text-red-100 placeholder-red-400/40 focus:border-red-400`;
-    }
-    
-    if (formData[field] && !errors[field] && touched.has(field)) {
-      return `${baseClass} border-green-500/40 bg-[#0F1A0F] text-green-50 placeholder-green-400/30 focus:border-green-400`;
-    }
-    
-    return `${baseClass} border-[#2C2F4A] bg-[#0F1328] text-[#EDEDED] placeholder-[#6B7280]`;
-  };
-
-  const getInputStyle = (_field: keyof PurchaseFormData) => {
-    return {};
-  };
 
   // Mostrar formulario y método de pago en la misma vista
   return (
@@ -190,272 +182,148 @@ export function PurchaseFormWithPayment({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         {/* Columna izquierda: Formulario - Integrado al mismo universo visual */}
-        <div className={`rounded-lg border ${isFormSubmitted ? 'border-green-500/30 opacity-75' : 'border-white/10'} p-6 md:p-8 space-y-6 transition-all duration-300`} style={{ 
-          backgroundColor: 'rgba(28, 32, 58, 0.6)', 
-          borderColor: isFormSubmitted ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+        <div className={`rounded-2xl border ${isFormSubmitted ? 'border-green-500/30 opacity-75' : 'border-[#3A2F5A]'} p-6 md:p-8 space-y-6 transition-all duration-300`} style={{ 
+          background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+          borderColor: isFormSubmitted ? 'rgba(34, 197, 94, 0.3)' : '#3A2F5A',
+          boxShadow: '0 20px 60px rgba(168, 62, 245, 0.2), 0 0 40px rgba(240, 32, 128, 0.1)'
         }}>
           {/* Nombre */}
-          <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
-              Nombre(s) <span className="text-red-400 font-bold">*</span>
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="Ingresa tu nombre"
-              disabled={isFormSubmitted}
-              className={getInputClassName('name')}
-              style={getInputStyle('name')}
-              onFocus={(e) => {
-                if (!errors.name) {
-                  e.currentTarget.style.borderColor = '#8F6AE1';
-                  e.currentTarget.style.outline = 'none';
-                }
-              }}
-              onBlur={(e) => {
-                handleBlur('name');
-                if (!errors.name) {
-                  e.currentTarget.style.borderColor = formData.name ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
-                }
-              }}
-            />
-            {errors.name && touched.has('name') && (
-              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>{errors.name}</span>
-              </p>
-            )}
-          </div>
+          <MaterialInput
+            id="name"
+            label="Nombre(s)"
+            type="text"
+            value={formData.name}
+            onChange={(value) => handleChange('name', value)}
+            onBlur={() => handleBlur('name')}
+            placeholder="Ingresa tu nombre"
+            disabled={isFormSubmitted}
+            required
+            error={errors.name && touched.has('name') ? errors.name : undefined}
+            variant="outlined"
+          />
 
           {/* Apellido */}
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
-              Apellido(s) <span className="text-red-400 font-bold">*</span>
-            </label>
-            <input
-              id="lastName"
-              type="text"
-              value={formData.lastName}
-              onChange={(e) => handleChange('lastName', e.target.value)}
-              placeholder="Ingresa tu apellido"
-              disabled={isFormSubmitted}
-              className={getInputClassName('lastName')}
-              style={getInputStyle('lastName')}
-              onFocus={(e) => {
-                if (!errors.lastName) {
-                  e.currentTarget.style.borderColor = '#8F6AE1';
-                  e.currentTarget.style.outline = 'none';
-                }
-              }}
-              onBlur={(e) => {
-                handleBlur('lastName');
-                if (!errors.lastName) {
-                  e.currentTarget.style.borderColor = formData.lastName ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
-                }
-              }}
-            />
-            {errors.lastName && touched.has('lastName') && (
-              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>{errors.lastName}</span>
-              </p>
-            )}
-          </div>
+          <MaterialInput
+            id="lastName"
+            label="Apellido(s)"
+            type="text"
+            value={formData.lastName}
+            onChange={(value) => handleChange('lastName', value)}
+            onBlur={() => handleBlur('lastName')}
+            placeholder="Ingresa tu apellido"
+            disabled={isFormSubmitted}
+            required
+            error={errors.lastName && touched.has('lastName') ? errors.lastName : undefined}
+            variant="outlined"
+          />
 
           {/* WhatsApp */}
-          <div>
-            <label htmlFor="whatsapp" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
-              Número WhatsApp <span className="text-red-400 font-bold">*</span>
-            </label>
-            <input
-              id="whatsapp"
-              type="text"
-              value={formData.whatsapp}
-              onChange={(e) => handleChange('whatsapp', e.target.value)}
-              placeholder="Ej: +593 939039191 o 0939039191"
-              disabled={isFormSubmitted}
-              className={getInputClassName('whatsapp')}
-              style={getInputStyle('whatsapp')}
-              onFocus={(e) => {
-                if (!errors.whatsapp) {
-                  e.currentTarget.style.borderColor = '#8F6AE1';
-                  e.currentTarget.style.outline = 'none';
-                }
-              }}
-              onBlur={(e) => {
-                handleBlur('whatsapp');
-                if (!errors.whatsapp) {
-                  e.currentTarget.style.borderColor = formData.whatsapp ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
-                }
-              }}
-            />
-            {errors.whatsapp && touched.has('whatsapp') && (
-              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>{errors.whatsapp}</span>
-              </p>
-            )}
-          </div>
+          <PhoneInput
+            id="whatsapp"
+            label="Número WhatsApp"
+            value={formData.whatsapp}
+            onChange={(value) => handleChange('whatsapp', value)}
+            onBlur={() => handleBlur('whatsapp')}
+            disabled={isFormSubmitted}
+            required
+            error={errors.whatsapp && touched.has('whatsapp') ? errors.whatsapp : undefined}
+            variant="outlined"
+          />
 
           {/* Email */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
-              Correo Electrónico <span className="text-red-400 font-bold">*</span>
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              placeholder="tu@email.com"
-              disabled={isFormSubmitted}
-              className={getInputClassName('email')}
-              style={getInputStyle('email')}
-              onFocus={(e) => {
-                if (!errors.email) {
-                  e.currentTarget.style.borderColor = '#8F6AE1';
-                  e.currentTarget.style.outline = 'none';
-                }
-              }}
-              onBlur={(e) => {
-                handleBlur('email');
-                if (!errors.email) {
-                  e.currentTarget.style.borderColor = formData.email ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
-                }
-              }}
-            />
-            {errors.email && touched.has('email') && (
-              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>{errors.email}</span>
-              </p>
-            )}
-          </div>
+          <MaterialInput
+            id="email"
+            label="Correo Electrónico"
+            type="email"
+            value={formData.email}
+            onChange={(value) => handleChange('email', value)}
+            onBlur={() => handleBlur('email')}
+            placeholder="tu@email.com"
+            disabled={isFormSubmitted}
+            required
+            error={errors.email && touched.has('email') ? errors.email : undefined}
+            variant="outlined"
+          />
 
           {/* Confirmar Email */}
-          <div>
-            <label htmlFor="confirmEmail" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
-              Confirma el Correo Electrónico <span className="text-red-400 font-bold">*</span>
-            </label>
-            <input
-              id="confirmEmail"
-              type="email"
-              value={formData.confirmEmail}
-              onChange={(e) => handleChange('confirmEmail', e.target.value)}
-              placeholder="Confirma tu correo"
-              disabled={isFormSubmitted}
-              className={getInputClassName('confirmEmail')}
-              style={getInputStyle('confirmEmail')}
-              onFocus={(e) => {
-                if (!errors.confirmEmail) {
-                  e.currentTarget.style.borderColor = '#8F6AE1';
-                  e.currentTarget.style.outline = 'none';
-                }
-              }}
-              onBlur={(e) => {
-                handleBlur('confirmEmail');
-                if (!errors.confirmEmail) {
-                  e.currentTarget.style.borderColor = formData.confirmEmail ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
-                }
-              }}
-            />
-            {errors.confirmEmail && touched.has('confirmEmail') && (
-              <p className="text-sm mt-2.5 font-[var(--font-dm-sans)] flex items-center gap-2" style={{ color: '#FCA5A5' }}>
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>{errors.confirmEmail}</span>
-              </p>
-            )}
-          </div>
+          <MaterialInput
+            id="confirmEmail"
+            label="Confirma el Correo Electrónico"
+            type="email"
+            value={formData.confirmEmail}
+            onChange={(value) => handleChange('confirmEmail', value)}
+            onBlur={() => handleBlur('confirmEmail')}
+            placeholder="Confirma tu correo"
+            disabled={isFormSubmitted}
+            required
+            error={errors.confirmEmail && touched.has('confirmEmail') ? errors.confirmEmail : undefined}
+            variant="outlined"
+          />
 
-          {/* Documento de Identidad (Opcional) */}
-          <div>
-            <label htmlFor="documentId" className="block text-sm font-semibold text-[#F9FAFB] mb-3 font-[var(--font-dm-sans)] tracking-wide">
-              Cédula/Documento de Identidad
-              <span className="text-xs text-[#9CA3AF] ml-2 font-normal">(Opcional)</span>
-            </label>
-            <input
-              id="documentId"
-              type="text"
-              value={formData.documentId}
-              onChange={(e) => handleChange('documentId', e.target.value)}
-              placeholder="Ej: 1234567890"
-              disabled={isFormSubmitted}
-              className={getInputClassName('documentId')}
-              style={getInputStyle('documentId')}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#8F6AE1';
-                e.currentTarget.style.outline = 'none';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = formData.documentId ? 'rgba(34, 197, 94, 0.4)' : '#2C2F4A';
-              }}
-            />
-            <p className="text-xs text-[#9CA3AF] mt-2 font-[var(--font-dm-sans)]">
-              Si no lo ingresas, Payphone lo solicitará durante el pago
-            </p>
-          </div>
+          {/* Documento de Identidad */}
+          <MaterialInput
+            id="documentId"
+            label="Cédula/Documento de Identidad"
+            type="text"
+            value={formData.documentId || ''}
+            onChange={(value) => handleChange('documentId', value)}
+            onBlur={() => handleBlur('documentId')}
+            placeholder="Ej: 1234567890"
+            disabled={isFormSubmitted}
+            required
+            error={errors.documentId && touched.has('documentId') ? errors.documentId : undefined}
+            variant="outlined"
+          />
         </div>
 
           {/* Columna derecha: Resumen - Zona segura de pago */}
         <div className="space-y-6">
-          <div className="rounded-lg border p-6 md:p-8 transition-all duration-300" style={{ 
-            background: 'rgba(28, 32, 58, 0.7)',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+          <div className="rounded-2xl border p-6 md:p-8 transition-all duration-300" style={{ 
+            background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+            borderColor: '#3A2F5A',
+            boxShadow: '0 20px 60px rgba(168, 62, 245, 0.2), 0 0 40px rgba(240, 32, 128, 0.1)'
           }}>
-            <h3 className="text-xl font-bold mb-6 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
+            <h3 className="text-xl font-bold mb-6 font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
               Resumen de la compra
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-                <span style={{ color: '#9CA3AF' }}>Cantidad de boletos:</span>
-                <span className="font-semibold" style={{ color: '#E5E7EB' }}>{quantity}</span>
+              <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: '#3A2F5A' }}>
+                <span style={{ color: '#E5D4FF' }}>Cantidad de boletos:</span>
+                <span className="font-semibold" style={{ color: '#FFFFFF' }}>{quantity}</span>
               </div>
-              <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-                <span style={{ color: '#9CA3AF' }}>Precio unitario:</span>
-                <span className="font-medium" style={{ color: '#E5E7EB' }}>
+              <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: '#3A2F5A' }}>
+                <span style={{ color: '#E5D4FF' }}>Precio unitario:</span>
+                <span className="font-medium" style={{ color: '#FFFFFF' }}>
                   {formatPrice(totalAmount / quantity)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-lg font-bold pt-4 border-t font-[var(--font-comfortaa)]" style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }}>
-                <span style={{ color: '#E5E7EB' }}>Total a pagar:</span>
-                <span className="font-bold text-2xl" style={{ color: '#FFB200' }}>{formatPrice(totalAmount)}</span>
+              <div className="flex justify-between items-center text-lg font-bold pt-4 border-t font-[var(--font-comfortaa)]" style={{ borderColor: '#3A2F5A' }}>
+                <span style={{ color: '#FFFFFF' }}>Total a pagar:</span>
+                <span className="font-bold text-2xl" style={{ color: '#A83EF5' }}>{formatPrice(totalAmount)}</span>
               </div>
             </div>
           </div>
 
-          <div className="rounded-lg p-5 border" style={{ 
-            background: 'rgba(15, 17, 23, 0.4)',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+          <div className="rounded-2xl p-5 border" style={{ 
+            background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
+            borderColor: '#3A2F5A',
+            boxShadow: '0 10px 30px rgba(168, 62, 245, 0.15)'
           }}>
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ 
-                background: 'rgba(168, 62, 245, 0.15)',
-                border: '1px solid rgba(168, 62, 245, 0.2)'
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style={{ 
+                background: 'rgba(168, 62, 245, 0.2)',
+                border: '1px solid rgba(168, 62, 245, 0.4)',
+                boxShadow: '0 0 20px rgba(168, 62, 245, 0.3)'
               }}>
                 <svg className="w-5 h-5" style={{ color: '#A83EF5' }} fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-semibold mb-2 font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+                <p className="text-sm font-semibold mb-2 font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
                   Nota importante
                 </p>
-                <p className="text-xs leading-relaxed font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                <p className="text-xs leading-relaxed font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
                   Tus números de boletos se asignarán automáticamente después de completar el pago. Los recibirás por correo y WhatsApp.
                 </p>
               </div>
@@ -472,8 +340,24 @@ export function PurchaseFormWithPayment({
               type="button"
               onClick={onBack}
               disabled={isSubmitting || isLoading}
-              className="px-8 py-4 md:py-3 text-base md:text-lg border-2 rounded-xl font-bold transition-all font-[var(--font-dm-sans)] min-h-[48px] text-white hover:bg-[#2A2D45]"
-              style={{ borderColor: '#2A2D45' }}
+              className="px-8 py-4 md:py-3 text-base md:text-lg border-2 rounded-xl font-bold transition-all font-[var(--font-dm-sans)] min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                borderColor: '#3A2F5A',
+                color: '#E5D4FF',
+                background: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting && !isLoading) {
+                  e.currentTarget.style.borderColor = '#5A4A7A';
+                  e.currentTarget.style.color = '#FFFFFF';
+                  e.currentTarget.style.background = 'rgba(168, 62, 245, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#3A2F5A';
+                e.currentTarget.style.color = '#E5D4FF';
+                e.currentTarget.style.background = 'transparent';
+              }}
             >
               Volver
             </button>
@@ -483,20 +367,23 @@ export function PurchaseFormWithPayment({
             disabled={isSubmitting || isLoading}
             className="px-8 py-4 text-base rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-dm-sans)] flex items-center justify-center gap-2 min-h-[48px] w-full"
             style={{
-              background: 'linear-gradient(135deg, #F2C94C, #F2994A)',
-              color: '#1A1A1A',
+              background: 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)',
+              color: '#FFFFFF',
               border: 'none',
-              boxShadow: '0 4px 12px rgba(242, 201, 76, 0.25)'
+              boxShadow: '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)',
+              fontWeight: '600'
             }}
             onMouseEnter={(e) => {
               if (!isSubmitting && !isLoading) {
-                e.currentTarget.style.filter = 'brightness(1.05)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(242, 201, 76, 0.35)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, #f02080 0%, #A83EF5 100%)';
+                e.currentTarget.style.boxShadow = '0 6px 25px rgba(168, 62, 245, 0.5), 0 0 40px rgba(240, 32, 128, 0.3)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.filter = 'brightness(1)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(242, 201, 76, 0.25)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, #A83EF5 0%, #f02080 100%)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(168, 62, 245, 0.4), 0 0 30px rgba(240, 32, 128, 0.2)';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             {(isSubmitting || isLoading) ? (

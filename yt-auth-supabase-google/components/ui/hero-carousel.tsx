@@ -43,6 +43,14 @@ export function HeroCarousel({
     return () => clearInterval(timer);
   }, [autoplayInterval, validImages.length]);
 
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev - 1 + validImages.length) % validImages.length);
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % validImages.length);
+  };
+
   if (validImages.length === 0) {
     return null;
   }
@@ -66,6 +74,40 @@ export function HeroCarousel({
             </div>
           ))}
         </div>
+
+        {/* Controles manuales - Flechas izquierda/derecha */}
+        {validImages.length > 1 && (
+          <>
+            <button
+              onClick={goToPrevious}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              aria-label="Imagen anterior"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={goToNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              aria-label="Imagen siguiente"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
 
         {showIndicators && validImages.length > 1 && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-2">

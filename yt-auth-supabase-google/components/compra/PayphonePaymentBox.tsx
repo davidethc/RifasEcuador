@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Script from 'next/script';
+import { getPhoneForPayphone, isValidEcuadorianPhone } from '@/utils/phoneFormatter';
 
 interface PayphonePaymentBoxProps {
   orderId: string;
@@ -72,20 +73,22 @@ export function PayphonePaymentBox({
   const token = process.env.NEXT_PUBLIC_PAYPHONE_TOKEN;
   const storeId = process.env.NEXT_PUBLIC_PAYPHONE_STORE_ID;
 
-  // Debug: Log temporal para verificar variables (eliminar despudés)
+  // Verificar variables de entorno
   useEffect(() => {
-    console.log('🔍 Debug Payphone Variables:', {
-      hasToken: !!token,
-      hasStoreId: !!storeId,
-      tokenLength: token?.length || 0,
-      storeIdValue: storeId || 'NO DEFINIDO',
-      allEnvVars: {
-        NEXT_PUBLIC_PAYPHONE_TOKEN: process.env.NEXT_PUBLIC_PAYPHONE_TOKEN ? 'DEFINIDO' : 'NO DEFINIDO',
-        NEXT_PUBLIC_PAYPHONE_STORE_ID: process.env.NEXT_PUBLIC_PAYPHONE_STORE_ID ? 'DEFINIDO' : 'NO DEFINIDO',
-        NEXT_PUBLIC_PAYPHONE_ENVIRONMENT: process.env.NEXT_PUBLIC_PAYPHONE_ENVIRONMENT || 'NO DEFINIDO',
-        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'NO DEFINIDO',
-      }
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Debug Payphone Variables:', {
+        hasToken: !!token,
+        hasStoreId: !!storeId,
+        tokenLength: token?.length || 0,
+        storeIdValue: storeId || 'NO DEFINIDO',
+        allEnvVars: {
+          NEXT_PUBLIC_PAYPHONE_TOKEN: process.env.NEXT_PUBLIC_PAYPHONE_TOKEN ? 'DEFINIDO' : 'NO DEFINIDO',
+          NEXT_PUBLIC_PAYPHONE_STORE_ID: process.env.NEXT_PUBLIC_PAYPHONE_STORE_ID ? 'DEFINIDO' : 'NO DEFINIDO',
+          NEXT_PUBLIC_PAYPHONE_ENVIRONMENT: process.env.NEXT_PUBLIC_PAYPHONE_ENVIRONMENT || 'NO DEFINIDO',
+          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'NO DEFINIDO',
+        }
+      });
+    }
   }, [token, storeId]);
 
   useEffect(() => {
@@ -108,13 +111,17 @@ export function PayphonePaymentBox({
       return;
     }
 
-    console.log('📨 Mensaje de Payphone:', event.data);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📨 Mensaje de Payphone:', event.data);
+    }
 
     try {
       const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
       if (data.event === 'payment_success') {
-        console.log('✅ Pago exitoso:', data);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ Pago exitoso:', data);
+        }
         if (onSuccess) {
           onSuccess(data.transactionId || 'success');
         }
@@ -160,59 +167,45 @@ export function PayphonePaymentBox({
           return;
         }
 
-        console.log('🔑 ClientTransactionId generado:', {
-          value: clientTransactionId,
-          length: clientTransactionId.length,
-          orderId: orderId,
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔑 ClientTransactionId generado:', {
+            value: clientTransactionId,
+            length: clientTransactionId.length,
+            orderId: orderId,
+          });
+        }
 
         // URL de callback (donde Payphone redirigirá después del pago)
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
         const responseUrl = `${appUrl}/payment/payphone/callback`;
 
-        // Limpiar y validar número de teléfono de Ecuador
-        let cleanPhone = customerData.whatsapp.trim();
+        // Limpiar y validar número de teléfono de Ecuador usando la utilidad
+        const cleanPhone = getPhoneForPayphone(customerData.whatsapp);
 
-        // Remover caracteres no numéricos (excepto +)
-        cleanPhone = cleanPhone.replace(/[^\d+]/g, '');
-
-        // Si empieza con +593, usar tal cual
-        // Si empieza con 593, agregar +
-        // Si empieza con 0, reemplazar 0 por +593
-        // Si no tiene código de país, agregar +593
-        if (cleanPhone.startsWith('+593')) {
-          // Ya está bien
-        } else if (cleanPhone.startsWith('593')) {
-          cleanPhone = '+' + cleanPhone;
-        } else if (cleanPhone.startsWith('0')) {
-          cleanPhone = '+593' + cleanPhone.substring(1);
-        } else {
-          cleanPhone = '+593' + cleanPhone;
-        }
-
-        // Validar longitud (Ecuador: +593 + 9 dígitos = 13 caracteres)
-        if (cleanPhone.length !== 13) {
-          console.warn('⚠️ Número de teléfono con longitud incorrecta:', {
+        // Validar que el número sea válido
+        if (!isValidEcuadorianPhone(cleanPhone)) {
+          console.warn('⚠️ Número de teléfono inválido:', {
             original: customerData.whatsapp,
             cleaned: cleanPhone,
-            length: cleanPhone.length,
-            expected: 13
+            expected: '+593XXXXXXXXX (13 caracteres)'
           });
         }
 
-        console.log('📱 Número de teléfono procesado:', {
-          original: customerData.whatsapp,
-          cleaned: cleanPhone,
-          isValid: cleanPhone.length === 13 && cleanPhone.startsWith('+593')
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📱 Número de teléfono procesado:', {
+            original: customerData.whatsapp,
+            cleaned: cleanPhone,
+            isValid: isValidEcuadorianPhone(cleanPhone)
+          });
 
-        console.log('🚀 Inicializando Cajita de Pagos:', {
-          orderId,
-          clientTransactionId,
-          amount: amountInCents,
-          responseUrl,
-          phoneNumber: cleanPhone,
-        });
+          console.log('🚀 Inicializando Cajita de Pagos:', {
+            orderId,
+            clientTransactionId,
+            amount: amountInCents,
+            responseUrl,
+            phoneNumber: cleanPhone,
+          });
+        }
 
         // Configuración de la Cajita de Pagos
         const config: PPaymentButtonBoxConfig = {
@@ -249,14 +242,18 @@ export function PayphonePaymentBox({
           optionalParameter: orderId,
         };
 
-        console.log('📋 Configuración:', config);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📋 Configuración:', config);
+        }
 
         // Crear instancia y renderizar
         const ppb = new window.PPaymentButtonBox(config);
         ppb.render('pp-button');
 
         buttonRendered.current = true;
-        console.log('✅ Cajita de Pagos renderizada');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ Cajita de Pagos renderizada');
+        }
 
         // Escuchar eventos del iframe (opcional)
         window.addEventListener('message', handlePayphoneMessage);
@@ -280,7 +277,9 @@ export function PayphonePaymentBox({
   }, [isScriptLoaded, token, storeId, orderId, amount, customerData, raffleTitle, onError, onSuccess, handlePayphoneMessage]);
 
   const handleScriptLoad = () => {
-    console.log('✅ Script de Cajita de Pagos cargado');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Script de Cajita de Pagos cargado');
+    }
     setIsScriptLoaded(true);
   };
 

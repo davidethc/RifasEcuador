@@ -47,6 +47,7 @@ export default {
         comfortaa: ['var(--font-comfortaa)', 'sans-serif'],
         'dm-sans': ['var(--font-dm-sans)', 'sans-serif'],
         'josefin': ['var(--font-josefin)', 'sans-serif'],
+        'space-grotesk': ['var(--font-space-grotesk)', 'sans-serif'],
       },
     },
   },
