@@ -171,8 +171,11 @@ export async function POST(request: NextRequest) {
     console.log('✅ OrderId completo recuperado:', orderId);
 
     // Actualizar la orden en la base de datos según el estado
-    // Strict check: statusCode 3 AND transactionStatus 'Approved'
-    if (transaction.statusCode === 3 && transaction.transactionStatus === 'Approved') {
+    // Strict check: statusCode 3 AND transactionStatus 'Approved' (case insensitive)
+    const status = transaction.transactionStatus ? transaction.transactionStatus.toString().toLowerCase() : '';
+    const isApproved = transaction.statusCode === 3 && status === 'approved';
+
+    if (isApproved) {
       console.log('✅ Pago aprobado, actualizando orden...');
 
       // Crear o actualizar registro de pago
@@ -189,7 +192,7 @@ export async function POST(request: NextRequest) {
         provider_reference: transaction.transactionId.toString(),
         amount: transaction.amount / 100, // Convertir centavos a dólares
         status: 'approved',
-        // metadata column doesn't exist in DB, removing to avoid potential issues
+        // metadata column doesn't exist in DB
         created_at: new Date().toISOString(),
       };
 
@@ -199,7 +202,7 @@ export async function POST(request: NextRequest) {
           .update({
             provider_reference: transaction.transactionId.toString(),
             status: 'approved',
-            amount: transaction.amount / 100,
+            amount: transaction.amount / 100, // Update amount too
           })
           .eq('id', existingPayment.id);
       } else {
@@ -277,7 +280,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-    } else if (transaction.statusCode === 2 || (transaction.statusCode === 3 && transaction.transactionStatus !== 'Approved')) {
+    } else if (transaction.statusCode === 2 || (transaction.statusCode === 3 && !isApproved)) {
       // statusCode 2 = Canceled OR statusCode 3 but NOT Approved (e.g. Rejected)
       console.log('⚠️ Pago cancelado o rechazado:', transaction.transactionStatus);
 

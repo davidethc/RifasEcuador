@@ -58,8 +58,11 @@ function PayphoneCallbackContent() {
         console.log('✅ Transacción confirmada:', transaction);
 
         // Verificar el estado de la transacción
-        // Strict check: statusCode 3 AND transactionStatus 'Approved'
-        if (transaction.statusCode === 3 && transaction.transactionStatus === 'Approved') {
+        // Strict check: statusCode 3 AND transactionStatus 'Approved' (case insensitive)
+        const status = transaction.transactionStatus ? transaction.transactionStatus.toString().toLowerCase() : '';
+        const isApproved = transaction.statusCode === 3 && status === 'approved';
+
+        if (isApproved) {
           // Aprobado
           setStatus('success');
           setMessage('¡Pago aprobado! Redirigiendo...');
@@ -79,7 +82,7 @@ function PayphoneCallbackContent() {
             }
           }, 2000);
 
-        } else if (transaction.statusCode === 2 || (transaction.statusCode === 3 && transaction.transactionStatus !== 'Approved')) {
+        } else if (transaction.statusCode === 2 || (transaction.statusCode === 3 && !isApproved)) {
           // Cancelado o Rechazado (aunque tenga statusCode 3 si no es Approved es rechazo)
           setStatus('error');
           setMessage(`Pago no aprobado: ${transaction.transactionStatus || 'Cancelado'}`);
