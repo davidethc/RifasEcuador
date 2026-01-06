@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import axios, { AxiosError } from 'axios';
 
 // Cliente de Supabase con service role para bypass de RLS
 const getSupabaseAdmin = () => {
@@ -79,51 +80,33 @@ export async function POST(request: NextRequest) {
     // Llamar al endpoint de confirmación de Payphone
     const confirmUrl = 'https://pay.payphonetodoesposible.com/api/button/V2/Confirm';
 
-    console.log('🔄 Enviando confirmación a Payphone...');
+    console.log('🔄 Enviando confirmación a Payphone (usando axios)...');
 
-    const response = await fetch(confirmUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
+    try {
+      const response = await axios.post(confirmUrl, {
         id: parseInt(id),
         clientTxId: clientTxId,
-      }),
-    });
-
-    const responseText = await response.text();
-    console.log('📤 Respuesta de Payphone (raw):', responseText);
-
-    if (!response.ok) {
-      console.error('❌ Error HTTP de Payphone:', response.status, responseText);
-
-      let errorData = null;
-      try {
-        errorData = JSON.parse(responseText);
-      } catch {
-        // No se pudo parsear
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorData?.message || 'Error al confirmar la transacción',
-          errorCode: errorData?.errorCode,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        { status: response.status }
-      );
-    }
+        timeout: 30000, // 30 segundos
+      });
 
-    // Parsear respuesta exitosa
-    const transaction = JSON.parse(responseText);
+      console.log('📤 Respuesta de Payphone:', JSON.stringify(response.data, null, 2));
 
-    console.log('✅ Transacción confirmada:', {
-      transactionId: transaction.transactionId,
-      status: transaction.transactionStatus,
-      statusCode: transaction.statusCode,
-    });
+      const transaction = response.data;
+
+      console.log('✅ Transacción confirmada:', {
+        transactionId: transaction.transactionId,
+        status: transaction.transactionStatus,
+        statusCode: transaction.statusCode,
+        authorizationCode: transaction.authorizationCode,
+        amount: transaction.amount,
+        cardType: transaction.cardType,
+        cardBrand: transaction.cardBrand,
+      });
 
     // Extraer orderId del clientTransactionId
     // Formato nuevo: ord-{primeros8chars}-{timestamp}
@@ -192,7 +175,7 @@ export async function POST(request: NextRequest) {
         provider_reference: transaction.transactionId.toString(),
         amount: transaction.amount / 100, // Convertir centavos a dólares
         status: 'approved',
-        // metadata column doesn't exist in DB
+        payphone_response: transaction, // ✅ GUARDAR RESPUESTA COMPLETA de PayPhone
         created_at: new Date().toISOString(),
       };
 
@@ -203,6 +186,7 @@ export async function POST(request: NextRequest) {
             provider_reference: transaction.transactionId.toString(),
             status: 'approved',
             amount: transaction.amount / 100, // Update amount too
+            payphone_response: transaction, // ✅ GUARDAR RESPUESTA COMPLETA
           })
           .eq('id', existingPayment.id);
       } else {
@@ -258,24 +242,17 @@ export async function POST(request: NextRequest) {
           const emailUrl = `${baseUrl}/api/email/send-purchase-confirmation`;
           console.log('📧 URL del correo:', emailUrl);
 
-          const emailResponse = await fetch(emailUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ orderId }),
-          });
+          const emailResponse = await axios.post(emailUrl, 
+            { orderId },
+            {
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 10000, // 10 segundos
+            }
+          );
 
-          const emailData = await emailResponse.json();
-
-          if (emailResponse.ok) {
-            console.log('✅ Correo de confirmación enviado exitosamente:', emailData);
-          } else {
-            console.error('⚠️ Error al enviar correo:', emailData);
-            console.warn('⚠️ No se pudo enviar correo de confirmación');
-          }
+          console.log('✅ Correo de confirmación enviado exitosamente:', emailResponse.data);
         } catch (emailError) {
-          console.error('❌ Error al enviar correo (no crítico):', emailError);
+          console.error('❌ Error al enviar correo (no crítico):', emailError instanceof AxiosError ? emailError.message : emailError);
           // No lanzamos error para no bloquear el flujo
         }
       }
@@ -297,14 +274,46 @@ export async function POST(request: NextRequest) {
       console.log('⏳ Pago pendiente');
     }
 
-    return NextResponse.json({
-      success: true,
-      transaction,
-      orderId, // Retornar el orderId completo para usar en el callback
-    });
+      return NextResponse.json({
+        success: true,
+        transaction,
+        orderId, // Retornar el orderId completo para usar en el callback
+      });
 
+    } catch (axiosError) {
+      const error = axiosError as AxiosError;
+      console.error('❌ Error de axios al confirmar con PayPhone:', error.message);
+      
+      if (error.response) {
+        console.error('❌ Respuesta de error:', error.response.status, error.response.data);
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Error HTTP ${error.response.status} de PayPhone`,
+            details: error.response.data,
+          },
+          { status: error.response.status }
+        );
+      } else if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Timeout al conectar con PayPhone',
+          },
+          { status: 504 }
+        );
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Error de red al conectar con PayPhone',
+          },
+          { status: 503 }
+        );
+      }
+    }
   } catch (error) {
-    console.error('❌ Error al confirmar transacción:', error);
+    console.error('❌ Error general al confirmar transacción:', error);
     return NextResponse.json(
       {
         success: false,

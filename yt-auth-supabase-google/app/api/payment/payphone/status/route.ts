@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { PayphoneTransactionResponse, PayphoneErrorResponse } from '@/types/payphone.types';
+import axios, { AxiosError } from 'axios';
 
 /**
  * API Route para consultar el estado de una transacción de Payphone
@@ -39,57 +40,68 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Consultar el estado en la API de Payphone
+    // Consultar el estado en la API de Payphone (usando axios)
     const apiUrl = `https://pay.payphonetodoesposible.com/api/Sale/${transactionId}`;
 
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept-language': 'es',
-      },
-    });
-
-    const responseText = await response.text();
-    console.log('📤 Respuesta de Payphone:', responseText);
-
-    if (!response.ok) {
-      console.error('❌ Error HTTP de Payphone:', response.status, responseText);
-      
-      // Intentar parsear el error
-      let errorData: PayphoneErrorResponse | null = null;
-      try {
-        errorData = JSON.parse(responseText);
-      } catch {
-        // No se pudo parsear como JSON
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorData?.message || 'Error al consultar el estado',
-          errorCode: errorData?.errorCode,
+    try {
+      const response = await axios.get<PayphoneTransactionResponse>(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept-language': 'es',
         },
-        { status: response.status }
-      );
+        timeout: 30000, // 30 segundos
+      });
+
+      const data = response.data;
+
+      console.log('✅ Estado obtenido:', {
+        transactionId: data.transactionId,
+        status: data.transactionStatus,
+        statusCode: data.statusCode,
+      });
+
+      return NextResponse.json({
+        success: true,
+        transaction: data,
+      });
+
+    } catch (axiosError) {
+      const error = axiosError as AxiosError<PayphoneErrorResponse>;
+      console.error('❌ Error de axios al consultar estado:', error.message);
+      
+      if (error.response) {
+        const errorData = error.response.data;
+        console.error('❌ Error HTTP de Payphone:', error.response.status, errorData);
+        
+        return NextResponse.json(
+          {
+            success: false,
+            error: errorData?.message || 'Error al consultar el estado',
+            errorCode: errorData?.errorCode,
+          },
+          { status: error.response.status }
+        );
+      } else if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Timeout al consultar estado con PayPhone',
+          },
+          { status: 504 }
+        );
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Error de red al conectar con PayPhone',
+          },
+          { status: 503 }
+        );
+      }
     }
 
-    // Parsear respuesta exitosa
-    const data: PayphoneTransactionResponse = JSON.parse(responseText);
-
-    console.log('✅ Estado obtenido:', {
-      transactionId: data.transactionId,
-      status: data.transactionStatus,
-      statusCode: data.statusCode,
-    });
-
-    return NextResponse.json({
-      success: true,
-      transaction: data,
-    });
-
   } catch (error) {
-    console.error('❌ Error al consultar estado:', error);
+    console.error('❌ Error general al consultar estado:', error);
     return NextResponse.json(
       {
         success: false,
