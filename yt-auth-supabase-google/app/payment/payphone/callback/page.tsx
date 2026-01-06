@@ -17,7 +17,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 function PayphoneCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState<string>('Procesando pago...');
 
@@ -36,7 +36,7 @@ function PayphoneCallbackContent() {
 
         // Llamar al endpoint de confirmación
         console.log('🔄 Confirmando transacción...');
-        
+
         const response = await fetch('/api/payment/payphone/confirm', {
           method: 'POST',
           headers: {
@@ -58,7 +58,8 @@ function PayphoneCallbackContent() {
         console.log('✅ Transacción confirmada:', transaction);
 
         // Verificar el estado de la transacción
-        if (transaction.statusCode === 3) {
+        // Strict check: statusCode 3 AND transactionStatus 'Approved'
+        if (transaction.statusCode === 3 && transaction.transactionStatus === 'Approved') {
           // Aprobado
           setStatus('success');
           setMessage('¡Pago aprobado! Redirigiendo...');
@@ -66,7 +67,7 @@ function PayphoneCallbackContent() {
           // El orderId completo viene del endpoint de confirmación
           // que lo buscó en la base de datos por el prefijo
           const orderId: string | null = data.orderId || transaction.optionalParameter || null;
-          
+
           console.log('🔍 OrderId recibido:', orderId);
 
           // Redirigir a la página de confirmación después de 2 segundos
@@ -78,14 +79,14 @@ function PayphoneCallbackContent() {
             }
           }, 2000);
 
-        } else if (transaction.statusCode === 2) {
-          // Cancelado
+        } else if (transaction.statusCode === 2 || (transaction.statusCode === 3 && transaction.transactionStatus !== 'Approved')) {
+          // Cancelado o Rechazado (aunque tenga statusCode 3 si no es Approved es rechazo)
           setStatus('error');
-          setMessage('Pago cancelado');
+          setMessage(`Pago no aprobado: ${transaction.transactionStatus || 'Cancelado'}`);
 
           setTimeout(() => {
-            router.push('/comprar/error?message=Pago cancelado');
-          }, 2000);
+            router.push(`/comprar/error?message=${encodeURIComponent('Pago no aprobado: ' + (transaction.transactionStatus || 'Cancelado'))}`);
+          }, 3000);
 
         } else {
           // Pendiente
