@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       console.error('❌ Error HTTP de Payphone:', response.status, responseText);
-      
+
       let errorData = null;
       try {
         errorData = JSON.parse(responseText);
@@ -129,14 +129,14 @@ export async function POST(request: NextRequest) {
     // Formato nuevo: ord-{primeros8chars}-{timestamp}
     // Formato antiguo: order-{orderId}-{timestamp}
     let orderId: string | null = null;
-    
+
     // Intentar formato nuevo primero
     const newFormatMatch = clientTxId.match(/^ord-([a-f0-9]{8})-/);
     if (newFormatMatch) {
       // Solo tenemos los primeros 8 caracteres, necesitamos buscar la orden completa
       const orderPrefix = newFormatMatch[1];
       console.log('🔍 Buscando orden con prefijo:', orderPrefix);
-      
+
       // Buscar en la base de datos por el prefijo del ID
       const supabase = getSupabaseAdmin();
       const { data: orders } = await supabase
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
         .ilike('id', `${orderPrefix}%`)
         .order('created_at', { ascending: false })
         .limit(1);
-      
+
       if (orders && orders.length > 0) {
         orderId = orders[0].id;
         console.log('✅ Orden encontrada:', orderId);
@@ -167,12 +167,12 @@ export async function POST(request: NextRequest) {
         warning: 'No se pudo actualizar la orden en la base de datos',
       });
     }
-    
+
     console.log('✅ OrderId completo recuperado:', orderId);
 
     // Actualizar la orden en la base de datos según el estado
-    if (transaction.statusCode === 3) {
-      // statusCode 3 = Approved
+    // Strict check: statusCode 3 AND transactionStatus 'Approved'
+    if (transaction.statusCode === 3 && transaction.transactionStatus === 'Approved') {
       console.log('✅ Pago aprobado, actualizando orden...');
 
       // Crear o actualizar registro de pago
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
         provider_reference: transaction.transactionId.toString(),
         amount: transaction.amount / 100, // Convertir centavos a dólares
         status: 'approved',
-        metadata: transaction,
+        // metadata column doesn't exist in DB, removing to avoid potential issues
         created_at: new Date().toISOString(),
       };
 
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
           .update({
             provider_reference: transaction.transactionId.toString(),
             status: 'approved',
-            metadata: transaction,
+            amount: transaction.amount / 100,
           })
           .eq('id', existingPayment.id);
       } else {
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
         console.error('❌ Error al actualizar orden:', updateError);
       } else {
         console.log('✅ Orden actualizada a completada');
-        
+
         // Actualizar todos los tickets de esta orden a 'paid'
         console.log('🔄 Actualizando tickets a "paid" para orden:', orderId);
         const { data: orderData } = await supabase
@@ -227,34 +227,34 @@ export async function POST(request: NextRequest) {
           .select('raffle_id, numbers')
           .eq('id', orderId)
           .single();
-        
+
         if (orderData && orderData.numbers && orderData.numbers.length > 0) {
           // Los números en orders.numbers son strings, y en tickets.number también son strings
           const ticketNumbers = orderData.numbers as string[];
-          
+
           const { error: ticketsUpdateError } = await supabase
             .from('tickets')
-            .update({ 
+            .update({
               status: 'paid',
               payment_id: existingPayment?.id || null
             })
             .eq('raffle_id', orderData.raffle_id)
             .in('number', ticketNumbers);
-          
+
           if (ticketsUpdateError) {
             console.error('❌ Error al actualizar tickets a "paid":', ticketsUpdateError);
           } else {
             console.log(`✅ ${ticketNumbers.length} tickets actualizados a "paid"`);
           }
         }
-        
+
         // Enviar correo de confirmación (no bloquea si falla)
         try {
           console.log('📧 Intentando enviar correo de confirmación para orden:', orderId);
           const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
           const emailUrl = `${baseUrl}/api/email/send-purchase-confirmation`;
           console.log('📧 URL del correo:', emailUrl);
-          
+
           const emailResponse = await fetch(emailUrl, {
             method: 'POST',
             headers: {
@@ -262,9 +262,9 @@ export async function POST(request: NextRequest) {
             },
             body: JSON.stringify({ orderId }),
           });
-          
+
           const emailData = await emailResponse.json();
-          
+
           if (emailResponse.ok) {
             console.log('✅ Correo de confirmación enviado exitosamente:', emailData);
           } else {
@@ -277,20 +277,20 @@ export async function POST(request: NextRequest) {
         }
       }
 
-    } else if (transaction.statusCode === 2) {
-      // statusCode 2 = Canceled
-      console.log('⚠️ Pago cancelado');
+    } else if (transaction.statusCode === 2 || (transaction.statusCode === 3 && transaction.transactionStatus !== 'Approved')) {
+      // statusCode 2 = Canceled OR statusCode 3 but NOT Approved (e.g. Rejected)
+      console.log('⚠️ Pago cancelado o rechazado:', transaction.transactionStatus);
 
       const supabase = getSupabaseAdmin();
       await supabase
         .from('orders')
         .update({
-          status: 'expired',
+          status: 'expired', // Mark as expired/canceled
         })
         .eq('id', orderId);
 
     } else {
-      // statusCode 1 = Pending
+      // statusCode 1 = Pending or unknown
       console.log('⏳ Pago pendiente');
     }
 
