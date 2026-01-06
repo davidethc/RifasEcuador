@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { PayphoneSaleRequest, PayphoneSaleResponse, PayphoneErrorResponse } from '@/types/payphone.types';
+import axios, { AxiosError } from 'axios';
 
 /**
  * API Route para crear un pago con Payphone API Sale
@@ -98,60 +99,69 @@ export async function POST(request: NextRequest) {
       ? 'https://pay.payphonetodoesposible.com/api/Sale'
       : 'https://pay.payphonetodoesposible.com/api/Sale'; // Mismo endpoint para sandbox y producción
 
-    // Realizar la solicitud a la API de Payphone
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(payphoneRequest),
-    });
-
-    const responseText = await response.text();
-    console.log('📤 Respuesta de Payphone (raw):', responseText);
-
-    if (!response.ok) {
-      console.error('❌ Error HTTP de Payphone:', response.status, responseText);
-      
-      // Intentar parsear el error
-      let errorData: PayphoneErrorResponse | null = null;
-      try {
-        errorData = JSON.parse(responseText);
-      } catch {
-        // No se pudo parsear como JSON
-      }
-
-      // Extraer el mensaje de error específico
-      const errorMessage = errorData?.errors?.[0]?.message || errorData?.message || 'Error al crear la transacción';
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorMessage,
-          errorCode: errorData?.errorCode,
+    // Realizar la solicitud a la API de Payphone (usando axios)
+    try {
+      const response = await axios.post<PayphoneSaleResponse>(apiUrl, payphoneRequest, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        { status: response.status }
-      );
+        timeout: 30000, // 30 segundos
+      });
+
+      const data = response.data;
+
+      console.log('✅ Pago creado exitosamente:', {
+        transactionId: data.transactionId,
+        clientTransactionId,
+      });
+
+      return NextResponse.json({
+        success: true,
+        transactionId: data.transactionId,
+        clientTransactionId,
+        message: 'Solicitud de pago enviada. El cliente recibirá una notificación en su app Payphone.',
+      });
+
+    } catch (axiosError) {
+      const error = axiosError as AxiosError<PayphoneErrorResponse>;
+      console.error('❌ Error de axios al crear pago:', error.message);
+      
+      if (error.response) {
+        const errorData = error.response.data;
+        const errorMessage = errorData?.errors?.[0]?.message || errorData?.message || 'Error al crear la transacción';
+        
+        console.error('❌ Error HTTP de Payphone:', error.response.status, errorData);
+        
+        return NextResponse.json(
+          {
+            success: false,
+            error: errorMessage,
+            errorCode: errorData?.errorCode,
+          },
+          { status: error.response.status }
+        );
+      } else if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Timeout al conectar con PayPhone',
+          },
+          { status: 504 }
+        );
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Error de red al conectar con PayPhone',
+          },
+          { status: 503 }
+        );
+      }
     }
 
-    // Parsear respuesta exitosa
-    const data: PayphoneSaleResponse = JSON.parse(responseText);
-
-    console.log('✅ Pago creado exitosamente:', {
-      transactionId: data.transactionId,
-      clientTransactionId,
-    });
-
-    return NextResponse.json({
-      success: true,
-      transactionId: data.transactionId,
-      clientTransactionId,
-      message: 'Solicitud de pago enviada. El cliente recibirá una notificación en su app Payphone.',
-    });
-
   } catch (error) {
-    console.error('❌ Error al crear pago:', error);
+    console.error('❌ Error general al crear pago:', error);
     return NextResponse.json(
       {
         success: false,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import axios, { AxiosError } from 'axios';
 
 // Cliente de Supabase con service role para bypass de RLS
 const getSupabaseAdmin = () => {
@@ -59,10 +60,48 @@ export async function GET(request: NextRequest) {
 
     if (!confirmationResult.success) {
       console.error('❌ Error al confirmar transacción:', confirmationResult.error);
-      // Aún así redirigimos, pero con error
-      return NextResponse.redirect(
-        new URL(`/comprar/error?message=${encodeURIComponent(confirmationResult.error || 'Error al confirmar pago')}`, request.url)
-      );
+      console.warn('⚠️ Redirigiendo a página de espera - revisar estado manualmente');
+      
+      // Extraer orderId para redirigir a página de confirmación en modo pending
+      // (Mismo código de extracción que usamos abajo)
+      const supabase = getSupabaseAdmin();
+      let orderId: string | null = null;
+      
+      const orderMatch1 = clientTransactionId.match(/^order-([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})-/);
+      if (orderMatch1) {
+        orderId = orderMatch1[1];
+      } else {
+        const orderMatch2 = clientTransactionId.match(/^ord-([a-f0-9]{8})-/);
+        if (orderMatch2) {
+          const orderPrefix = orderMatch2[1];
+          const { data: orders } = await supabase
+            .from('orders')
+            .select('id')
+            .order('created_at', { ascending: false })
+            .limit(100);
+          
+          if (orders) {
+            const matchingOrder = orders.find(order => 
+              order.id.toLowerCase().startsWith(orderPrefix.toLowerCase())
+            );
+            if (matchingOrder) {
+              orderId = matchingOrder.id;
+            }
+          }
+        }
+      }
+      
+      // Redirigir a página de pending (no a error)
+      // El pago puede estar aprobado pero no pudimos confirmarlo
+      if (orderId) {
+        return NextResponse.redirect(
+          new URL(`/comprar/${orderId}/confirmacion?status=pending&message=Verificando+pago&transactionId=${transactionId}`, request.url)
+        );
+      } else {
+        return NextResponse.redirect(
+          new URL(`/comprar/error?message=${encodeURIComponent('Error al procesar confirmación - Contacta soporte con ID: ' + transactionId)}`, request.url)
+        );
+      }
     }
 
     const transaction = confirmationResult.data;
@@ -295,44 +334,97 @@ async function confirmPayphoneTransaction(
     
     console.log('📤 Request body:', requestBody);
 
-    const response = await fetch(confirmUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    console.log('📨 Status de respuesta:', response.status, response.statusText);
+    // ⚠️ REINTENTOS: PayPhone puede tardar en responder, intentar hasta 3 veces
+    // USANDO AXIOS en lugar de fetch (recomendación de PayPhone para Next.js)
+    let lastError: string | null = null;
+    let responseData: Record<string, unknown> | null = null;
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Error en respuesta de Payphone:', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-        body: errorText.substring(0, 500), // Solo primeros 500 chars
-      });
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`🔄 Intento ${attempt}/3 de confirmar con PayPhone (usando axios)...`);
+        
+        // Axios con timeout de 30 segundos por intento
+        const response = await axios.post(confirmUrl, requestBody, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          timeout: 30000, // 30 segundos
+          validateStatus: (status) => status < 600, // No lanzar error en 4xx/5xx, manejarlos manualmente
+        });
+        
+        console.log(`📨 Status de respuesta (intento ${attempt}):`, response.status, response.statusText);
+        
+        // Si respuesta OK (2xx), salir del loop
+        if (response.status >= 200 && response.status < 300) {
+          console.log(`✅ Confirmación exitosa en intento ${attempt}`);
+          responseData = response.data;
+          break;
+        }
+        
+        // Si es error 500 o 503 (servidor ocupado), reintentar
+        if (response.status === 500 || response.status === 503) {
+          const errorText = JSON.stringify(response.data).substring(0, 200);
+          lastError = `HTTP ${response.status}: ${errorText}`;
+          console.warn(`⚠️ Error ${response.status} en intento ${attempt}, reintentando en ${attempt * 2}s...`);
+          
+          // Esperar antes de reintentar (backoff exponencial: 2s, 4s, 6s)
+          if (attempt < 3) {
+            await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+          }
+          continue;
+        }
+        
+        // Otros errores (4xx) no reintentar
+        const errorText = JSON.stringify(response.data).substring(0, 200);
+        lastError = `HTTP ${response.status}: ${errorText}`;
+        console.error('❌ Error NO reintentar:', lastError);
+        break;
+        
+      } catch (axiosError) {
+        const error = axiosError as AxiosError;
+        
+        if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+          lastError = `Timeout en intento ${attempt}`;
+        } else if (error.response) {
+          lastError = `HTTP ${error.response.status}: ${JSON.stringify(error.response.data).substring(0, 200)}`;
+        } else {
+          lastError = error.message || 'Error de red desconocido';
+        }
+        
+        console.error(`❌ Error axios en intento ${attempt}:`, lastError);
+        
+        // Si es timeout o error de red, reintentar
+        if (attempt < 3) {
+          console.warn(`⚠️ Reintentando en ${attempt * 2}s...`);
+          await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+        }
+      }
+    }
+    
+    // Verificar si todos los intentos fallaron
+    if (!responseData) {
+      console.error('❌ Todos los intentos de confirmación fallaron');
+      console.error('❌ Error final:', lastError);
       
-      // ⚠️ CRÍTICO: NUNCA asumir que un pago está aprobado si hay error
-      // Un error 500 podría indicar problemas del servidor o transacciones rechazadas
-      // Es más seguro rechazar que aprobar incorrectamente
-      console.error('❌ Error HTTP de Payphone - NO podemos asumir el estado del pago');
       return {
         success: false,
-        error: `Error HTTP ${response.status}: No se pudo confirmar el estado de la transacción`,
-      };
-      
-      return {
-        success: false,
-        error: `Error HTTP ${response.status}: ${response.statusText}`,
+        error: `Error al confirmar con PayPhone después de 3 intentos: ${lastError}`,
       };
     }
 
-    const data = await response.json();
+    const data = responseData;
 
-    console.log('✅ Respuesta de confirmación de Payphone:', data);
+    console.log('✅ Respuesta de confirmación de Payphone:', JSON.stringify(data, null, 2));
+    console.log('📊 Detalles clave:', {
+      statusCode: data.statusCode,
+      transactionStatus: data.transactionStatus,
+      transactionId: data.transactionId,
+      authorizationCode: data.authorizationCode,
+      amount: data.amount,
+      cardType: data.cardType,
+      cardBrand: data.cardBrand,
+    });
 
     return {
       success: true,
@@ -375,6 +467,7 @@ async function processPaymentUpdate(
       provider_reference: transactionId,
       amount: transaction?.amount ? transaction.amount / 100 : 0, // Convertir centavos a dólares
       status: transactionStatus.toLowerCase(),
+      payphone_response: transaction, // ✅ GUARDAR RESPUESTA COMPLETA de PayPhone
       created_at: new Date().toISOString(),
     };
 
@@ -389,6 +482,7 @@ async function processPaymentUpdate(
           provider_reference: transactionId,
           status: transactionStatus.toLowerCase(),
           amount: paymentData.amount,
+          payphone_response: transaction, // ✅ GUARDAR RESPUESTA COMPLETA
         })
         .eq('id', existingPayment.id);
       
@@ -469,23 +563,17 @@ async function processPaymentUpdate(
           const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
           const emailUrl = `${baseUrl}/api/email/send-purchase-confirmation`;
           
-          const emailResponse = await fetch(emailUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ orderId }),
-          });
+          const emailResponse = await axios.post(emailUrl, 
+            { orderId },
+            {
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 10000, // 10 segundos timeout para email
+            }
+          );
           
-          if (emailResponse.ok) {
-            const emailData = await emailResponse.json();
-            console.log('✅ Correo de confirmación enviado exitosamente:', emailData);
-          } else {
-            const emailData = await emailResponse.json();
-            console.error('⚠️ Error al enviar correo:', emailData);
-          }
+          console.log('✅ Correo de confirmación enviado exitosamente:', emailResponse.data);
         } catch (emailError) {
-          console.error('❌ Error al enviar correo (no crítico):', emailError);
+          console.error('❌ Error al enviar correo (no crítico):', emailError instanceof AxiosError ? emailError.message : emailError);
         }
       }
     } else if (transaction?.statusCode === 2 || transactionStatus === 'Canceled') {
