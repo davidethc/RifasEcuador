@@ -161,7 +161,7 @@ export function Footer() {
         <div className="pt-4 md:pt-6 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
           <div className="text-center">
             <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#ffffff' }}>
-              © {currentYear} RIOBAMMBA. Todos los derechos reservados.
+              © {currentYear} Altoke. Todos los derechos reservados.
             </p>
             <p className="text-xs font-[var(--font-dm-sans)] mt-1" style={{ color: '#ffffff' }}>
               RUC: 0706567344001 • RIOMBAMBA, ECUADOR

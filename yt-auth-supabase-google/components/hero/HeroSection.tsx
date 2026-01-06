@@ -21,8 +21,6 @@ export function HeroSection() {
   const heroCarouselImages = [
     { src: "/mazdaprin.png", alt: "Mazda 3" },
     { src: "/yamaha.jpg", alt: "Yamaha MT-03" },
-    { src: "/tren02.jpeg", alt: "Tren histórico" },
-    { src: "/volcan01.jpeg", alt: "Volcán Ecuador" },
   ];
 
   const [ratio, setRatio] = useState(22 / 9);
