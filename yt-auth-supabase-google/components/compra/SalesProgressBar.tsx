@@ -66,9 +66,6 @@ export function SalesProgressBar({ raffleId, totalNumbers }: SalesProgressBarPro
                   <div className="text-3xl md:text-4xl font-bold font-[var(--font-comfortaa)]" style={{ color: '#fbbf24' }}>
                     {percentage}%
                   </div>
-                  <p className="text-xs font-[var(--font-dm-sans)] mt-1" style={{ color: '#94a3b8' }}>
-                    {soldCount.toLocaleString('es-EC')} / {totalNumbers.toLocaleString('es-EC')}
-                  </p>
                 </div>
               )}
             </div>

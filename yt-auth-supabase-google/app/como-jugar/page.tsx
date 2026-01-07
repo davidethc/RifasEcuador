@@ -42,28 +42,27 @@ export default function ComoJugarPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen relative overflow-hidden" style={{ 
-      background: 'linear-gradient(180deg, #1F1935 0%, #2A1F3D 30%, #360254 70%, #4A1F5C 100%)'
-    }}>
-      {/* Silueta de fondo - Integrada con el fondo morado */}
+    <div className="w-full min-h-screen relative overflow-hidden">
+      {/* Imagen de fondo - Iglesia */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-full h-full" style={{ maxWidth: '2000px', maxHeight: '100vh' }}>
-            <Image
-              src="/silueta2.png"
-              alt="Silueta de fondo"
-              fill
-              className="object-contain"
-              style={{ 
-                opacity: 0.1,
-                filter: 'brightness(0) invert(1)',
-                mixBlendMode: 'screen'
-              }}
-              priority
-            />
-          </div>
-        </div>
+        <Image
+          src="/fondoiglesia.jpeg"
+          alt="Fondo de iglesia"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
       </div>
+      
+      {/* Overlay oscuro para mejorar legibilidad del texto */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ 
+          zIndex: 0,
+          background: 'linear-gradient(180deg, rgba(31, 25, 53, 0.4) 0%, rgba(42, 31, 61, 0.45) 30%, rgba(54, 2, 84, 0.5) 70%, rgba(74, 31, 92, 0.55) 100%)'
+        }}
+      />
 
       {/* Contenido con z-index superior */}
       <div className="relative" style={{ zIndex: 1 }}>

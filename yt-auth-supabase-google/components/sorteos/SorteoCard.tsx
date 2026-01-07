@@ -64,12 +64,9 @@ export function SorteoCard({
 
                 {/* Progress Bar */}
                 <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-medium">
+                    <div className="flex justify-end text-xs font-medium">
                         <span className="text-gray-300">
-                            <span className="text-[#A83EF5] font-bold">{soldNumbers}</span> vendidos
-                        </span>
-                        <span className="text-gray-400">
-                            {totalNumbers} disponibles
+                            <span className="text-[#A83EF5] font-bold">{percentageSold}%</span> vendidos
                         </span>
                     </div>
                     <div className="h-2 w-full bg-gray-800/50 rounded-full overflow-hidden border border-gray-700/50">

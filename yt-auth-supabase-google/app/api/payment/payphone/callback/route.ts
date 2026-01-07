@@ -98,9 +98,9 @@ export async function GET(request: NextRequest) {
           new URL(`/comprar/${orderId}/confirmacion?status=pending&message=Verificando+pago&transactionId=${transactionId}`, request.url)
         );
       } else {
-        return NextResponse.redirect(
+      return NextResponse.redirect(
           new URL(`/comprar/error?message=${encodeURIComponent('Error al procesar confirmación - Contacta soporte con ID: ' + transactionId)}`, request.url)
-        );
+      );
       }
     }
 
@@ -345,16 +345,16 @@ async function confirmPayphoneTransaction(
         
         // Axios con timeout de 30 segundos por intento
         const response = await axios.post(confirmUrl, requestBody, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
           timeout: 30000, // 30 segundos
           validateStatus: (status) => status < 600, // No lanzar error en 4xx/5xx, manejarlos manualmente
-        });
-        
+    });
+
         console.log(`📨 Status de respuesta (intento ${attempt}):`, response.status, response.statusText);
-        
+    
         // Si respuesta OK (2xx), salir del loop
         if (response.status >= 200 && response.status < 300) {
           console.log(`✅ Confirmación exitosa en intento ${attempt}`);
