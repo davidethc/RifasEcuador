@@ -10,28 +10,38 @@ import Image from 'next/image';
  */
 export default function SorteosPage() {
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ 
-      background: 'linear-gradient(180deg, #1F1935 0%, #2A1F3D 30%, #360254 70%, #4A1F5C 100%)'
-    }}>
-      {/* Silueta de fondo - Integrada con el fondo morado */}
-      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-full h-full" style={{ maxWidth: '2000px', maxHeight: '100vh' }}>
-            <Image
-              src="/siluetafondo.png"
-              alt="Silueta de fondo"
-              fill
-              className="object-contain"
-              style={{ 
-                opacity: 0.1,
-                filter: 'brightness(0) invert(1)',
-                mixBlendMode: 'screen'
-              }}
-              priority
-            />
-          </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Imagen de fondo - Montañas */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+        <div style={{ 
+          position: 'absolute', 
+          top: '-15%',
+          left: 0, 
+          right: 0, 
+          bottom: '-25%',
+          width: '100%',
+          height: '135%'
+        }}>
+          <Image
+            src="/fondomontana.jpeg"
+            alt="Fondo de montañas"
+            fill
+            className="object-cover"
+            style={{ objectPosition: 'center top' }}
+            priority
+            quality={90}
+          />
         </div>
       </div>
+      
+      {/* Overlay oscuro para mejorar legibilidad del texto */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ 
+          zIndex: 0,
+          background: 'linear-gradient(180deg, rgba(31, 25, 53, 0.4) 0%, rgba(42, 31, 61, 0.45) 30%, rgba(54, 2, 84, 0.5) 70%, rgba(74, 31, 92, 0.55) 100%)'
+        }}
+      />
 
       {/* Contenido con z-index superior */}
       <div className="relative" style={{ zIndex: 1 }}>
