@@ -161,8 +161,37 @@ export async function POST(request: NextRequest) {
     if (isApproved) {
       console.log('✅ Pago aprobado, actualizando orden...');
 
-      // Crear o actualizar registro de pago
+      // ⚠️ VALIDACIÓN CRÍTICA: Verificar si este transactionId ya fue procesado (prevenir duplicados)
       const supabase = getSupabaseAdmin();
+      const { data: existingPaymentByTransaction } = await supabase
+        .from('payments')
+        .select('id, order_id, status')
+        .eq('provider_reference', transaction.transactionId.toString())
+        .maybeSingle();
+
+      if (existingPaymentByTransaction) {
+        // Si ya existe un pago con este transactionId
+        if (existingPaymentByTransaction.order_id === orderId) {
+          // Mismo orden - actualizar el pago existente
+          console.log('⚠️ Pago ya procesado para esta orden, actualizando...');
+        } else {
+          // Diferente orden - ERROR: transactionId duplicado
+          console.error('❌ ERROR CRÍTICO: transactionId ya procesado para otra orden:', {
+            transactionId: transaction.transactionId,
+            existingOrderId: existingPaymentByTransaction.order_id,
+            currentOrderId: orderId,
+          });
+          // Retornar error pero no bloquear
+          return NextResponse.json({
+            success: true,
+            transaction,
+            orderId,
+            warning: 'TransactionId duplicado detectado',
+          });
+        }
+      }
+
+      // Crear o actualizar registro de pago
       const { data: existingPayment } = await supabase
         .from('payments')
         .select('id')
@@ -191,6 +220,23 @@ export async function POST(request: NextRequest) {
           .eq('id', existingPayment.id);
       } else {
         await supabase.from('payments').insert(paymentData);
+      }
+
+      // ⚠️ VERIFICACIÓN ADICIONAL: Verificar que la orden no esté ya completada (idempotencia)
+      const { data: currentOrder } = await supabase
+        .from('orders')
+        .select('status')
+        .eq('id', orderId)
+        .single();
+
+      if (currentOrder?.status === 'completed') {
+        console.log('⚠️ Orden ya está completada, saltando actualización (idempotencia)');
+        return NextResponse.json({
+          success: true,
+          transaction,
+          orderId,
+          message: 'Orden ya procesada anteriormente',
+        });
       }
 
       // Actualizar la orden a completada
@@ -274,11 +320,11 @@ export async function POST(request: NextRequest) {
       console.log('⏳ Pago pendiente');
     }
 
-      return NextResponse.json({
-        success: true,
-        transaction,
-        orderId, // Retornar el orderId completo para usar en el callback
-      });
+    return NextResponse.json({
+      success: true,
+      transaction,
+      orderId, // Retornar el orderId completo para usar en el callback
+    });
 
     } catch (axiosError) {
       const error = axiosError as AxiosError;

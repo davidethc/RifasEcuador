@@ -454,6 +454,30 @@ async function processPaymentUpdate(
   try {
     console.log('🔄 Procesando actualización de base de datos para orden:', orderId);
 
+    // ⚠️ VALIDACIÓN CRÍTICA: Verificar si este transactionId ya fue procesado (prevenir duplicados)
+    const { data: existingPaymentByTransaction } = await supabase
+      .from('payments')
+      .select('id, order_id, status')
+      .eq('provider_reference', transactionId)
+      .maybeSingle();
+
+    if (existingPaymentByTransaction) {
+      // Si ya existe un pago con este transactionId
+      if (existingPaymentByTransaction.order_id === orderId) {
+        // Mismo orden - actualizar el pago existente
+        console.log('⚠️ Pago ya procesado para esta orden, actualizando...');
+      } else {
+        // Diferente orden - ERROR: transactionId duplicado
+        console.error('❌ ERROR CRÍTICO: transactionId ya procesado para otra orden:', {
+          transactionId,
+          existingOrderId: existingPaymentByTransaction.order_id,
+          currentOrderId: orderId,
+        });
+        // No procesar para evitar duplicados
+        return;
+      }
+    }
+
     // Actualizar o crear registro en la tabla payments
     const { data: existingPayment } = await supabase
       .from('payments')
@@ -515,6 +539,18 @@ async function processPaymentUpdate(
     const isApproved = transaction?.statusCode === 3 && status === 'approved';
     
     if (isApproved) {
+      // ⚠️ VERIFICACIÓN ADICIONAL: Verificar que la orden no esté ya completada (idempotencia)
+      const { data: currentOrder } = await supabase
+        .from('orders')
+        .select('status')
+        .eq('id', orderId)
+        .single();
+
+      if (currentOrder?.status === 'completed') {
+        console.log('⚠️ Orden ya está completada, saltando actualización (idempotencia)');
+        return; // Ya está procesada, no hacer nada
+      }
+
       // Pago aprobado: actualizar orden a completada
       console.log('🔄 Actualizando orden a completed...');
       const { error: updateError } = await supabase
