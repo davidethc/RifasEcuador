@@ -18,8 +18,11 @@ export function HeroSection() {
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [ratio, setRatio] = useState(16 / 9);
   
+  // URL del GIF desde Vercel Blob Storage o fallback a local
+  const gifUrl = process.env.NEXT_PUBLIC_GIF_URL || "/gifhero.gif";
+  
   const heroCarouselImages = [
-    { src: "/Diseño Video.gif", alt: "Video de diseño de premios", isGif: true },
+    { src: gifUrl, alt: "Video de diseño de premios", isGif: true },
     { src: "/carasuel3.jpg", alt: "Premios del sorteo" },
     { src: "/carusuel8.png", alt: "Premios del sorteo" },
   ];

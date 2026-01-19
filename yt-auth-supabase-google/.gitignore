@@ -40,9 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Archivos grandes de video (usar CDN en su lugar)
+# Archivos grandes de video/imagen (usar CDN en su lugar)
 # Estos archivos exceden el límite de GitHub (100 MB)
+# Incluso Git LFS tiene un límite de 100 MB por archivo
 public/premioo.mp4
 public/prenio.mp4
 public/carrro.mp4
-# El GIF "Diseño Video.gif" se maneja con Git LFS (ver .gitattributes)
+public/Diseño Video.gif  # 100.25 MB - excede límite de GitHub incluso con LFS
