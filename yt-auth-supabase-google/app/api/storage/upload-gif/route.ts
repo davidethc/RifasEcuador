@@ -13,7 +13,7 @@ import { logger } from '@/utils/logger';
  * - NEXT_PUBLIC_SUPABASE_URL
  * - SUPABASE_SERVICE_ROLE_KEY (para crear buckets y subir archivos)
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     // Subir el archivo
     logger.log(`⬆️  [STORAGE] Subiendo "${FILE_NAME}"...`);
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from(BUCKET_NAME)
       .upload(FILE_NAME, fileBuffer, {
         contentType: 'image/gif',

@@ -12,7 +12,7 @@ import { logger } from '@/utils/logger';
  * Requiere:
  * - BLOB_READ_WRITE_TOKEN (obtener desde Vercel Dashboard > Settings > Storage)
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
 

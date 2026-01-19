@@ -65,7 +65,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // ⚠️ ATENCIÓN: Usar logger en lugar de console.warn para consistencia con el resto del proyecto
     if (process.env.NODE_ENV === 'development') {
       // TODO: Reemplazar console.warn con logger.warn o logger.error
-      // eslint-disable-next-line no-console
       console.warn('No se pudieron obtener sorteos para el sitemap:', error);
     }
   }
