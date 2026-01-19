@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { SorteoCard } from "./SorteoCard";
 import type { Raffle } from "@/types/database.types";
+import { logger } from '@/utils/logger';
 
 interface Sorteo {
   id: string;
@@ -36,7 +37,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         setIsLoading(true);
         setError(null);
 
-        console.log('🔍 Intentando conectar a Supabase...');
+        logger.log('🔍 Intentando conectar a Supabase...');
         
         // Primero intentar con todas las columnas (incluyendo featured)
         let { data, error: fetchError } = await supabase
@@ -47,7 +48,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         
         // Si el error es por columna featured, intentar sin ella
         if (fetchError?.code === '42703' && fetchError?.message?.includes('featured')) {
-          console.log('⚠️ Columna featured no existe, consultando sin ella...');
+          logger.log('⚠️ Columna featured no existe, consultando sin ella...');
           
           const result = await supabase
             .from('raffles')
@@ -60,28 +61,30 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         }
 
         if (fetchError) {
-          console.error('❌ Error fetching raffles:', {
-            message: fetchError.message,
-            details: fetchError.details,
-            hint: fetchError.hint,
-            code: fetchError.code,
-          });
-          
-          // Mensajes de error más específicos
-          if (fetchError.code === 'PGRST116' || fetchError.message?.includes('permission denied')) {
-            setError('⚠️ RLS bloqueando consulta. Ve a Supabase y ejecuta: sql/policies_raffles.sql');
+          // Solo loggear errores que no sean de autenticación/permisos si son esperados
+          if (fetchError.code === 'PGRST301' || fetchError.code === 'PGRST116' || fetchError.message?.includes('permission denied')) {
+            // Error de permisos - probablemente RLS bloqueando
+            logger.warn('⚠️ Error de permisos al obtener sorteos. Verifica las políticas RLS en Supabase.');
+            setError('⚠️ Error de permisos. Verifica la configuración de Supabase.');
           } else if (fetchError.code === '42P01' || fetchError.message?.includes('does not exist')) {
+            logger.error('❌ La tabla "raffles" no existe');
             setError('⚠️ La tabla "raffles" no existe. Crea la tabla en Supabase primero.');
           } else {
+            logger.error('❌ Error fetching raffles:', {
+              message: fetchError.message,
+              details: fetchError.details,
+              hint: fetchError.hint,
+              code: fetchError.code,
+            });
             setError(`Error: ${fetchError.message || 'No se pudieron cargar los sorteos'}`);
           }
           return;
         }
 
-        console.log('✅ Sorteos cargados:', data?.length || 0);
+        logger.log('✅ Sorteos cargados:', data?.length || 0);
         setRaffles(data || []);
       } catch (err) {
-        console.error('❌ Unexpected error:', err);
+        logger.error('❌ Unexpected error:', err);
         setError('Ocurrió un error inesperado. Verifica la consola.');
       } finally {
         setIsLoading(false);
@@ -99,7 +102,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
       if (raffles.length === 0) return;
 
       try {
-        console.log('🔍 [SOLD_COUNTS] Iniciando conteo para', raffles.length, 'sorteos');
+        logger.log('🔍 [SOLD_COUNTS] Iniciando conteo para', raffles.length, 'sorteos');
         
         // Usar endpoint API que bypass RLS usando service role
         const raffleIds = raffles.map(r => r.id).join(',');
@@ -107,10 +110,10 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         const data = await response.json();
 
         if (data.success && data.counts) {
-          console.log('✅ [SOLD_COUNTS] Conteos recibidos:', data.counts);
+          logger.log('✅ [SOLD_COUNTS] Conteos recibidos:', data.counts);
           setSoldCounts(data.counts);
           } else {
-          console.error('❌ [SOLD_COUNTS] Error al obtener conteos:', data.error);
+          logger.error('❌ [SOLD_COUNTS] Error al obtener conteos:', data.error);
           // Fallback: poner todos en 0
           const counts: Record<string, number> = {};
           raffles.forEach(r => {
@@ -119,7 +122,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           setSoldCounts(counts);
         }
       } catch (err) {
-        console.error('❌ [SOLD_COUNTS] Error al obtener conteo de boletos:', err);
+        logger.error('❌ [SOLD_COUNTS] Error al obtener conteo de boletos:', err);
         // Fallback: poner todos en 0
         const counts: Record<string, number> = {};
         raffles.forEach(r => {
@@ -147,7 +150,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         titulo: raffle.title,
         premio: raffle.description || raffle.title,
         precio: raffle.price_per_ticket,
-        imagen: raffle.image_url || '/rifa.png',
+        imagen: raffle.image_url || '/cardrifa.jpg',
         totalNumbers: raffle.total_numbers || 1000,
         soldNumbers: soldCounts[raffle.id] || 0,
       }))

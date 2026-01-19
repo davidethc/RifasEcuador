@@ -15,22 +15,22 @@ export default function TerminosPage() {
     {
       numero: 2,
       titulo: 'Elegibilidad',
-      descripcion: 'Para participar en nuestros sorteos, debes ser mayor de edad según la legislación de tu país. Los sorteos están sujetos a las leyes y regulaciones locales aplicables.',
+      descripcion: 'Para participar en nuestros sorteos, debes ser mayor de edad según la legislación del Ecuador. Los sorteos están sujetos a las leyes y regulaciones locales aplicables.',
     },
     {
       numero: 3,
       titulo: 'Compra de boletos',
-      descripcion: 'Los boletos se asignan de forma aleatoria y automática. Una vez completada la compra, no se permiten cambios, devoluciones ni cancelaciones, excepto en casos excepcionales contemplados por la ley.',
+      descripcion: 'Los boletos se asignan de forma aleatoria y automática. Una vez completada la compra, no se permiten cambios, devoluciones ni cancelaciones.',
     },
     {
       numero: 4,
       titulo: 'Realización del sorteo',
-      descripcion: 'Los sorteos se realizarán en las fechas programadas y serán supervisados por un notario público o autoridad competente. Los resultados serán publicados en nuestra plataforma y serán definitivos.',
+      descripcion: 'El sorteo se realizará a la par que la lotería nacional del Ecuador, cuando se culmine la compra total de los boletos se elegiría la fecha de la lotería más actual.',
     },
     {
       numero: 5,
       titulo: 'Premios',
-      descripcion: 'Los premios se entregarán a los ganadores según se establezca en cada sorteo. Los ganadores serán contactados a través de los datos proporcionados durante la compra. Es responsabilidad del participante mantener sus datos actualizados.',
+      descripcion: 'Al ganador tendrá un plazo de contactarse máximo de 10 días para poder reclamar el premio, pasado los 10 días se buscará otro ganador.',
     },
     {
       numero: 6,
@@ -50,63 +50,100 @@ export default function TerminosPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen">
+    <main className="w-full min-h-screen" aria-label="Términos y condiciones" style={{
+      background: 'linear-gradient(180deg, #1F1A2E 0%, #2A1F3D 50%, #1F1A2E 100%)'
+    }}>
       {/* Sección principal */}
-      <section className="relative py-12 md:py-16 lg:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          {/* Encabezado */}
-          <div className="text-center mb-12 md:mb-16">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-[var(--font-comfortaa)]">
+      <section className="relative py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Encabezado mejorado */}
+          <div className="text-center mb-10 md:mb-12">
+            <div className="inline-block mb-4">
+              <div className="w-16 h-1 mx-auto rounded-full" style={{ background: 'linear-gradient(90deg, #FFB200, #f02080)' }}></div>
+            </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
               Términos y condiciones
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-[var(--font-dm-sans)]">
+            <p className="text-base md:text-lg max-w-2xl mx-auto font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               Información importante sobre nuestros sorteos
             </p>
           </div>
 
-          {/* Contenedor de términos */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="p-6 md:p-8 lg:p-12">
-              {/* Título de sección */}
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-8 font-[var(--font-comfortaa)]">
-                Condiciones de participación
-              </h2>
+          {/* Contenedor de términos mejorado */}
+          <div className="rounded-2xl overflow-hidden" style={{
+            background: 'rgba(28, 32, 58, 0.6)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div className="p-6 md:p-8 lg:p-10">
+              {/* Título de sección mejorado */}
+              <div className="mb-8 md:mb-10">
+                <h2 className="text-xl md:text-2xl font-bold mb-2 font-[var(--font-comfortaa)]" style={{ color: '#FFB200' }}>
+                  Condiciones de participación
+                </h2>
+                <div className="w-20 h-0.5 rounded-full" style={{ background: 'rgba(255, 178, 0, 0.5)' }}></div>
+              </div>
 
-              {/* Lista de términos */}
-              <div className="space-y-8 md:space-y-10">
+              {/* Lista de términos mejorada */}
+              <div className="space-y-6 md:space-y-8">
                 {terminos.map((termino, index) => (
-                  <div key={termino.numero} className="relative">
-                    <div className="flex items-start gap-4 md:gap-6">
-                      {/* Número del término - Minimalista */}
+                  <div 
+                    key={termino.numero} 
+                    className="relative group"
+                    style={{
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <div className="flex items-start gap-4 md:gap-5">
+                      {/* Número del término mejorado */}
                       <div className="flex-shrink-0">
-                        <span className="text-2xl md:text-3xl font-bold text-gray-400 dark:text-gray-500 font-[var(--font-comfortaa)]">
-                          {termino.numero}.
-                        </span>
+                        <div 
+                          className="w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center font-bold transition-all group-hover:scale-110" 
+                          style={{ 
+                            background: 'linear-gradient(135deg, rgba(168, 62, 245, 0.3), rgba(185, 33, 99, 0.3))',
+                            border: '1px solid rgba(168, 62, 245, 0.4)',
+                            color: '#E5E7EB'
+                          }}
+                        >
+                          <span className="text-lg md:text-xl font-[var(--font-comfortaa)]">
+                            {termino.numero}
+                          </span>
+                        </div>
                       </div>
-                      {/* Contenido */}
-                      <div className="flex-1">
-                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 font-[var(--font-comfortaa)]">
+                      {/* Contenido mejorado */}
+                      <div className="flex-1 pt-1">
+                        <h3 className="text-lg md:text-xl font-bold mb-2.5 font-[var(--font-comfortaa)]" style={{ color: '#F9FAFB' }}>
                           {termino.titulo}
                         </h3>
-                        <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed font-[var(--font-dm-sans)]">
+                        <p className="text-sm md:text-base leading-relaxed font-[var(--font-dm-sans)]" style={{ 
+                          color: '#D1D5DB',
+                          lineHeight: '1.7'
+                        }}>
                           {termino.descripcion}
                         </p>
                       </div>
                     </div>
-                    {/* Separador sutil (excepto en el último) */}
+                    {/* Separador mejorado (excepto en el último) */}
                     {index < terminos.length - 1 && (
-                      <div className="mt-8 md:mt-10 border-t border-gray-100 dark:border-gray-800" />
+                      <div className="mt-6 md:mt-8" style={{ 
+                        borderTop: '1px solid rgba(255, 255, 255, 0.08)'
+                      }} />
                     )}
                   </div>
                 ))}
               </div>
 
-              {/* Fecha de última actualización */}
-              <div className="mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-200 dark:border-gray-700">
-                <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 md:p-6">
-                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
-                    <span className="text-gray-500 dark:text-gray-500">Última actualización: </span>
-                    <span className="text-primary-600 dark:text-accent-500 font-semibold">
+              {/* Fecha de última actualización mejorada */}
+              <div className="mt-10 md:mt-12 pt-6 md:pt-8" style={{ 
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <div className="rounded-lg p-4 md:p-5" style={{
+                  background: 'rgba(15, 17, 23, 0.5)',
+                  border: '1px solid rgba(255, 255, 255, 0.05)'
+                }}>
+                  <p className="text-xs md:text-sm font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                    <span style={{ color: '#6B7280' }}>Última actualización: </span>
+                    <span style={{ color: '#FFB200', fontWeight: 600 }}>
                       {new Date().toLocaleDateString('es-ES', {
                         year: 'numeric',
                         month: 'long',
@@ -118,15 +155,26 @@ export default function TerminosPage() {
               </div>
             </div>
           </div>
+
+          {/* Información adicional destacada */}
+          <div className="mt-8 md:mt-10 rounded-xl p-5 md:p-6" style={{
+            background: 'rgba(168, 62, 245, 0.1)',
+            border: '1px solid rgba(168, 62, 245, 0.2)'
+          }}>
+            <p className="text-sm md:text-base text-center font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+              <span style={{ color: '#A83EF5', fontWeight: 600 }}>Importante: </span>
+              Al participar en nuestros sorteos, aceptas estos términos y condiciones en su totalidad.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Pie de página con copyright */}
-      <footer className="py-8 px-4 text-center">
-        <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-[var(--font-dm-sans)]">
+      <footer className="py-6 md:py-8 px-4 text-center">
+        <p className="text-xs md:text-sm font-[var(--font-dm-sans)]" style={{ color: '#6B7280' }}>
           © {new Date().getFullYear()} Rifas Ecuador. Todos los derechos reservados.
         </p>
       </footer>
-    </div>
+    </main>
   );
 }

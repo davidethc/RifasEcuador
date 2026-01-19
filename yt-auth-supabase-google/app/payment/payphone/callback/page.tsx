@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { logger } from '@/utils/logger';
 
 /**
  * Página de callback de Payphone
@@ -28,14 +29,14 @@ function PayphoneCallbackContent() {
         const id = searchParams.get('id');
         const clientTxId = searchParams.get('clientTransactionId');
 
-        console.log('📥 Callback de Payphone recibido:', { id, clientTxId });
+        logger.log('📥 Callback de Payphone recibido:', { id, clientTxId });
 
         if (!id || !clientTxId) {
           throw new Error('Parámetros faltantes en la URL');
         }
 
         // Llamar al endpoint de confirmación
-        console.log('🔄 Confirmando transacción...');
+        logger.log('🔄 Confirmando transacción...');
 
         const response = await fetch('/api/payment/payphone/confirm', {
           method: 'POST',
@@ -55,7 +56,7 @@ function PayphoneCallbackContent() {
         }
 
         const transaction = data.transaction;
-        console.log('✅ Transacción confirmada:', transaction);
+        logger.log('✅ Transacción confirmada:', transaction);
 
         // Verificar el estado de la transacción
         // Strict check: statusCode 3 AND transactionStatus 'Approved' (case insensitive)
@@ -71,7 +72,7 @@ function PayphoneCallbackContent() {
           // que lo buscó en la base de datos por el prefijo
           const orderId: string | null = data.orderId || transaction.optionalParameter || null;
 
-          console.log('🔍 OrderId recibido:', orderId);
+          logger.log('🔍 OrderId recibido:', orderId);
 
           // Redirigir a la página de confirmación después de 2 segundos
           setTimeout(() => {
@@ -102,7 +103,7 @@ function PayphoneCallbackContent() {
         }
 
       } catch (error) {
-        console.error('❌ Error en callback:', error);
+        logger.error('❌ Error en callback:', error);
         setStatus('error');
         setMessage(error instanceof Error ? error.message : 'Error al procesar el pago');
 
@@ -117,7 +118,7 @@ function PayphoneCallbackContent() {
   }, [searchParams, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-legacy-purple-deep p-4">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-legacy-purple-deep p-4" aria-label="Confirmación de pago Payphone">
       <div className="max-w-md w-full">
         {status === 'loading' && (
           <div className="bg-white dark:bg-legacy-purple-deep rounded-2xl shadow-xl p-8 text-center">
@@ -168,7 +169,7 @@ function PayphoneCallbackContent() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 

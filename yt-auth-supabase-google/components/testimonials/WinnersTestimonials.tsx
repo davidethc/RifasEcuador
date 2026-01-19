@@ -55,7 +55,8 @@ export function WinnersTestimonials() {
                 filter: 'brightness(0) invert(1)',
                 mixBlendMode: 'screen'
               }}
-              priority
+              loading="lazy"
+              quality={50}
             />
           </div>
         </div>

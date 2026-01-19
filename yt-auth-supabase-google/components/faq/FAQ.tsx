@@ -24,7 +24,7 @@ export function FAQ() {
     {
       id: "2",
       question: "¿Cómo puedo verificar que el sorteo es transparente?",
-      answer: "Todos nuestros sorteos se transmiten en vivo en nuestro canal de YouTube. Puedes ver el proceso completo en tiempo real, desde la selección de números hasta la entrega del premio. Además, cada sorteo está documentado y los resultados son públicos.",
+      answer: "Todos nuestros sorteos se transmiten en vivo en el canal de la Lotería Nacional. Puedes ver el proceso completo en tiempo real, desde la selección de números hasta la entrega del premio. Además, cada sorteo está documentado y los resultados son públicos.",
     },
     {
       id: "3",
@@ -44,7 +44,7 @@ export function FAQ() {
     {
       id: "6",
       question: "¿Puedo cancelar mi compra?",
-      answer: "Una vez completada la compra y asignados los números, no se permiten cancelaciones ni devoluciones, excepto en casos excepcionales contemplados por la ley. Esto garantiza la integridad del sorteo.",
+      answer: "Una vez completada la compra y asignados los números, no se permiten cancelaciones ni devoluciones. Esto garantiza la integridad del sorteo.",
     },
     {
       id: "7",

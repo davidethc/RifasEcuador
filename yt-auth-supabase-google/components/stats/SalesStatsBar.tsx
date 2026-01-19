@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { logger } from '@/utils/logger';
 
 /**
  * Componente de barra de estadísticas de ventas
@@ -22,13 +23,13 @@ export function SalesStatsBar() {
 
         if (data.success) {
           setTotalSold(data.totalSold || 0);
-          console.log('✅ [SALES_STATS] Total de boletos vendidos:', data.totalSold);
+          logger.log('✅ [SALES_STATS] Total de boletos vendidos:', data.totalSold);
         } else {
-          console.error('❌ [SALES_STATS] Error al obtener total:', data.error);
+          logger.error('❌ [SALES_STATS] Error al obtener total:', data.error);
           setTotalSold(0);
         }
       } catch (err) {
-        console.error('❌ [SALES_STATS] Error al obtener total de boletos vendidos:', err);
+        logger.error('❌ [SALES_STATS] Error al obtener total de boletos vendidos:', err);
         setTotalSold(0);
       } finally {
         setIsLoading(false);

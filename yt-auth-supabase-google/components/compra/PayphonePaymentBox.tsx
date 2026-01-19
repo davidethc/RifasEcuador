@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Script from 'next/script';
 import { getPhoneForPayphone, isValidEcuadorianPhone } from '@/utils/phoneFormatter';
+import { logger } from '@/utils/logger';
 
 interface PayphonePaymentBoxProps {
   orderId: string;
@@ -75,8 +76,7 @@ export function PayphonePaymentBox({
 
   // Verificar variables de entorno
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 Debug Payphone Variables:', {
+    logger.log('🔍 Debug Payphone Variables:', {
         hasToken: !!token,
         hasStoreId: !!storeId,
         tokenLength: token?.length || 0,
@@ -88,12 +88,11 @@ export function PayphonePaymentBox({
           NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'NO DEFINIDO',
         }
       });
-    }
   }, [token, storeId]);
 
   useEffect(() => {
     if (!token || !storeId) {
-      console.error('❌ Variables faltantes:', {
+      logger.error('❌ Variables faltantes:', {
         token: token ? 'OK' : 'FALTA',
         storeId: storeId ? 'OK' : 'FALTA'
       });
@@ -111,28 +110,24 @@ export function PayphonePaymentBox({
       return;
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📨 Mensaje de Payphone:', event.data);
-    }
+    logger.log('📨 Mensaje de Payphone:', event.data);
 
     try {
       const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
       if (data.event === 'payment_success') {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('✅ Pago exitoso:', data);
-        }
+        logger.log('✅ Pago exitoso:', data);
         if (onSuccess) {
           onSuccess(data.transactionId || 'success');
         }
       } else if (data.event === 'payment_error') {
-        console.error('❌ Error en el pago:', data);
+        logger.error('❌ Error en el pago:', data);
         if (onError) {
           onError(data.message || 'Error en el pago');
         }
       }
     } catch (error) {
-      console.error('Error al procesar mensaje:', error);
+      logger.error('Error al procesar mensaje:', error);
     }
   }, [onSuccess, onError]);
 
@@ -144,7 +139,7 @@ export function PayphonePaymentBox({
     // Esperar a que el window tenga PPaymentButtonBox
     const initializePaymentBox = () => {
       if (!window.PPaymentButtonBox) {
-        console.error('❌ PPaymentButtonBox no está disponible');
+        logger.error('❌ PPaymentButtonBox no está disponible');
         setLoadError('Error al cargar el sistema de pagos');
         return;
       }
@@ -162,18 +157,16 @@ export function PayphonePaymentBox({
 
         // Verificar longitud (debe ser <= 50)
         if (clientTransactionId.length > 50) {
-          console.error('❌ clientTransactionId demasiado largo:', clientTransactionId.length);
+          logger.error('❌ clientTransactionId demasiado largo:', clientTransactionId.length);
           setLoadError('Error de configuración: ID de transacción inválido');
           return;
         }
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔑 ClientTransactionId generado:', {
+        logger.log('🔑 ClientTransactionId generado:', {
             value: clientTransactionId,
             length: clientTransactionId.length,
             orderId: orderId,
           });
-        }
 
         // URL de callback (donde Payphone redirigirá después del pago)
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
@@ -184,28 +177,26 @@ export function PayphonePaymentBox({
 
         // Validar que el número sea válido
         if (!isValidEcuadorianPhone(cleanPhone)) {
-          console.warn('⚠️ Número de teléfono inválido:', {
+          logger.warn('⚠️ Número de teléfono inválido:', {
             original: customerData.whatsapp,
             cleaned: cleanPhone,
             expected: '+593XXXXXXXXX (13 caracteres)'
           });
         }
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('📱 Número de teléfono procesado:', {
-            original: customerData.whatsapp,
-            cleaned: cleanPhone,
-            isValid: isValidEcuadorianPhone(cleanPhone)
-          });
+        logger.log('📱 Número de teléfono procesado:', {
+          original: customerData.whatsapp,
+          cleaned: cleanPhone,
+          isValid: isValidEcuadorianPhone(cleanPhone)
+        });
 
-          console.log('🚀 Inicializando Cajita de Pagos:', {
+        logger.log('🚀 Inicializando Cajita de Pagos:', {
             orderId,
             clientTransactionId,
             amount: amountInCents,
             responseUrl,
             phoneNumber: cleanPhone,
           });
-        }
 
         // Configuración de la Cajita de Pagos
         const config: PPaymentButtonBoxConfig = {
@@ -242,24 +233,20 @@ export function PayphonePaymentBox({
           optionalParameter: orderId,
         };
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('📋 Configuración:', config);
-        }
+        logger.log('📋 Configuración:', config);
 
         // Crear instancia y renderizar
         const ppb = new window.PPaymentButtonBox(config);
         ppb.render('pp-button');
 
         buttonRendered.current = true;
-        if (process.env.NODE_ENV === 'development') {
-          console.log('✅ Cajita de Pagos renderizada');
-        }
+        logger.log('✅ Cajita de Pagos renderizada');
 
         // Escuchar eventos del iframe (opcional)
         window.addEventListener('message', handlePayphoneMessage);
 
       } catch (error) {
-        console.error('❌ Error al inicializar Cajita de Pagos:', error);
+        logger.error('❌ Error al inicializar Cajita de Pagos:', error);
         setLoadError('Error al inicializar el sistema de pagos');
         if (onError) {
           onError(error instanceof Error ? error.message : 'Error desconocido');
@@ -277,14 +264,12 @@ export function PayphonePaymentBox({
   }, [isScriptLoaded, token, storeId, orderId, amount, customerData, raffleTitle, onError, onSuccess, handlePayphoneMessage]);
 
   const handleScriptLoad = () => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✅ Script de Cajita de Pagos cargado');
-    }
+    logger.log('✅ Script de Cajita de Pagos cargado');
     setIsScriptLoaded(true);
   };
 
   const handleScriptError = () => {
-    console.error('❌ Error al cargar script de Cajita de Pagos');
+    logger.error('❌ Error al cargar script de Cajita de Pagos');
     setLoadError('No se pudo cargar el sistema de pagos. Intenta recargar la página.');
   };
 
@@ -381,6 +366,7 @@ export function PayphonePaymentBox({
             background: 'rgba(15, 17, 23, 0.4)',
             border: '1px solid rgba(255, 255, 255, 0.1)'
           }}
+          aria-label="Sistema de pago Payphone"
         />
 
         {/* Información adicional - Consistente */}

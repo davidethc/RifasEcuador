@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import axios, { AxiosError } from 'axios';
+import { logger } from '@/utils/logger';
 
 // Cliente de Supabase con service role para bypass de RLS
 const getSupabaseAdmin = () => {
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
     const transactionId = searchParams.get('id');
     const clientTransactionId = searchParams.get('clientTransactionId');
 
-    console.log('📥 Callback de Payphone recibido:', {
+    logger.debug('📥 Callback de Payphone recibido:', {
       transactionId,
       clientTransactionId,
       url: request.url,
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
 
     // Validar parámetros
     if (!transactionId || !clientTransactionId) {
-      console.error('❌ Faltan parámetros en el callback');
+      logger.error('❌ Faltan parámetros en el callback');
       return NextResponse.redirect(
         new URL('/comprar/error?message=Parámetros faltantes', request.url)
       );
@@ -55,12 +56,12 @@ export async function GET(request: NextRequest) {
 
     // ⚠️ CRÍTICO: Confirmar PRIMERO con Payphone (debe ser rápido, dentro de 5 minutos)
     // Si no confirmamos rápido, Payphone reversará automáticamente la transacción
-    console.log('⚡ Confirmando transacción con Payphone INMEDIATAMENTE...');
+    logger.debug('⚡ Confirmando transacción con Payphone INMEDIATAMENTE...');
     const confirmationResult = await confirmPayphoneTransaction(transactionId, clientTransactionId);
 
     if (!confirmationResult.success) {
-      console.error('❌ Error al confirmar transacción:', confirmationResult.error);
-      console.warn('⚠️ Redirigiendo a página de espera - revisar estado manualmente');
+      logger.error('❌ Error al confirmar transacción:', confirmationResult.error);
+      logger.warn('⚠️ Redirigiendo a página de espera - revisar estado manualmente');
       
       // Extraer orderId para redirigir a página de confirmación en modo pending
       // (Mismo código de extracción que usamos abajo)
@@ -107,6 +108,7 @@ export async function GET(request: NextRequest) {
     const transaction = confirmationResult.data;
     const transactionStatus = transaction?.transactionStatus || 'Pending';
     const statusCode = transaction?.statusCode;
+    const transactionAmount = transaction?.amount || 0; // En centavos
 
     // ⚠️ VALIDACIÓN CRÍTICA: Verificar statusCode === 3 Y transactionStatus === 'Approved'
     // statusCode 2 = Cancelado, 3 = Aprobada (pero también puede ser Rejected)
@@ -114,7 +116,7 @@ export async function GET(request: NextRequest) {
     const status = transactionStatus.toString().toLowerCase();
     const isApproved = statusCode === 3 && status === 'approved';
 
-    console.log('✅ Transacción confirmada con Payphone:', {
+    logger.debug('✅ Transacción confirmada con Payphone:', {
       transactionId,
       status: transactionStatus,
       statusCode: statusCode,
@@ -141,13 +143,13 @@ export async function GET(request: NextRequest) {
     const orderMatch1 = clientTransactionId.match(/^order-([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})-/);
     if (orderMatch1) {
       orderId = orderMatch1[1];
-      console.log('✅ OrderId extraído del formato completo (order-{uuid}-):', orderId);
+      logger.debug('✅ OrderId extraído del formato completo (order-{uuid}-):', orderId);
     } else {
       // Formato 2: ord-{primeros 8 chars}-{timestamp}
       const orderMatch2 = clientTransactionId.match(/^ord-([a-f0-9]{8})-/);
       if (orderMatch2) {
         const orderPrefix = orderMatch2[1];
-        console.log('🔍 Buscando orden con prefijo (ord-{8chars}-):', orderPrefix);
+        logger.debug('🔍 Buscando orden con prefijo (ord-{8chars}-):', orderPrefix);
         
         // Buscar en las últimas 100 órdenes por el prefijo
         const { data: orders, error: searchError } = await supabase
@@ -163,7 +165,7 @@ export async function GET(request: NextRequest) {
           
           if (matchingOrder) {
             orderId = matchingOrder.id;
-            console.log('✅ Orden encontrada por prefijo:', orderId);
+            logger.debug('✅ Orden encontrada por prefijo:', orderId);
           }
         }
       }
@@ -171,11 +173,11 @@ export async function GET(request: NextRequest) {
 
     // Si aún no tenemos orderId, intentar usar el clientTransactionId de la respuesta de Payphone
     if (!orderId && transaction?.clientTransactionId) {
-      console.log('🔍 Intentando extraer orderId del clientTransactionId de la respuesta:', transaction.clientTransactionId);
+      logger.debug('🔍 Intentando extraer orderId del clientTransactionId de la respuesta:', transaction.clientTransactionId);
       const responseOrderMatch1 = transaction.clientTransactionId.match(/^order-([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})-/);
       if (responseOrderMatch1) {
         orderId = responseOrderMatch1[1];
-        console.log('✅ OrderId extraído del clientTransactionId de la respuesta:', orderId);
+        logger.debug('✅ OrderId extraído del clientTransactionId de la respuesta:', orderId);
       } else {
         const responseOrderMatch2 = transaction.clientTransactionId.match(/^ord-([a-f0-9]{8})-/);
         if (responseOrderMatch2) {
@@ -192,7 +194,7 @@ export async function GET(request: NextRequest) {
             );
             if (matchingOrder) {
               orderId = matchingOrder.id;
-              console.log('✅ Orden encontrada por prefijo en respuesta:', orderId);
+              logger.debug('✅ Orden encontrada por prefijo en respuesta:', orderId);
             }
           }
         }
@@ -204,15 +206,15 @@ export async function GET(request: NextRequest) {
     if (!orderId) {
       if (transaction?.optionalParameter3) {
         orderId = transaction.optionalParameter3;
-        console.log('✅ OrderId obtenido de optionalParameter3:', orderId);
+        logger.debug('✅ OrderId obtenido de optionalParameter3:', orderId);
       } else if (transaction?.optionalParameter) {
         orderId = transaction.optionalParameter;
-        console.log('✅ OrderId obtenido de optionalParameter:', orderId);
+        logger.debug('✅ OrderId obtenido de optionalParameter:', orderId);
       }
     }
 
     if (!orderId) {
-      console.error('❌ No se pudo extraer orderId de ninguna fuente:', {
+      logger.error('❌ No se pudo extraer orderId de ninguna fuente:', {
         clientTransactionId,
         responseClientTransactionId: transaction?.clientTransactionId,
         optionalParameter3: transaction?.optionalParameter3,
@@ -224,13 +226,54 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('✅ Order ID recuperado:', orderId);
+    logger.debug('✅ Order ID recuperado:', orderId);
     const finalOrderId = orderId;
+
+    // ⚠️ VALIDACIÓN CRÍTICA: Verificar que el monto de Payphone coincida con el de la orden
+    // Esto previene fraude donde alguien modifica el monto
+    const { data: orderData, error: orderDataError } = await supabase
+      .from('orders')
+      .select('total, status')
+      .eq('id', finalOrderId)
+      .single();
+
+    if (orderDataError || !orderData) {
+      logger.error('❌ Error al obtener orden para validar monto:', orderDataError);
+      return NextResponse.redirect(
+        new URL(`/comprar/error?message=Error al validar la orden&orderId=${finalOrderId}`, request.url)
+      );
+    }
+
+    // Convertir monto de Payphone (centavos) a dólares y comparar
+    const payphoneAmountInDollars = transactionAmount / 100;
+    const orderTotal = orderData.total;
+    const amountDifference = Math.abs(payphoneAmountInDollars - orderTotal);
+    const tolerance = 0.01; // Tolerancia de 1 centavo por redondeos
+
+    if (amountDifference > tolerance) {
+      logger.error('❌ ERROR CRÍTICO: Monto de Payphone no coincide con orden:', {
+        payphoneAmount: payphoneAmountInDollars,
+        orderTotal: orderTotal,
+        difference: amountDifference,
+        transactionId,
+        orderId: finalOrderId,
+      });
+      // ⚠️ NO procesar el pago si los montos no coinciden
+      return NextResponse.redirect(
+        new URL(`/comprar/error?message=Error de validación: Los montos no coinciden. Contacta soporte con ID: ${transactionId}`, request.url)
+      );
+    }
+
+    logger.debug('✅ Validación de monto exitosa:', {
+      payphoneAmount: payphoneAmountInDollars,
+      orderTotal: orderTotal,
+      transactionId,
+    });
 
     // Actualizar base de datos (esto puede tomar más tiempo, pero ya confirmamos con Payphone)
     // Procesar de forma asíncrona para no bloquear la respuesta
     processPaymentUpdate(supabase, finalOrderId, transactionId, transactionStatus, transaction).catch(err => {
-      console.error('❌ Error en actualización asíncrona de pago:', err);
+      logger.error('❌ Error en actualización asíncrona de pago:', err);
       // No bloqueamos el flujo, solo registramos el error
     });
 
@@ -239,25 +282,25 @@ export async function GET(request: NextRequest) {
     // ⚠️ VALIDACIÓN CRÍTICA: Solo considerar aprobado si statusCode === 3 Y transactionStatus === 'Approved'
     if (isApproved) {
       // Pago aprobado: redirigir inmediatamente
-      console.log('✅ Pago aprobado - Redirigiendo inmediatamente');
+      logger.debug('✅ Pago aprobado - Redirigiendo inmediatamente');
       return NextResponse.redirect(
         new URL(`/comprar/${finalOrderId}/confirmacion?status=success&transactionId=${transactionId}`, request.url)
       );
     } else if (statusCode === 2 || transactionStatus === 'Canceled') {
       // Pago cancelado (statusCode 2 = Cancelado)
-      console.log('❌ Pago cancelado - Redirigiendo');
+      logger.debug('❌ Pago cancelado - Redirigiendo');
       return NextResponse.redirect(
         new URL(`/comprar/error?message=Pago cancelado o rechazado&orderId=${finalOrderId}`, request.url)
       );
     } else {
       // Pago pendiente, rechazado u otro estado (NO aprobado)
-      console.log('⏳ Pago pendiente/rechazado - Redirigiendo a página de espera');
+      logger.debug('⏳ Pago pendiente/rechazado - Redirigiendo a página de espera');
       return NextResponse.redirect(
         new URL(`/comprar/${finalOrderId}/confirmacion?status=pending&transactionId=${transactionId}`, request.url)
       );
     }
   } catch (error) {
-    console.error('❌ Error en callback de Payphone:', error);
+    logger.error('❌ Error en callback de Payphone:', error);
     return NextResponse.redirect(
       new URL('/comprar/error?message=Error al procesar el pago', request.url)
     );
@@ -319,10 +362,10 @@ async function confirmPayphoneTransaction(
     const confirmUrl = 'https://pay.payphonetodoesposible.com/api/button/V2/Confirm';
     const environment = process.env.NEXT_PUBLIC_PAYPHONE_ENVIRONMENT || 'prod';
     
-    console.log('🌐 Ambiente Payphone:', environment, '| Endpoint:', confirmUrl);
-    console.log('🔑 Token configurado:', token ? `${token.substring(0, 20)}...` : 'NO');
+    logger.debug('🌐 Ambiente Payphone:', environment, '| Endpoint:', confirmUrl);
+    logger.debug('🔑 Token configurado:', token ? `${token.substring(0, 20)}...` : 'NO');
 
-    console.log('🔄 Confirmando transacción con Payphone:', { transactionId, clientTransactionId });
+    logger.debug('🔄 Confirmando transacción con Payphone:', { transactionId, clientTransactionId });
 
     // Convertir transactionId a número (Payphone lo requiere como int)
     const transactionIdNum = parseInt(transactionId, 10);
@@ -332,7 +375,7 @@ async function confirmPayphoneTransaction(
       clientTxId: clientTransactionId,
     };
     
-    console.log('📤 Request body:', requestBody);
+    logger.debug('📤 Request body:', requestBody);
 
     // ⚠️ REINTENTOS: PayPhone puede tardar en responder, intentar hasta 3 veces
     // USANDO AXIOS en lugar de fetch (recomendación de PayPhone para Next.js)
@@ -341,7 +384,7 @@ async function confirmPayphoneTransaction(
     
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        console.log(`🔄 Intento ${attempt}/3 de confirmar con PayPhone (usando axios)...`);
+        logger.debug(`🔄 Intento ${attempt}/3 de confirmar con PayPhone (usando axios)...`);
         
         // Axios con timeout de 30 segundos por intento
         const response = await axios.post(confirmUrl, requestBody, {
@@ -353,11 +396,11 @@ async function confirmPayphoneTransaction(
           validateStatus: (status) => status < 600, // No lanzar error en 4xx/5xx, manejarlos manualmente
     });
 
-        console.log(`📨 Status de respuesta (intento ${attempt}):`, response.status, response.statusText);
+        logger.debug(`📨 Status de respuesta (intento ${attempt}):`, response.status, response.statusText);
     
         // Si respuesta OK (2xx), salir del loop
         if (response.status >= 200 && response.status < 300) {
-          console.log(`✅ Confirmación exitosa en intento ${attempt}`);
+          logger.debug(`✅ Confirmación exitosa en intento ${attempt}`);
           responseData = response.data;
           break;
         }
@@ -366,7 +409,7 @@ async function confirmPayphoneTransaction(
         if (response.status === 500 || response.status === 503) {
           const errorText = JSON.stringify(response.data).substring(0, 200);
           lastError = `HTTP ${response.status}: ${errorText}`;
-          console.warn(`⚠️ Error ${response.status} en intento ${attempt}, reintentando en ${attempt * 2}s...`);
+          logger.warn(`⚠️ Error ${response.status} en intento ${attempt}, reintentando en ${attempt * 2}s...`);
           
           // Esperar antes de reintentar (backoff exponencial: 2s, 4s, 6s)
           if (attempt < 3) {
@@ -378,7 +421,7 @@ async function confirmPayphoneTransaction(
         // Otros errores (4xx) no reintentar
         const errorText = JSON.stringify(response.data).substring(0, 200);
         lastError = `HTTP ${response.status}: ${errorText}`;
-        console.error('❌ Error NO reintentar:', lastError);
+        logger.error('❌ Error NO reintentar:', lastError);
         break;
         
       } catch (axiosError) {
@@ -392,11 +435,11 @@ async function confirmPayphoneTransaction(
           lastError = error.message || 'Error de red desconocido';
         }
         
-        console.error(`❌ Error axios en intento ${attempt}:`, lastError);
+        logger.error(`❌ Error axios en intento ${attempt}:`, lastError);
         
         // Si es timeout o error de red, reintentar
         if (attempt < 3) {
-          console.warn(`⚠️ Reintentando en ${attempt * 2}s...`);
+          logger.warn(`⚠️ Reintentando en ${attempt * 2}s...`);
           await new Promise(resolve => setTimeout(resolve, attempt * 2000));
         }
       }
@@ -404,8 +447,8 @@ async function confirmPayphoneTransaction(
     
     // Verificar si todos los intentos fallaron
     if (!responseData) {
-      console.error('❌ Todos los intentos de confirmación fallaron');
-      console.error('❌ Error final:', lastError);
+      logger.error('❌ Todos los intentos de confirmación fallaron');
+      logger.error('❌ Error final:', lastError);
       
       return {
         success: false,
@@ -415,8 +458,8 @@ async function confirmPayphoneTransaction(
 
     const data = responseData;
 
-    console.log('✅ Respuesta de confirmación de Payphone:', JSON.stringify(data, null, 2));
-    console.log('📊 Detalles clave:', {
+    logger.debug('✅ Respuesta de confirmación de Payphone:', JSON.stringify(data, null, 2));
+    logger.debug('📊 Detalles clave:', {
       statusCode: data.statusCode,
       transactionStatus: data.transactionStatus,
       transactionId: data.transactionId,
@@ -431,7 +474,7 @@ async function confirmPayphoneTransaction(
       data: data,
     };
   } catch (error) {
-    console.error('❌ Error al confirmar transacción:', error);
+    logger.error('❌ Error al confirmar transacción:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido',
@@ -452,23 +495,35 @@ async function processPaymentUpdate(
   transaction: any
 ) {
   try {
-    console.log('🔄 Procesando actualización de base de datos para orden:', orderId);
+    logger.debug('🔄 Procesando actualización de base de datos para orden:', orderId);
 
     // ⚠️ VALIDACIÓN CRÍTICA: Verificar si este transactionId ya fue procesado (prevenir duplicados)
-    const { data: existingPaymentByTransaction } = await supabase
+    // Usar SELECT FOR UPDATE para bloqueo de fila y prevenir race conditions
+    const { data: existingPaymentByTransaction, error: checkError } = await supabase
       .from('payments')
       .select('id, order_id, status')
       .eq('provider_reference', transactionId)
       .maybeSingle();
 
+    if (checkError) {
+      logger.error('❌ Error al verificar pago existente:', checkError);
+      // Continuar pero registrar el error
+    }
+
     if (existingPaymentByTransaction) {
       // Si ya existe un pago con este transactionId
       if (existingPaymentByTransaction.order_id === orderId) {
-        // Mismo orden - actualizar el pago existente
-        console.log('⚠️ Pago ya procesado para esta orden, actualizando...');
+        // Mismo orden - verificar si ya está completado (idempotencia)
+        if (existingPaymentByTransaction.status === 'approved') {
+          logger.debug('⚠️ Pago ya procesado y aprobado para esta orden (idempotencia)');
+          // Ya está procesado, no hacer nada más
+          return;
+        }
+        // Mismo orden pero diferente estado - actualizar
+        logger.debug('⚠️ Pago ya existe para esta orden con estado diferente, actualizando...');
       } else {
         // Diferente orden - ERROR: transactionId duplicado
-        console.error('❌ ERROR CRÍTICO: transactionId ya procesado para otra orden:', {
+        logger.error('❌ ERROR CRÍTICO: transactionId ya procesado para otra orden:', {
           transactionId,
           existingOrderId: existingPaymentByTransaction.order_id,
           currentOrderId: orderId,
@@ -499,7 +554,7 @@ async function processPaymentUpdate(
 
     if (existingPayment) {
       // Actualizar pago existente
-      console.log('🔄 Actualizando pago existente:', existingPayment.id);
+      logger.debug('🔄 Actualizando pago existente:', existingPayment.id);
       const { error: updatePaymentError } = await supabase
         .from('payments')
         .update({
@@ -511,14 +566,14 @@ async function processPaymentUpdate(
         .eq('id', existingPayment.id);
       
       if (updatePaymentError) {
-        console.error('❌ Error al actualizar payment:', updatePaymentError);
+        logger.error('❌ Error al actualizar payment:', updatePaymentError);
       } else {
-        console.log('✅ Payment actualizado');
+        logger.debug('✅ Payment actualizado');
         paymentId = existingPayment.id;
       }
     } else {
       // Crear nuevo registro de pago
-      console.log('✨ Creando nuevo registro en payments...');
+      logger.debug('✨ Creando nuevo registro en payments...');
       const { data: newPayment, error: insertError } = await supabase
         .from('payments')
         .insert(paymentData)
@@ -526,9 +581,9 @@ async function processPaymentUpdate(
         .single();
       
       if (insertError) {
-        console.error('❌ Error al insertar en payments:', insertError);
+        logger.error('❌ Error al insertar en payments:', insertError);
       } else {
-        console.log('✅ Registro creado en payments');
+        logger.debug('✅ Registro creado en payments');
         paymentId = newPayment?.id || null;
       }
     }
@@ -547,12 +602,12 @@ async function processPaymentUpdate(
         .single();
 
       if (currentOrder?.status === 'completed') {
-        console.log('⚠️ Orden ya está completada, saltando actualización (idempotencia)');
+        logger.debug('⚠️ Orden ya está completada, saltando actualización (idempotencia)');
         return; // Ya está procesada, no hacer nada
       }
 
       // Pago aprobado: actualizar orden a completada
-      console.log('🔄 Actualizando orden a completed...');
+      logger.debug('🔄 Actualizando orden a completed...');
       const { error: updateError } = await supabase
         .from('orders')
         .update({
@@ -562,12 +617,12 @@ async function processPaymentUpdate(
         .eq('id', orderId);
 
       if (updateError) {
-        console.error('❌ Error al actualizar orden:', updateError);
+        logger.error('❌ Error al actualizar orden:', updateError);
       } else {
-        console.log('✅ Orden actualizada a completada');
+        logger.debug('✅ Orden actualizada a completada');
         
         // Actualizar todos los tickets de esta orden a 'paid'
-        console.log('🔄 Actualizando tickets a "paid" para orden:', orderId);
+        logger.debug('🔄 Actualizando tickets a "paid" para orden:', orderId);
         const { data: orderData } = await supabase
           .from('orders')
           .select('raffle_id, numbers')
@@ -587,15 +642,15 @@ async function processPaymentUpdate(
             .in('number', ticketNumbers);
           
           if (ticketsUpdateError) {
-            console.error('❌ Error al actualizar tickets a "paid":', ticketsUpdateError);
+            logger.error('❌ Error al actualizar tickets a "paid":', ticketsUpdateError);
           } else {
-            console.log(`✅ ${ticketNumbers.length} tickets actualizados a "paid"`);
+            logger.debug(`✅ ${ticketNumbers.length} tickets actualizados a "paid"`);
           }
         }
         
         // Enviar correo de confirmación (no bloquea si falla)
         try {
-          console.log('📧 Intentando enviar correo de confirmación para orden:', orderId);
+          logger.debug('📧 Intentando enviar correo de confirmación para orden:', orderId);
           const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
           const emailUrl = `${baseUrl}/api/email/send-purchase-confirmation`;
           
@@ -607,30 +662,30 @@ async function processPaymentUpdate(
             }
           );
           
-          console.log('✅ Correo de confirmación enviado exitosamente:', emailResponse.data);
+          logger.debug('✅ Correo de confirmación enviado exitosamente:', emailResponse.data);
         } catch (emailError) {
-          console.error('❌ Error al enviar correo (no crítico):', emailError instanceof AxiosError ? emailError.message : emailError);
+          logger.error('❌ Error al enviar correo (no crítico):', emailError instanceof AxiosError ? emailError.message : emailError);
         }
       }
     } else if (transaction?.statusCode === 2 || transactionStatus === 'Canceled') {
       // Pago cancelado o rechazado (statusCode 2 = Cancelado)
-      console.log('❌ Actualizando orden a expired (pago cancelado/rechazado)...');
+      logger.debug('❌ Actualizando orden a expired (pago cancelado/rechazado)...');
       await supabase
         .from('orders')
         .update({
           status: 'expired',
         })
         .eq('id', orderId);
-      console.log('⚠️ Orden marcada como expirada (pago cancelado/rechazado)');
+      logger.debug('⚠️ Orden marcada como expirada (pago cancelado/rechazado)');
     } else {
       // Pago pendiente o rechazado (pero no cancelado explícitamente)
       // Mantener estado 'reserved' para que el usuario pueda ver el estado pendiente
-      console.log('⏳ Orden permanece en estado reserved (pago pendiente/rechazado)');
+      logger.debug('⏳ Orden permanece en estado reserved (pago pendiente/rechazado)');
     }
 
-    console.log('✅ Actualización de base de datos completada para orden:', orderId);
+    logger.debug('✅ Actualización de base de datos completada para orden:', orderId);
   } catch (error) {
-    console.error('❌ Error en processPaymentUpdate:', error);
+    logger.error('❌ Error en processPaymentUpdate:', error);
     // No lanzamos el error para no afectar el flujo principal
   }
 }

@@ -8,6 +8,7 @@ import {
   SupabaseClient, 
   AuthTokenResponse 
 } from '@supabase/supabase-js';
+import { logger } from '@/utils/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -114,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
       } catch (error) {
-        console.error('Sign out error:', error);
+        logger.error('Sign out error:', error);
         // Even if there's an error, clear the local state and redirect
         setUser(null);
         setSession(null);

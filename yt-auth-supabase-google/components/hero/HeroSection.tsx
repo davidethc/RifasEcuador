@@ -3,27 +3,26 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { purchaseService, type UserTicket } from "@/services/purchaseService";
-import StatsCount from "@/components/ui/statscount";
-import { HeroCarousel } from "@/components/ui/hero-carousel";
+import { logger } from '@/utils/logger';
+import { HeroCarousel } from "../ui/hero-carousel";
 
 /**
  * Hero Section - Sección principal de la página de inicio
  * Diseño moderno y responsive con call-to-action
  */
 export function HeroSection() {
-  const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const [userTickets, setUserTickets] = useState<UserTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
+  const [ratio, setRatio] = useState(16 / 9);
+  
   const heroCarouselImages = [
-    { src: "/mazdaprin.png", alt: "Mazda 3" },
-    { src: "/yamaha.jpg", alt: "Yamaha MT-03" },
+    { src: "/Diseño Video.gif", alt: "Video de diseño de premios", isGif: true },
+    { src: "/carasuel3.jpg", alt: "Premios del sorteo" },
+    { src: "/carusuel8.png", alt: "Premios del sorteo" },
   ];
-
-  const [ratio, setRatio] = useState(22 / 9);
 
   // Cargar boletos del usuario cuando esté autenticado
   useEffect(() => {
@@ -38,7 +37,7 @@ export function HeroSection() {
         const tickets = await purchaseService.getUserTickets();
         setUserTickets(tickets);
       } catch (error) {
-        console.error('Error al cargar boletos:', error);
+        logger.error('Error al cargar boletos:', error);
         setUserTickets([]);
       } finally {
         setTicketsLoading(false);
@@ -51,197 +50,37 @@ export function HeroSection() {
   // Manejar ratio responsivo
   useEffect(() => {
     const handleResize = () => {
-      // 16/10 para móvil, 19/9 para desktop (un poco más alto que antes 22/9)
       setRatio(window.innerWidth < 768 ? 16 / 10 : 19 / 9);
     };
 
-    // Set initial
     handleResize();
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+
   return (
-    <section className="relative w-full min-h-[50vh] flex items-start md:items-center pt-4 md:pt-12 pb-8 md:pb-16 overflow-hidden" style={{
+    <section className="relative w-full min-h-[50vh] flex items-center justify-center pt-6 md:pt-16 pb-12 md:pb-20 overflow-hidden" style={{
       background: 'linear-gradient(180deg, #1F1935 0%, #2A1F3D 30%, #360254 70%, #4A1F5C 100%)'
     }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-        {/* Carrusel de imágenes */}
-        <div className="mb-6 md:mb-12">
-          <HeroCarousel images={heroCarouselImages} ratio={ratio} />
-        </div>
-
-        <div className="text-left w-full">
-          {/* Título principal - Profesional y sobrio */}
-          <div className="mb-4 md:mb-6">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 font-[var(--font-comfortaa)] leading-tight" style={{ color: '#F9FAFB' }}>
-              Premios reales. Ganadores reales.
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl font-semibold" style={{ color: '#FFB200' }}>
-              En todo el Ecuador 🇪🇨
-            </p>
-          </div>
-
-          {/* Subtítulo */}
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 font-[var(--font-comfortaa)]" style={{ color: '#E5E7EB' }}>
-            Sorteos Disponibles
-          </h2>
-
-          <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 font-[var(--font-dm-sans)] max-w-2xl leading-relaxed" style={{ color: '#9CA3AF' }}>
-            Participa en nuestros sorteos y gana increíbles premios
-          </p>
-
-          {/* Botones de acción - Profesionales */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 md:mb-12">
-            <button
-              onClick={() => router.push('/sorteos')}
-              className="px-6 py-3.5 md:px-8 md:py-4 text-base md:text-lg font-bold font-[var(--font-dm-sans)] border-0 min-h-[44px] rounded-lg transition-all"
-              style={{
-                background: 'linear-gradient(135deg, #F2C94C, #F2994A)',
-                color: '#1A1A1A',
-                boxShadow: '0 4px 12px rgba(242, 201, 76, 0.25)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.filter = 'brightness(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.filter = 'brightness(1)';
-              }}
-            >
-              Ver Sorteos
-            </button>
-            <Link
-              href="/como-jugar"
-              className="px-6 py-3.5 md:px-8 md:py-4 text-base md:text-lg font-semibold rounded-lg transition-all font-[var(--font-dm-sans)] min-h-[44px] flex items-center justify-center"
-              style={{
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#E5E7EB',
-                background: 'rgba(28, 32, 58, 0.4)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(28, 32, 58, 0.6)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(28, 32, 58, 0.4)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-              }}
-            >
-              Cómo Funciona
-            </Link>
-          </div>
-
-          {/* Bloque de Confianza - Estilo profesional */}
-          <div className="mt-8 md:mt-12 max-w-4xl mx-auto">
-            <div className="rounded-lg border p-4 md:p-6 lg:p-8" style={{
-              background: 'rgba(28, 32, 58, 0.6)',
-              borderColor: 'rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-            }}>
-              {/* Título */}
-              <div className="mb-4 md:mb-6 text-center">
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold font-[var(--font-comfortaa)] flex items-center justify-center gap-2" style={{ color: '#F9FAFB' }}>
-                  <span className="text-xl md:text-2xl">🔒</span>
-                  <span>Plataforma segura y legal</span>
-                </h2>
-              </div>
-
-              {/* Beneficios - Estilo profesional */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
-                <div className="flex items-start gap-3">
-                  <span className="text-xl font-bold mt-1" style={{ color: '#22C55E' }}>✔</span>
-                  <div>
-                    <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
-                      Sorteos transparentes y públicos
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-xl font-bold mt-1" style={{ color: '#22C55E' }}>✔</span>
-                  <div>
-                    <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
-                      Cumplimos normativa vigente en Ecuador
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-xl font-bold mt-1" style={{ color: '#22C55E' }}>✔</span>
-                  <div>
-                    <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
-                      Pagos 100% seguros
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-xl font-bold mt-1" style={{ color: '#22C55E' }}>✔</span>
-                  <div>
-                    <p className="font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
-                      Premios entregados a ganadores reales
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Métodos de pago */}
-              <div className="border-t pt-4 md:pt-6" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-                <p className="text-xs md:text-sm font-semibold mb-3 md:mb-4 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-                  Métodos de pago disponibles
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 lg:gap-8">
-                  {/* PayPhone */}
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="relative w-20 h-14 md:w-28 md:h-18 lg:w-32 lg:h-20">
-                      <Image
-                        src="/payphonee.webp"
-                        alt="PayPhone"
-                        fill
-                        sizes="(max-width: 768px) 80px, (max-width: 1024px) 112px, 128px"
-                        className="object-contain"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Transferencia Bancaria */}
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-20 h-14 md:w-28 md:h-18 lg:w-32 lg:h-20 flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg border-2 border-primary-200 dark:border-primary-700">
-                      <span className="text-[10px] md:text-xs lg:text-sm font-bold text-primary-700 dark:text-primary-300 text-center px-1.5 md:px-2 font-[var(--font-dm-sans)] leading-tight">
-                        Transferencia Bancaria
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs mt-3 md:mt-4 font-[var(--font-dm-sans)] text-center" style={{ color: '#9CA3AF' }}>
-                  Pagos procesados de forma segura y verificada
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Estadísticas animadas */}
-          <div className="mt-4 md:mt-6">
-            <StatsCount
-              stats={[
-                {
-                  value: 10,
-                  label: "Sorteos Activos",
-                  duration: 2,
-                },
-                {
-                  value: 200,
-                  label: "Participantes",
-                  duration: 2.5,
-                },
-                {
-                  value: 100,
-                  suffix: "%",
-                  label: "Legales",
-                  duration: 2,
-                },
-              ]}
-              title=""
-              showDividers={true}
-              className="py-0"
+        {/* Carrusel con margen transparente 3D */}
+        <div className="w-full flex justify-center py-8 md:py-12">
+          <div 
+            className="relative w-full max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw]"
+            style={{ 
+              padding: '20px',
+              background: 'rgba(0, 0, 0, 0.2)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '20px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(168, 62, 245, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.15)'
+            }}
+          >
+            <HeroCarousel 
+              images={heroCarouselImages} 
+              ratio={ratio}
+              autoplayInterval={9000}
             />
           </div>
         </div>
@@ -329,10 +168,11 @@ export function HeroSection() {
                           <div className="flex-shrink-0 relative w-20 h-20 md:w-24 md:h-24">
                             <Image
                               src={ticket.raffle_image_url}
-                              alt={ticket.raffle_title}
+                              alt={`Imagen del sorteo ${ticket.raffle_title}`}
                               fill
                               className="object-cover rounded-lg"
                               sizes="(max-width: 768px) 80px, 96px"
+                              loading="lazy"
                             />
                           </div>
                         )}

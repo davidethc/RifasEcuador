@@ -60,7 +60,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch (error) {
     // Si falla, continuar sin sorteos (sitemap solo con páginas estáticas)
+    // En producción, no loguear errores de sitemap para evitar ruido
+    // El error se silencia intencionalmente para no afectar el sitemap
+    // ⚠️ ATENCIÓN: Usar logger en lugar de console.warn para consistencia con el resto del proyecto
     if (process.env.NODE_ENV === 'development') {
+      // TODO: Reemplazar console.warn con logger.warn o logger.error
+      // eslint-disable-next-line no-console
       console.warn('No se pudieron obtener sorteos para el sitemap:', error);
     }
   }

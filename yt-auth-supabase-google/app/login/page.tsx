@@ -58,7 +58,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden" style={{ 
+    <main className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden" aria-label="Iniciar sesión" style={{ 
       background: 'linear-gradient(180deg, #1F1A2E 0%, #2A1F3D 20%, #2D2140 40%, #2A1F3D 60%, #1F1A2E 100%)',
       backgroundAttachment: 'fixed'
     }}>
@@ -79,6 +79,6 @@ export default function LoginPage() {
           error={error}
         />
       </div>
-    </div>
+    </main>
   );
 } 

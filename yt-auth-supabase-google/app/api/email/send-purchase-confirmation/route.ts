@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/utils/logger';
 
 // Cliente de Supabase con service role para bypass de RLS
 const getSupabaseAdmin = () => {
@@ -48,14 +49,14 @@ interface OrderWithRelations {
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('📧 [EMAIL] Iniciando envío de correo de confirmación');
+    logger.debug('📧 [EMAIL] Iniciando envío de correo de confirmación');
     const body = await request.json();
     const { orderId } = body;
 
-    console.log('📧 [EMAIL] OrderId recibido:', orderId);
+    logger.debug('📧 [EMAIL] OrderId recibido:', orderId);
 
     if (!orderId) {
-      console.error('❌ [EMAIL] orderId no proporcionado');
+      logger.error('❌ [EMAIL] orderId no proporcionado');
       return NextResponse.json(
         { success: false, error: 'orderId es requerido' },
         { status: 400 }
@@ -90,14 +91,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (orderError || !orderData) {
-      console.error('❌ [EMAIL] Error al obtener orden:', orderError);
+      logger.error('❌ [EMAIL] Error al obtener orden:', orderError);
       return NextResponse.json(
         { success: false, error: 'Orden no encontrada', details: orderError },
         { status: 404 }
       );
     }
 
-    console.log('✅ [EMAIL] Orden obtenida:', orderData.id);
+    logger.debug('✅ [EMAIL] Orden obtenida:', orderData.id);
 
     const typedOrderData = orderData as unknown as OrderWithRelations;
     const client = typedOrderData.clients;
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
           ticketNumbers = [String(typedOrderData.numbers)];
         }
       } catch {
-        console.warn('⚠️ [EMAIL] No se pudo parsear numbers, usando array vacío');
+        logger.warn('⚠️ [EMAIL] No se pudo parsear numbers, usando array vacío');
         ticketNumbers = [];
       }
     }
@@ -124,8 +125,8 @@ export async function POST(request: NextRequest) {
     // Si aún no hay números, intentar obtenerlos de la tabla tickets usando los números de la orden
     // Los tickets se relacionan por raffle_id y number (que debe estar en orders.numbers)
     if (ticketNumbers.length === 0) {
-      console.log('⚠️ [EMAIL] No se encontraron números en orders.numbers');
-      console.log('⚠️ [EMAIL] Verificando si la orden tiene números en otro formato...');
+      logger.debug('⚠️ [EMAIL] No se encontraron números en orders.numbers');
+      logger.debug('⚠️ [EMAIL] Verificando si la orden tiene números en otro formato...');
       
       // Intentar obtener la orden nuevamente con más detalle
       const { data: orderDataRetry } = await supabase
@@ -135,22 +136,22 @@ export async function POST(request: NextRequest) {
         .single();
       
       if (orderDataRetry?.numbers) {
-        console.log('📧 [EMAIL] Reintento - Numbers encontrados:', orderDataRetry.numbers);
+        logger.debug('📧 [EMAIL] Reintento - Numbers encontrados:', orderDataRetry.numbers);
         if (Array.isArray(orderDataRetry.numbers)) {
           ticketNumbers = orderDataRetry.numbers.map(n => String(n));
         }
       }
     }
 
-    console.log('📧 [EMAIL] Cliente:', client?.name, 'Email:', client?.email);
-    console.log('📧 [EMAIL] Sorteo:', raffle?.title);
-    console.log('📧 [EMAIL] Números de boletos:', ticketNumbers);
-    console.log('📧 [EMAIL] Cantidad de números:', ticketNumbers.length);
-    console.log('📧 [EMAIL] Tipo de numbers:', typeof typedOrderData.numbers);
-    console.log('📧 [EMAIL] Numbers raw:', typedOrderData.numbers);
+    logger.debug('📧 [EMAIL] Cliente:', client?.name, 'Email:', client?.email);
+    logger.debug('📧 [EMAIL] Sorteo:', raffle?.title);
+    logger.debug('📧 [EMAIL] Números de boletos:', ticketNumbers);
+    logger.debug('📧 [EMAIL] Cantidad de números:', ticketNumbers.length);
+    logger.debug('📧 [EMAIL] Tipo de numbers:', typeof typedOrderData.numbers);
+    logger.debug('📧 [EMAIL] Numbers raw:', typedOrderData.numbers);
 
     if (!client?.email) {
-      console.error('❌ [EMAIL] Email del cliente no encontrado');
+      logger.error('❌ [EMAIL] Email del cliente no encontrado');
       return NextResponse.json(
         { success: false, error: 'Email del cliente no encontrado' },
         { status: 400 }
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
     // Calcular el total correcto: cantidad pagada * precio por ticket
     const correctTotal = paidQuantity * (raffle?.price_per_ticket || 0);
     
-    console.log('💰 [EMAIL_PRICE_CORRECTION] Corrigiendo total en correo:', {
+    logger.debug('💰 [EMAIL_PRICE_CORRECTION] Corrigiendo total en correo:', {
       totalTickets,
       paidQuantity,
       pricePerTicket: raffle?.price_per_ticket,
@@ -187,14 +188,14 @@ export async function POST(request: NextRequest) {
     // Verificar que Resend esté configurado
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
-      console.error('❌ [EMAIL] RESEND_API_KEY no configurado');
+      logger.error('❌ [EMAIL] RESEND_API_KEY no configurado');
       return NextResponse.json(
         { success: false, error: 'Servicio de correo no configurado' },
         { status: 500 }
       );
     }
 
-    console.log('✅ [EMAIL] RESEND_API_KEY configurado');
+    logger.debug('✅ [EMAIL] RESEND_API_KEY configurado');
 
     // Formatear números de boletos - mostrar todos los números de forma clara
     let numbersText = 'No asignados';
@@ -225,8 +226,8 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    console.log('📧 [EMAIL] Numbers text formateado:', numbersText);
-    console.log('📧 [EMAIL] Numbers HTML generado:', numbersHtml.substring(0, 200) + '...');
+    logger.debug('📧 [EMAIL] Numbers text formateado:', numbersText);
+    logger.debug('📧 [EMAIL] Numbers HTML generado:', numbersHtml.substring(0, 200) + '...');
 
     // Crear template HTML del correo
     const emailHtml = `
@@ -307,10 +308,10 @@ export async function POST(request: NextRequest) {
     
     const emailSubject = `✅ Confirmación de Compra - ${raffle?.title || 'Sorteo'}`;
     
-    console.log('📧 [EMAIL] Enviando correo a:', client.email);
-    console.log('📧 [EMAIL] Desde (original):', fromEmail);
-    console.log('📧 [EMAIL] Desde (final):', finalFromEmail);
-    console.log('📧 [EMAIL] Asunto:', emailSubject);
+    logger.debug('📧 [EMAIL] Enviando correo a:', client.email);
+    logger.debug('📧 [EMAIL] Desde (original):', fromEmail);
+    logger.debug('📧 [EMAIL] Desde (final):', finalFromEmail);
+    logger.debug('📧 [EMAIL] Asunto:', emailSubject);
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -327,8 +328,8 @@ export async function POST(request: NextRequest) {
     });
 
     const responseText = await resendResponse.text();
-    console.log('📧 [EMAIL] Respuesta de Resend (status):', resendResponse.status);
-    console.log('📧 [EMAIL] Respuesta de Resend (body):', responseText);
+    logger.debug('📧 [EMAIL] Respuesta de Resend (status):', resendResponse.status);
+    logger.debug('📧 [EMAIL] Respuesta de Resend (body):', responseText);
 
     if (!resendResponse.ok) {
       let errorData;
@@ -337,7 +338,7 @@ export async function POST(request: NextRequest) {
       } catch {
         errorData = { message: responseText };
       }
-      console.error('❌ [EMAIL] Error al enviar correo:', errorData);
+      logger.error('❌ [EMAIL] Error al enviar correo:', errorData);
       return NextResponse.json(
         { success: false, error: 'Error al enviar correo', details: errorData },
         { status: 500 }
@@ -345,7 +346,7 @@ export async function POST(request: NextRequest) {
     }
 
     const emailResult = JSON.parse(responseText);
-    console.log('✅ [EMAIL] Correo enviado exitosamente:', emailResult);
+    logger.debug('✅ [EMAIL] Correo enviado exitosamente:', emailResult);
 
     return NextResponse.json({
       success: true,
@@ -354,7 +355,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Error al enviar correo:', error);
+    logger.error('❌ Error al enviar correo:', error);
     return NextResponse.json(
       {
         success: false,

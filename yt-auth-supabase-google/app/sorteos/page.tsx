@@ -10,7 +10,7 @@ import Image from 'next/image';
  */
 export default function SorteosPage() {
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <main className="min-h-screen relative overflow-hidden" aria-label="Sorteos disponibles">
       {/* Imagen de fondo - Montañas */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
         <div style={{ 
@@ -24,12 +24,13 @@ export default function SorteosPage() {
         }}>
           <Image
             src="/fondomontana.jpeg"
-            alt="Fondo de montañas"
+            alt=""
             fill
             className="object-cover"
             style={{ objectPosition: 'center top' }}
             priority
             quality={90}
+            aria-hidden="true"
           />
         </div>
       </div>
@@ -78,6 +79,6 @@ export default function SorteosPage() {
         <SorteosGrid />
         </div>
       </div>
-    </div>
+    </main>
   );
 }

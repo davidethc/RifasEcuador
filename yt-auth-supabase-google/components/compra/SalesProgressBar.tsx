@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { logger } from '@/utils/logger';
 
 interface SalesProgressBarProps {
   raffleId: string;
@@ -30,7 +31,7 @@ export function SalesProgressBar({ raffleId, totalNumbers }: SalesProgressBarPro
           setSoldCount(0);
         }
       } catch (err) {
-        console.error('Error al obtener conteo de boletos vendidos:', err);
+        logger.error('Error al obtener conteo de boletos vendidos:', err);
         setSoldCount(0);
       } finally {
         setIsLoading(false);

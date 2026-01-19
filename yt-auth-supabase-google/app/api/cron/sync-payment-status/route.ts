@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import axios, { AxiosError } from 'axios';
+import { logger } from '@/utils/logger';
 
 // Cliente de Supabase con service role para bypass de RLS
 const getSupabaseAdmin = () => {
@@ -47,13 +48,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔄 Iniciando verificación de estado de pagos...');
+    logger.debug('🔄 Iniciando verificación de estado de pagos...');
 
     const supabase = getSupabaseAdmin();
     const token = process.env.NEXT_PUBLIC_PAYPHONE_TOKEN;
 
     if (!token) {
-      console.error('❌ Token de Payphone no configurado');
+      logger.error('❌ Token de Payphone no configurado');
       return NextResponse.json(
         { error: 'Token de Payphone no configurado' },
         { status: 500 }
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
       .limit(100); // Limitar a 100 para no sobrecargar
 
     if (paymentsError) {
-      console.error('❌ Error al obtener pagos:', paymentsError);
+      logger.error('❌ Error al obtener pagos:', paymentsError);
       return NextResponse.json(
         { error: 'Error al obtener pagos', details: paymentsError },
         { status: 500 }
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!approvedPayments || approvedPayments.length === 0) {
-      console.log('✅ No hay pagos aprobados recientes para verificar');
+      logger.debug('✅ No hay pagos aprobados recientes para verificar');
       return NextResponse.json({
         success: true,
         message: 'No hay pagos para verificar',
@@ -103,7 +104,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`🔍 Verificando ${approvedPayments.length} pagos aprobados...`);
+    logger.debug(`🔍 Verificando ${approvedPayments.length} pagos aprobados...`);
 
     let checked = 0;
     let reversed = 0;
@@ -113,13 +114,13 @@ export async function GET(request: NextRequest) {
     for (const payment of approvedPayments) {
       const transactionId = payment.provider_reference;
       if (!transactionId) {
-        console.warn('⚠️ Pago sin provider_reference, saltando:', payment.id);
+        logger.warn('⚠️ Pago sin provider_reference, saltando:', payment.id);
         continue;
       }
 
       try {
         checked++;
-        console.log(`🔍 Verificando pago ${checked}/${approvedPayments.length}: ${transactionId}`);
+        logger.debug(`🔍 Verificando pago ${checked}/${approvedPayments.length}: ${transactionId}`);
 
         // Consultar estado actual en Payphone
         const apiUrl = `https://pay.payphonetodoesposible.com/api/Sale/${transactionId}`;
@@ -140,7 +141,7 @@ export async function GET(request: NextRequest) {
 
         if (!isStillApproved) {
           // ⚠️ REVERSO DETECTADO
-          console.error('❌ REVERSO DETECTADO:', {
+          logger.error('❌ REVERSO DETECTADO:', {
             paymentId: payment.id,
             orderId: payment.order_id,
             transactionId,
@@ -173,8 +174,8 @@ export async function GET(request: NextRequest) {
             .eq('id', payment.order_id);
 
           // Revertir tickets a reserved
-          const order = payment.orders as any;
-          if (order && order.numbers && Array.isArray(order.numbers)) {
+          const order = payment.orders as { numbers?: string[] | unknown; raffle_id?: string } | null;
+          if (order && order.numbers && Array.isArray(order.numbers) && order.raffle_id) {
             const ticketNumbers = order.numbers as string[];
             await supabase
               .from('tickets')
@@ -185,12 +186,12 @@ export async function GET(request: NextRequest) {
               .eq('raffle_id', order.raffle_id)
               .in('number', ticketNumbers);
 
-            console.log(`✅ ${ticketNumbers.length} tickets revertidos a 'reserved'`);
+            logger.debug(`✅ ${ticketNumbers.length} tickets revertidos a 'reserved'`);
           }
 
-          console.log(`✅ Reverso procesado para orden ${payment.order_id}`);
+          logger.debug(`✅ Reverso procesado para orden ${payment.order_id}`);
         } else {
-          console.log(`✅ Pago ${transactionId} sigue siendo aprobado`);
+          logger.debug(`✅ Pago ${transactionId} sigue siendo aprobado`);
         }
 
         // Pequeña pausa para no sobrecargar Payphone API
@@ -199,7 +200,7 @@ export async function GET(request: NextRequest) {
       } catch (error) {
         if (error instanceof AxiosError && error.response?.status === 404) {
           // Transacción no encontrada - posible reverso
-          console.error('❌ Transacción no encontrada en Payphone (posible reverso):', transactionId);
+          logger.error('❌ Transacción no encontrada en Payphone (posible reverso):', transactionId);
           
           reversed++;
           reversedPayments.push({
@@ -223,13 +224,13 @@ export async function GET(request: NextRequest) {
             })
             .eq('id', payment.order_id);
         } else {
-          console.error(`❌ Error al verificar pago ${transactionId}:`, error);
+          logger.error(`❌ Error al verificar pago ${transactionId}:`, error);
           // Continuar con el siguiente pago
         }
       }
     }
 
-    console.log('✅ Verificación completada:', {
+    logger.debug('✅ Verificación completada:', {
       checked,
       reversed,
       reversedPayments: reversedPayments.length,
@@ -244,7 +245,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Error en cron de verificación de pagos:', error);
+    logger.error('❌ Error en cron de verificación de pagos:', error);
     return NextResponse.json(
       {
         error: 'Error interno',

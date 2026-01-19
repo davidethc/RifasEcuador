@@ -75,37 +75,39 @@ export function MaterialInput({
   // Clases base para el contenedor
   const containerBaseClasses = 'relative w-full';
   
-  // Clases base para el input - Premium oscuro
-  const inputBaseClasses = 'w-full px-4 pt-6 pb-2 text-base font-[var(--font-dm-sans)] transition-all duration-300 outline-none min-h-[52px] disabled:opacity-[0.38] disabled:cursor-not-allowed';
+  // Clases base para el input - Más compacto pero visible, optimizado para escritura rápida
+  const inputBaseClasses = 'w-full px-4 pt-6 pb-2 text-base font-[var(--font-dm-sans)] transition-all duration-200 outline-none min-h-[50px] disabled:opacity-[0.38] disabled:cursor-not-allowed';
 
-  // Estilos para variant filled - Vibrante con colores del logo (rosa, púrpura, azul)
+  // Estilos usando sistema de diseño unificado - Campos más resaltantes y visibles
   const filledClasses = [
     inputBaseClasses,
-    'bg-[#1F1A2E]',
     'border-2',
     'rounded-xl',
-    'text-[#FFFFFF]',
+    'text-[var(--text-primary)]',
     'placeholder-transparent',
-    isFocused && !error ? 'border-[#A83EF5]' : 'border-[#3A2F5A]',
-    error ? 'border-[#DC2626]' : '',
-    disabled ? 'border-dashed border-[#3A2F5A] opacity-[0.38] bg-[#1A1525]' : '',
-    'hover:border-[#5A4A7A] transition-all duration-300',
-    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.2)]' : '',
+    // Fondo más claro para que resalte - usa bg-elevated siempre y más claro en focus
+    isFocused && !error ? 'bg-[#2F2540]' : 'bg-[#2A1F3D]', // Más claro que bg-secondary
+    isFocused && !error ? 'border-[var(--primary-purple)]' : 'border-[rgba(168,62,245,0.3)]', // Borde más visible
+    error ? 'border-[var(--error)] bg-[#2A1F3D]' : '',
+    disabled ? 'border-dashed border-[var(--border-subtle)] opacity-[0.38] bg-[var(--bg-primary)]' : '',
+    'hover:border-[rgba(168,62,245,0.5)] hover:bg-[#2F2540] transition-all duration-200',
+    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.2)]' : 'shadow-sm',
   ].filter(Boolean).join(' ');
 
-  // Estilos para variant outlined - Vibrante con colores del logo
+  // Estilos para variant outlined - MÁS RESALTANTE y visible
   const outlinedClasses = [
     inputBaseClasses,
-    'bg-[#1F1A2E]',
     'border-2',
     'rounded-xl',
-    'text-[#FFFFFF]',
+    'text-[var(--text-primary)]',
     'placeholder-transparent',
-    isFocused && !error ? 'border-[#A83EF5]' : 'border-[#3A2F5A]',
-    error ? 'border-[#DC2626]' : '',
-    disabled ? 'border-dashed border-[#3A2F5A] opacity-[0.38] bg-[#1A1525]' : '',
-    'hover:border-[#5A4A7A] transition-all duration-300',
-    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.2)]' : '',
+    // Fondo más claro y visible - resalta sobre el fondo oscuro
+    isFocused && !error ? 'bg-[#2F2540]' : 'bg-[#2A1F3D]', // Más claro para destacar
+    isFocused && !error ? 'border-[var(--primary-purple)]' : 'border-[rgba(168,62,245,0.4)]', // Borde más visible siempre
+    error ? 'border-[var(--error)] bg-[#2A1F3D]' : '',
+    disabled ? 'border-dashed border-[var(--border-subtle)] opacity-[0.38] bg-[var(--bg-primary)]' : '',
+    'hover:border-[rgba(168,62,245,0.6)] hover:bg-[#2F2540] transition-all duration-200',
+    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.25)]' : 'shadow-md',
   ].filter(Boolean).join(' ');
 
   const inputClasses = variant === 'filled' ? filledClasses : outlinedClasses;
@@ -116,7 +118,7 @@ export function MaterialInput({
   const labelNormalClasses = [
     labelBaseClasses,
     'top-4',
-    'text-[#B8A8D8]',
+    'text-[var(--text-secondary)]', // Más visible que muted
     'text-base',
     isLabelFloating ? 'opacity-0' : 'opacity-100',
   ].filter(Boolean).join(' ');
@@ -126,19 +128,19 @@ export function MaterialInput({
     'top-2',
     'text-xs',
     'font-medium',
-    isFocused && !error ? 'text-[#A83EF5]' : '',
-    error ? 'text-[#DC2626]' : '',
-    !isFocused && !error ? 'text-[#E5D4FF]' : '',
+    isFocused && !error ? 'text-[var(--primary-purple)]' : '',
+    error ? 'text-[var(--error)]' : '',
+    !isFocused && !error ? 'text-[var(--text-secondary)]' : '',
     isLabelFloating ? 'opacity-100 scale-100' : 'opacity-0 scale-0',
   ].filter(Boolean).join(' ');
 
-  // Clases para el texto de ayuda/error - Vibrante
+  // Clases para el texto de ayuda/error
   const helperTextClasses = [
     'mt-1',
     'px-4',
     'text-xs',
     'font-[var(--font-dm-sans)]',
-    error ? 'text-[#DC2626]' : 'text-[#B8A8D8]',
+    error ? 'text-[var(--error)]' : 'text-[var(--text-muted)]',
   ].filter(Boolean).join(' ');
 
   return (
@@ -157,8 +159,8 @@ export function MaterialInput({
           required={required}
           placeholder={isLabelFloating ? placeholder : ''}
           style={{ 
-            color: '#FFFFFF',
-            caretColor: '#A83EF5'
+            color: 'var(--text-primary)',
+            caretColor: 'var(--primary-purple)'
           }}
           className={inputClasses}
           aria-invalid={error ? 'true' : 'false'}
@@ -171,7 +173,7 @@ export function MaterialInput({
           className={labelNormalClasses}
         >
           {label}
-          {required && <span className="text-[#A83EF5] ml-1">*</span>}
+          {required && <span className="text-[var(--primary-purple)] ml-1">*</span>}
         </label>
 
         {/* Etiqueta flotante (cuando el campo tiene valor o está enfocado) */}
@@ -180,7 +182,7 @@ export function MaterialInput({
           className={labelFloatingClasses}
         >
           {label}
-          {required && <span className="text-[#A83EF5] ml-1">*</span>}
+          {required && <span className="text-[var(--primary-purple)] ml-1">*</span>}
         </label>
 
       </div>

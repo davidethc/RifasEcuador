@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { logger } from '@/utils/logger';
 
 interface OrderDetails {
   id: string;
@@ -51,7 +52,7 @@ export default function ConfirmacionPage() {
       const response = await fetch(`/api/orders/${orderId}`);
 
       if (!response.ok) {
-        console.error('Error al obtener orden:', response.status);
+        logger.error('Error al obtener orden:', response.status);
         setError('No se pudo cargar la información de la orden');
         return;
       }
@@ -69,10 +70,10 @@ export default function ConfirmacionPage() {
 
       // Si el estado cambió de pendiente a completado, mostrar notificación
       if (previousStatus && previousStatus !== 'completed' && newOrder.status === 'completed') {
-        console.log('✅ ¡Estado actualizado a completado!');
+        logger.log('✅ ¡Estado actualizado a completado!');
       }
     } catch (err) {
-      console.error('Error inesperado:', err);
+      logger.error('Error inesperado:', err);
       setError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
@@ -93,11 +94,11 @@ export default function ConfirmacionPage() {
       return;
     }
 
-    console.log('🔄 Iniciando polling para actualizar estado de la orden...');
+    logger.log('🔄 Iniciando polling para actualizar estado de la orden...');
 
     // Polling cada 3 segundos
     const intervalId = setInterval(() => {
-      console.log('🔄 Actualizando estado de la orden...');
+      logger.log('🔄 Actualizando estado de la orden...');
       // Usar fetch directamente para evitar dependencias circulares
       fetch(`/api/orders/${orderId}`)
         .then(res => res.json())
@@ -109,18 +110,18 @@ export default function ConfirmacionPage() {
 
             // Si el estado cambió a completado, detener el polling
             if (previousStatus !== 'completed' && newOrder.status === 'completed') {
-              console.log('✅ ¡Estado actualizado a completado!');
+              logger.log('✅ ¡Estado actualizado a completado!');
             }
           }
         })
         .catch(err => {
-          console.error('Error en polling:', err);
+          logger.error('Error en polling:', err);
         });
     }, 3000);
 
     // Limpiar intervalo cuando el componente se desmonte o cuando la orden se complete
     return () => {
-      console.log('🛑 Deteniendo polling...');
+      logger.log('🛑 Deteniendo polling...');
       clearInterval(intervalId);
     };
   }, [order?.status, orderId, order]); // Solo dependemos del status, no del objeto completo
@@ -199,7 +200,7 @@ export default function ConfirmacionPage() {
   const isExpired = order.status === 'expired';
 
   return (
-    <div className="min-h-screen pt-8 md:pt-12 pb-8">
+    <main className="min-h-screen pt-8 md:pt-12 pb-8" aria-label="Confirmación de compra">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado con estado */}
         <div className="text-center mb-8">
@@ -277,10 +278,11 @@ export default function ConfirmacionPage() {
               <div className="mb-4 rounded-xl overflow-hidden relative w-full h-48">
                 <Image
                   src={order.raffles.image_url}
-                  alt={order.raffles.title}
+                  alt={`Imagen del sorteo ${order.raffles.title}`}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
+                  loading="lazy"
                 />
               </div>
             )}
@@ -377,6 +379,6 @@ export default function ConfirmacionPage() {
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

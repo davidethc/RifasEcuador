@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/utils/logger';
 
 /**
  * Ruta de prueba para enviar correos
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🧪 [TEST] Enviando correo de prueba para orden:', orderId);
+    logger.debug('🧪 [TEST] Enviando correo de prueba para orden:', orderId);
 
     // Llamar a la API de envío de correos
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Error en prueba de correo:', error);
+    logger.error('❌ Error en prueba de correo:', error);
     return NextResponse.json(
       {
         success: false,
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🧪 [TEST] Enviando correo de prueba para orden:', orderId);
+    logger.debug('🧪 [TEST] Enviando correo de prueba para orden:', orderId);
 
     // Llamar a la API de envío de correos
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Error en prueba de correo:', error);
+    logger.error('❌ Error en prueba de correo:', error);
     return NextResponse.json(
       {
         success: false,

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { purchaseService, type UserTicket } from '@/services/purchaseService';
+import { logger } from '@/utils/logger';
 
 /**
  * Página de Mis Boletos
@@ -36,7 +37,7 @@ export default function MisBoletosPage() {
         const userTickets = await purchaseService.getUserTickets();
         setTickets(userTickets);
       } catch (err) {
-        console.error('Error al cargar boletos:', err);
+        logger.error('Error al cargar boletos:', err);
         setError('Error al cargar tus boletos. Por favor, intenta nuevamente.');
       } finally {
         setLoading(false);
@@ -84,7 +85,7 @@ export default function MisBoletosPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen" aria-label="Mis boletos">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Header */}
         <div className="text-center mb-10 md:mb-16">
@@ -156,10 +157,11 @@ export default function MisBoletosPage() {
                     <div className="flex-shrink-0 relative w-full lg:w-48 h-48">
                       <Image
                         src={ticket.raffle_image_url}
-                        alt={ticket.raffle_title}
+                        alt={`Imagen del sorteo ${ticket.raffle_title}`}
                         fill
                         className="object-cover rounded-xl"
                         sizes="(max-width: 1024px) 100vw, 192px"
+                        loading="lazy"
                       />
                     </div>
                   )}
@@ -246,6 +248,6 @@ export default function MisBoletosPage() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/utils/logger';
 
 // Cliente de Supabase con service role para bypass de RLS
 const getSupabaseAdmin = () => {
@@ -104,7 +105,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error al calcular boletos vendidos por sorteo:', error);
+    logger.error('Error al calcular boletos vendidos por sorteo:', error);
     return NextResponse.json(
       { 
         success: false, 

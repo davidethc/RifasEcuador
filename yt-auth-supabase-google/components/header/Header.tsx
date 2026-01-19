@@ -113,8 +113,10 @@ export function Header() {
               alt="ALTOKEE"
               width={180}
               height={72}
+              sizes="(max-width: 768px) 140px, 180px"
               className="w-auto h-14 md:h-[4.5rem] object-contain transition-transform duration-300 group-hover:scale-105"
               priority
+              quality={85}
             />
             {/* Texto eliminado en desktop para dar prioridad al logo gráfico más grande */}
             <span className="font-space-grotesk text-2xl font-medium tracking-[0.25em] text-gray-100 uppercase group-hover:text-white transition-colors hidden lg:block">
@@ -129,10 +131,12 @@ export function Header() {
             <Image
               src="/logosrifaweb.png"
               alt="ALTOKEE"
-              width={140}
-              height={56}
+              width={96}
+              height={38}
+              sizes="96px"
               className="w-auto h-11 object-contain"
               priority
+              quality={85}
             />
             <span
               className={`font-space-grotesk text-lg font-medium tracking-[0.2em] text-gray-100 uppercase whitespace-nowrap transition-all duration-300 ${mobileMenuOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}
@@ -143,15 +147,16 @@ export function Header() {
         </div>
 
         {/* Navegación Desktop */}
-        <nav className="hidden sm:flex items-center gap-5 lg:gap-8">
+        <nav className="hidden sm:flex items-center gap-5 lg:gap-8" aria-label="Navegación principal">
           {navLinks.map((item, index) => (
             <Link
               key={index}
               href={item.href}
-              className="text-sm lg:text-base font-dm-sans font-medium text-gray-300 hover:text-white transition-colors relative group py-1 tracking-wide"
+              className="text-sm lg:text-base font-dm-sans font-medium text-gray-300 hover:text-white transition-colors relative group py-1 tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded"
+              aria-label={`Ir a ${item.label}`}
             >
               {item.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#A83EF5] to-[#f02080] group-hover:w-full transition-all duration-300 rounded-full"></span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#A83EF5] to-[#f02080] group-hover:w-full transition-all duration-300 rounded-full" aria-hidden="true"></span>
             </Link>
           ))}
         </nav>
@@ -162,7 +167,8 @@ export function Header() {
             <>
               <Link
                 href="/mis-boletos"
-                className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200 font-dm-sans whitespace-nowrap"
+                className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200 font-dm-sans whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                aria-label="Ver mis boletos"
               >
                 Mis boletos
               </Link>
@@ -176,7 +182,10 @@ export function Header() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 bg-white/5 hover:bg-white/10 border border-white/10"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 bg-white/5 hover:bg-white/10 border border-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  aria-label={`Menú de usuario ${userName ? `para ${userName}` : ''}`}
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="true"
                 >
                   <div className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0 bg-gradient-to-br from-[#A83EF5] to-[#f02080] text-white">
                     {userName?.[0]?.toUpperCase() || "U"}
@@ -222,13 +231,15 @@ export function Header() {
             <>
               <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 font-dm-sans whitespace-nowrap border border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5"
+                className="px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 font-dm-sans whitespace-nowrap border border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                aria-label="Iniciar sesión"
               >
                 Iniciar Sesión
               </Link>
               <button
                 onClick={() => router.push("/comprar/3b1f1182-ce6b-42cb-802c-a1537fe59c0e")}
-                className="px-5 lg:px-6 py-2.5 text-sm font-bold text-slate-900 rounded-full transition-all duration-200 font-dm-sans hover:-translate-y-0.5 whitespace-nowrap shadow-lg shadow-white/10 hover:shadow-white/20 bg-white hover:bg-gray-100"
+                className="px-5 lg:px-6 py-2.5 text-sm font-bold text-slate-900 rounded-full transition-all duration-200 font-dm-sans hover:-translate-y-0.5 whitespace-nowrap shadow-lg shadow-white/10 hover:shadow-white/20 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                aria-label="Participar en el sorteo desde $1.00"
               >
                 <span className="hidden lg:inline">Participar - Desde $1.00</span>
                 <span className="lg:hidden">Participar</span>
@@ -241,7 +252,10 @@ export function Header() {
         <div className="sm:hidden flex-shrink-0">
           <button
             onClick={toggleMobileMenu}
-            className="flex justify-center items-center p-2 rounded-xl transition-all duration-200 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10"
+            className="flex justify-center items-center p-2 rounded-xl transition-all duration-200 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             <motion.svg
               width="24"
@@ -292,14 +306,16 @@ export function Header() {
               top: 'calc(100% + 0.5rem)',
               maxHeight: '80vh',
             }}
+            id="mobile-menu"
           >
-            <nav className="flex flex-col py-2">
+            <nav className="flex flex-col py-2" aria-label="Navegación móvil">
               {navLinks.map((item, index) => (
                 <Link
                   key={index}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-6 py-4 text-sm font-medium transition-all duration-200 relative active:scale-95 text-gray-300 hover:text-white hover:bg-white/5 flex items-center font-dm-sans tracking-wide"
+                  className="px-6 py-4 text-sm font-medium transition-all duration-200 relative active:scale-95 text-gray-300 hover:text-white hover:bg-white/5 flex items-center font-dm-sans tracking-wide focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+                  aria-label={`Ir a ${item.label}`}
                 >
                   <span className="relative z-10">{item.label}</span>
                 </Link>
@@ -309,7 +325,8 @@ export function Header() {
                   <Link
                     href="/mis-boletos"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-6 py-4 text-sm font-medium transition-all duration-200 active:scale-95 text-gray-300 hover:text-white hover:bg-white/5 flex items-center font-dm-sans tracking-wide"
+                    className="px-6 py-4 text-sm font-medium transition-all duration-200 active:scale-95 text-gray-300 hover:text-white hover:bg-white/5 flex items-center font-dm-sans tracking-wide focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+                    aria-label="Ver mis boletos"
                   >
                     Mis boletos
                   </Link>
@@ -345,7 +362,8 @@ export function Header() {
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block w-full px-4 py-3 text-sm font-semibold text-center rounded-xl transition-all duration-200 font-dm-sans border border-white/20 bg-white/5 text-white hover:bg-white/10 active:scale-95 hover:border-white/40"
+                      className="block w-full px-4 py-3 text-sm font-semibold text-center rounded-xl transition-all duration-200 font-dm-sans border border-white/20 bg-white/5 text-white hover:bg-white/10 active:scale-95 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+                      aria-label="Iniciar sesión"
                     >
                       Iniciar Sesión
                     </Link>

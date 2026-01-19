@@ -3,42 +3,72 @@
 @tailwind utilities;
 
 :root {
-  /* Paleta oficial del proyecto - Dark Neon Futuristic */
-  --bg-1: #100235;           /* Deep purple/black-blue - fondo principal */
-  --bg-2: #360254;           /* Dark purple - fondo secundario */
-  --bg-3: #683DF5;           /* Bright purple - acentos */
-  --bg-4: #5A0B5C;           /* Alternative purple */
-  --bg-5: #b92163;           /* Pink/magenta - hero base */
-  
-  /* Text colors */
-  --text-white: #ffffff;     /* Texto principal */
-  --text-light-gray: #e5e7eb; /* Texto secundario */
-  --text-gray: #9ca3af;      /* Texto cuerpo */
-  --text-gold: #FFB200;      /* CTA y destacados */
-  
-  /* Accent colors */
-  --accent-purple: #A83EF5;  /* Neon purple */
-  --accent-pink: #f02080;    /* Controlled pink/fuchsia */
-  --accent-gold: #FFB200;    /* Gold/yellow CTA */
-  
-  /* Button gradients */
+  /* ===========================================
+     SISTEMA DE DISEÑO UNIFICADO - VENDER BOLETOS
+     =========================================== */
+
+  /* Colores Primarios (CTAs y acciones principales) */
+  --primary-gold: #FFB200;      /* Botón principal: Comprar Boletos */
+  --primary-purple: #A83EF5;    /* Acentos, links importantes */
+  --primary-pink: #f02080;      /* Acentos secundarios */
+  --primary-gold-hover: #F59E0B; /* Hover del botón principal */
+  --primary-purple-hover: #683DF5; /* Hover del botón secundario */
+
+  /* Colores de Fondo */
+  --bg-primary: #100235;        /* Fondo principal oscuro */
+  --bg-secondary: #1A1525;      /* Cards, containers */
+  --bg-elevated: #2A1F3D;       /* Elementos elevados */
+  --bg-input: #2A1F3D;          /* Fondo de inputs - más claro para resaltar */
+  --bg-input-focus: #2F2540;    /* Fondo de inputs en focus - aún más claro */
+  --bg-overlay: rgba(16, 2, 53, 0.95); /* Overlays, modales */
+
+  /* Colores de Texto */
+  --text-primary: #FFFFFF;      /* Texto principal */
+  --text-secondary: #E5E7EB;    /* Texto secundario */
+  --text-muted: #9CA3AF;        /* Texto deshabilitado/helper */
+  --text-accent: #FFB200;       /* Precios, números importantes */
+
+  /* Estados */
+  --success: #22C55E;
+  --error: #EF4444;
+  --warning: #F59E0B;
+
+  /* Bordes */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-purple: rgba(168, 62, 245, 0.4); /* Más visible para inputs */
+  --border-purple-focus: rgba(168, 62, 245, 0.6);
+  --border-gold: rgba(255, 178, 0, 0.3);
+
+  /* Sombras y Glows (sutiles, no excesivos) */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glow-purple: 0 0 16px rgba(168, 62, 245, 0.3);
+  --glow-gold: 0 0 20px rgba(255, 178, 0, 0.4);
+
+  /* Espaciado Consistente */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Legacy (mantener para compatibilidad temporal) */
+  --bg-1: #100235;
+  --bg-2: #360254;
+  --text-white: #ffffff;
+  --text-light-gray: #e5e7eb;
+  --text-gray: #9ca3af;
+  --text-gold: #FFB200;
+  --accent-purple: #A83EF5;
+  --accent-pink: #f02080;
+  --accent-gold: #FFB200;
   --btn-gradient-start: #ffb200;
   --btn-gradient-end: #f02080;
   --btn-purple: #A83EF5;
-  
-  /* Component colors */
-  --comp-purple: #A83EF5;
-  --comp-orange: #EC6624;
-  --comp-blue: #128ECE;
-  
-  /* Background system */
   --background: #100235;
   --foreground: #ffffff;
-  
-  /* Neon glow intensities */
-  --glow-soft: 0.3;
-  --glow-medium: 0.5;
-  --glow-strong: 0.7;
 }
 
 body {
@@ -198,6 +228,70 @@ html {
 
 .animate-spin-slow {
   animation: spin-slow 20s linear infinite;
+}
+
+/* Tipografía exacta del template Bootstrap */
+.josefin-sans-700 {
+  font-family: var(--font-josefin), "Josefin Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.josefin-sans-regular {
+  font-family: "Josefin Sans", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Tamaños exactos display-2 del template Bootstrap */
+.display-2-hero {
+  font-size: 2rem; /* Mobile por defecto */
+  line-height: 1.2;
+}
+
+@media (min-width: 992px) {
+  .display-2-hero {
+    font-size: 3rem !important;
+  }
+}
+
+@media (min-width: 1366px) {
+  .display-2-hero {
+    font-size: 4.5rem !important;
+  }
+}
+
+/* Clase t1 para texto amarillo con sombra */
+.t1 {
+  color: #FFB200 !important;
+  text-shadow: 
+    0 0 10px rgba(255, 178, 0, 0.5),
+    0 0 20px rgba(255, 178, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Estilos del botón b1 */
+.btn.b1, a.b1 {
+  color: #fff !important;
+  background: linear-gradient(135deg, #ffb200 0%, #f02080 100%) !important;
+  font-weight: 700;
+  border: none !important;
+  box-shadow: 
+    0 4px 16px rgba(255, 178, 0, 0.3),
+    0 0 12px rgba(240, 32, 128, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn.b1:hover, a.b1:hover {
+  background: linear-gradient(135deg, #f02080 0%, #ffb200 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(255, 178, 0, 0.4),
+    0 0 20px rgba(240, 32, 128, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 /* Sparkles / Diamonds */
@@ -494,72 +588,94 @@ html {
   border-color: rgba(236, 102, 36, 0.5) !important;
 }
 
-/* Botones con gradiente oficial */
-.btn-gradient-gold-pink {
-  background: linear-gradient(135deg, #ffb200 0%, #f02080 100%);
-  color: #ffffff;
-  transition: all 0.3s ease;
-}
+/* ===========================================
+   BOTONES UNIFICADOS - SISTEMA DE DISEÑO
+   =========================================== */
 
-.btn-gradient-gold-pink:hover {
-  background: linear-gradient(135deg, #f02080 0%, #ffb200 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(240, 32, 128, 0.4);
-}
-
-.btn-purple {
-  background: #A83EF5;
-  color: #ffffff;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(168, 62, 245, 0.3);
-}
-
-.btn-purple:hover {
-  background: #683DF5;
-  transform: translateY(-2px);
-  box-shadow: 
-    0 8px 20px rgba(168, 62, 245, 0.4),
-    0 0 16px rgba(168, 62, 245, 0.3);
-}
-
-/* Premium CTA buttons - Gold with glow */
-.btn-cta-primary {
-  background: linear-gradient(135deg, #ffb200 0%, #f02080 100%);
-  color: #ffffff;
+/* Botón Primario (CTA Principal) - Comprar Boletos */
+.btn-primary {
+  background: var(--primary-gold);
+  color: #1A1A1A;
   font-weight: 700;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 4px 16px rgba(255, 178, 0, 0.3),
-    0 0 12px rgba(240, 32, 128, 0.2);
   border: none;
+  min-height: 48px; /* Accesibilidad móvil */
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--primary-gold-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-gold);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Botón Secundario */
+.btn-secondary {
+  background: var(--primary-purple);
+  color: var(--text-primary);
+  font-weight: 600;
+  border: 1px solid var(--border-purple);
+  min-height: 48px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--primary-purple-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-purple);
+}
+
+/* Botón Terciario/Ghost */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border: 1px solid var(--border-subtle);
+  min-height: 48px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-purple);
+  color: var(--text-primary);
+}
+
+/* Legacy (mantener para compatibilidad temporal) */
+.btn-cta-primary {
+  background: var(--primary-gold);
+  color: #1A1A1A;
+  font-weight: 700;
+  border: none;
+  min-height: 48px;
+  transition: all 0.2s ease;
 }
 
 .btn-cta-primary:hover {
-  background: linear-gradient(135deg, #f02080 0%, #ffb200 100%);
-  transform: translateY(-3px);
-  box-shadow: 
-    0 8px 24px rgba(255, 178, 0, 0.4),
-    0 0 20px rgba(240, 32, 128, 0.3);
+  background: var(--primary-gold-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-gold);
 }
 
-/* Secondary neon purple button */
 .btn-cta-secondary {
-  background: #A83EF5;
-  color: #ffffff;
+  background: var(--primary-purple);
+  color: var(--text-primary);
   font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 4px 16px rgba(168, 62, 245, 0.3),
-    0 0 12px rgba(168, 62, 245, 0.2);
-  border: 1px solid rgba(168, 62, 245, 0.4);
+  border: 1px solid var(--border-purple);
+  min-height: 48px;
+  transition: all 0.2s ease;
 }
 
 .btn-cta-secondary:hover {
-  background: #683DF5;
-  transform: translateY(-3px);
-  box-shadow: 
-    0 8px 24px rgba(168, 62, 245, 0.4),
-    0 0 20px rgba(104, 61, 245, 0.3);
+  background: var(--primary-purple-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-purple);
 }
 
 /* Neutral dark button */
@@ -591,6 +707,327 @@ html {
 .scroll-reveal {
   animation: fadeInUp 0.6s ease-out forwards;
   opacity: 0;
+}
+
+/* ===========================================
+   EFECTOS GALÁCTICOS PARA PREMIOS
+   =========================================== */
+
+/* Animación de partículas flotantes */
+@keyframes particle-float {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px) rotate(360deg) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Animación de estrellas titilantes */
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* Animación de brillo galáctico pulsante */
+@keyframes galactic-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 30px rgba(168, 62, 245, 0.4),
+      0 0 60px rgba(168, 62, 245, 0.2),
+      0 0 90px rgba(240, 32, 128, 0.1),
+      inset 0 0 30px rgba(168, 62, 245, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 50px rgba(168, 62, 245, 0.6),
+      0 0 100px rgba(168, 62, 245, 0.4),
+      0 0 150px rgba(240, 32, 128, 0.3),
+      inset 0 0 50px rgba(168, 62, 245, 0.2);
+  }
+}
+
+/* Animación de anillo orbital */
+@keyframes orbital-rotate {
+  0% {
+    transform: rotate(0deg) translateX(150px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(150px) rotate(-360deg);
+  }
+}
+
+@keyframes orbital-rotate-reverse {
+  0% {
+    transform: rotate(0deg) translateX(120px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg) translateX(120px) rotate(360deg);
+  }
+}
+
+/* Animación de ondas galácticas */
+@keyframes galactic-wave {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+/* Animación de estrellas que caen */
+@keyframes star-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Animación de brillo rotatorio */
+@keyframes rotate-glow {
+  0% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Animación de pulso neón */
+@keyframes neon-pulse {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px rgba(168, 62, 245, 0.8),
+      0 0 20px rgba(168, 62, 245, 0.6),
+      0 0 30px rgba(240, 32, 128, 0.4);
+  }
+  50% {
+    text-shadow: 
+      0 0 20px rgba(168, 62, 245, 1),
+      0 0 40px rgba(168, 62, 245, 0.8),
+      0 0 60px rgba(240, 32, 128, 0.6);
+  }
+}
+
+/* Animación de brillo que se mueve */
+@keyframes shine-sweep {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Animación de partículas que explotan */
+@keyframes particle-explode {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Contenedor galáctico */
+.galactic-container {
+  position: relative;
+  overflow: visible;
+  will-change: transform; /* Optimización de rendimiento */
+}
+
+/* Ondas galácticas */
+.galactic-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid;
+  border-image: linear-gradient(45deg, rgba(168, 62, 245, 0.4), rgba(240, 32, 128, 0.4), rgba(255, 178, 0, 0.3)) 1;
+  animation: galactic-wave 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Estrellas que caen */
+.galactic-falling-star {
+  position: absolute;
+  width: 2px;
+  height: 30px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
+  box-shadow: 0 0 10px rgba(168, 62, 245, 0.8);
+  animation: star-fall 8s linear infinite;
+  pointer-events: none;
+}
+
+/* Brillo rotatorio */
+.galactic-rotating-glow {
+  position: absolute;
+  inset: -50px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(168, 62, 245, 0.3) 90deg,
+    rgba(240, 32, 128, 0.3) 180deg,
+    rgba(255, 178, 0, 0.2) 270deg,
+    transparent 360deg
+  );
+  border-radius: 50%;
+  animation: rotate-glow 10s linear infinite;
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Partícula que explota */
+.galactic-explosion {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(168, 62, 245, 1), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(168, 62, 245, 0.8);
+  animation: particle-explode 2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Efecto de brillo galáctico */
+.galactic-glow {
+  animation: galactic-pulse 3s ease-in-out infinite;
+  position: relative;
+}
+
+.galactic-glow::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 62, 245, 0.3) 0%, transparent 70%);
+  filter: blur(30px);
+  z-index: -1;
+  animation: galactic-pulse 3s ease-in-out infinite;
+}
+
+.galactic-glow::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 32, 128, 0.2) 0%, transparent 70%);
+  filter: blur(40px);
+  z-index: -2;
+  animation: galactic-pulse 4s ease-in-out infinite reverse;
+}
+
+/* Partículas flotantes - Optimizadas */
+.galactic-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(168, 62, 245, 0.8), 0 0 20px rgba(240, 32, 128, 0.6);
+  animation: particle-float 15s linear infinite;
+  will-change: transform, opacity; /* Optimización */
+  transform: translateZ(0); /* Aceleración GPU */
+}
+
+/* Estrellas alrededor - Optimizadas */
+.galactic-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(168, 62, 245, 1);
+  animation: star-twinkle 2s ease-in-out infinite;
+  will-change: transform, opacity; /* Optimización */
+  transform: translateZ(0); /* Aceleración GPU */
+}
+
+/* Anillos orbitales - Optimizados */
+.galactic-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(0);
+  width: 300px;
+  height: 300px;
+  border: 2px solid;
+  border-image: linear-gradient(45deg, rgba(168, 62, 245, 0.3), rgba(240, 32, 128, 0.3), rgba(255, 178, 0, 0.3)) 1;
+  border-radius: 50%;
+  animation: orbital-rotate 20s linear infinite;
+  pointer-events: none;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.galactic-orbit::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(168, 62, 245, 1), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(168, 62, 245, 0.8);
+  transform: translateX(-50%);
+}
+
+.galactic-orbit-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  height: 240px;
+  border: 1px solid;
+  border-image: linear-gradient(45deg, rgba(240, 32, 128, 0.2), rgba(168, 62, 245, 0.2)) 1;
+  border-radius: 50%;
+  animation: orbital-rotate-reverse 15s linear infinite;
+}
+
+.galactic-orbit-inner::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(240, 32, 128, 1), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(240, 32, 128, 0.8);
 }
 
 /* Smooth transitions for all interactive elements */

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 interface CarouselImage {
   src: string;
   alt?: string;
+  isGif?: boolean;
 }
 
 interface HeroCarouselProps {
@@ -59,20 +60,36 @@ export function HeroCarousel({
     <div className={cn("relative w-full", className)}>
       <AspectRatio ratio={ratio} className={cn("rounded-3xl overflow-hidden relative", !transparent && "shadow-2xl")}>
         <div className={cn("relative w-full h-full", !transparent && "bg-white dark:bg-legacy-purple-deep")}>
-          {validImages.map((image, idx) => (
-            <div
-              key={`${image.src}-${idx}`}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"}`}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt ?? `Imagen ${idx + 1}`}
-                fill
-                className={cn(objectFit || (transparent ? "object-contain" : "object-cover"))}
-                priority={idx === 0}
-              />
-            </div>
-          ))}
+          {validImages.map((image, idx) => {
+            const isGif = image.isGif || image.src.toLowerCase().endsWith('.gif');
+            return (
+              <div
+                key={`${image.src}-${idx}`}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"}`}
+              >
+                {isGif ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={image.src}
+                    alt={image.alt ?? `Imagen ${idx + 1}`}
+                    className={cn("w-full h-full", objectFit || (transparent ? "object-contain" : "object-cover"))}
+                    style={{ display: 'block' }}
+                  />
+                ) : (
+                  <Image
+                    src={image.src}
+                    alt={image.alt ?? `Imagen ${idx + 1}`}
+                    fill
+                    sizes="100vw"
+                    className={cn(objectFit || (transparent ? "object-contain" : "object-cover"))}
+                    priority={idx === 0}
+                    quality={idx === 0 ? 90 : 75}
+                    loading={idx === 0 ? undefined : "lazy"}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Controles manuales - Flechas izquierda/derecha */}

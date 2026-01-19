@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { PayphoneTransactionResponse, PayphoneErrorResponse } from '@/types/payphone.types';
 import axios, { AxiosError } from 'axios';
+import { logger } from '@/utils/logger';
 
 /**
  * API Route para consultar el estado de una transacción de Payphone
@@ -24,13 +25,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Consultando estado de transacción:', transactionId);
+    logger.debug('🔍 Consultando estado de transacción:', transactionId);
 
     // Validar configuración
     const token = process.env.NEXT_PUBLIC_PAYPHONE_TOKEN;
 
     if (!token) {
-      console.error('❌ Token de Payphone no configurado');
+      logger.error('❌ Token de Payphone no configurado');
       return NextResponse.json(
         {
           success: false,
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
 
       const data = response.data;
 
-      console.log('✅ Estado obtenido:', {
+      logger.debug('✅ Estado obtenido:', {
         transactionId: data.transactionId,
         status: data.transactionStatus,
         statusCode: data.statusCode,
@@ -67,11 +68,11 @@ export async function GET(request: NextRequest) {
 
     } catch (axiosError) {
       const error = axiosError as AxiosError<PayphoneErrorResponse>;
-      console.error('❌ Error de axios al consultar estado:', error.message);
+      logger.error('❌ Error de axios al consultar estado:', error.message);
       
       if (error.response) {
         const errorData = error.response.data;
-        console.error('❌ Error HTTP de Payphone:', error.response.status, errorData);
+        logger.error('❌ Error HTTP de Payphone:', error.response.status, errorData);
         
         return NextResponse.json(
           {
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Error general al consultar estado:', error);
+    logger.error('❌ Error general al consultar estado:', error);
     return NextResponse.json(
       {
         success: false,

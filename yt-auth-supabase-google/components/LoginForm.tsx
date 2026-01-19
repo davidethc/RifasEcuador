@@ -47,7 +47,7 @@ export function LoginForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-6" aria-label={isSignUp ? "Formulario de registro" : "Formulario de inicio de sesión"}>
         <div className="space-y-6">
           <MaterialInput
             id="email"

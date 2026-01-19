@@ -31,9 +31,9 @@ export function VideoModal({ videoSrc, isOpen, onClose }: VideoModalProps) {
 
   if (!isOpen) return null;
 
-  // URL del video por defecto (puedes cambiarla o usar una URL externa)
-  // Si no hay videoSrc, usa una URL de ejemplo o deja vacío
-  const defaultVideoSrc = videoSrc || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+  // URL del video por defecto - Video promocional del sorteo (naturaleza/pájaros)
+  // Si no hay videoSrc, usa el video local del proyecto
+  const defaultVideoSrc = videoSrc || '/bg.mp4';
 
   return (
     <div
@@ -74,6 +74,8 @@ export function VideoModal({ videoSrc, isOpen, onClose }: VideoModalProps) {
             className="w-full rounded"
             controls
             autoPlay
+            preload="metadata"
+            playsInline
             style={{ maxHeight: '80vh' }}
           >
             <source src={defaultVideoSrc} type="video/mp4" />

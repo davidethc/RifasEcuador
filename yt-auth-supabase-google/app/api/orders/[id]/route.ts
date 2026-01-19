@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/utils/logger';
 
 // Cliente de Supabase con service role para bypass de RLS
 const getSupabaseAdmin = () => {
@@ -30,7 +31,7 @@ export async function GET(
     const supabase = getSupabaseAdmin();
     const { id: orderId } = await params;
 
-    console.log('📥 Solicitando orden:', orderId);
+    logger.debug('📥 Solicitando orden:', orderId);
 
     // Validar formato de UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -63,7 +64,7 @@ export async function GET(
       .single();
 
     if (error) {
-      console.error('❌ Error al obtener orden:', error);
+      logger.error('❌ Error al obtener orden:', error);
       return NextResponse.json(
         { error: 'Orden no encontrada', details: error },
         { status: 404 }
@@ -77,14 +78,14 @@ export async function GET(
       );
     }
 
-    console.log('✅ Orden encontrada:', data.id);
+    logger.debug('✅ Orden encontrada:', data.id);
 
     return NextResponse.json({
       success: true,
       data: data
     });
   } catch (error) {
-    console.error('❌ Error inesperado al obtener orden:', error);
+    logger.error('❌ Error inesperado al obtener orden:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

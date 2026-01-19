@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { logger } from './logger';
 
 let supabaseInstance: SupabaseClient | null = null;
 
@@ -51,7 +52,7 @@ const getSupabaseClient = (): SupabaseClient => {
       },
     });
   } catch (error) {
-    console.error('Error creating Supabase client:', error);
+    logger.error('Error creating Supabase client:', error);
     throw error;
   }
 
@@ -71,7 +72,7 @@ export const supabase = new Proxy({} as SupabaseClient, {
       return value;
     } catch (error) {
       // En caso de error, loguear y re-lanzar
-      console.error('Error accessing Supabase property:', prop, error);
+      logger.error('Error accessing Supabase property:', prop, error);
       throw error;
     }
   },

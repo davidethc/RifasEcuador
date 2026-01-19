@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { purchaseService } from '@/services/purchaseService';
 import type { PurchaseFormData } from '@/types/purchase.types';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook personalizado para manejar el estado del proceso de compra
@@ -65,7 +66,7 @@ export function usePurchase(raffleId: string) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
         setError(errorMessage);
-        console.error('Error al crear compra:', err);
+        logger.error('Error al crear compra:', err);
         return null;
       } finally {
         setIsLoading(false);

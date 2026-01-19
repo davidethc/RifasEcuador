@@ -3,18 +3,22 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  console.log('AuthCallback: Processing callback');
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const next = requestUrl.searchParams.get('next');
 
   if (code) {
-    console.log('AuthCallback: Exchanging code for session');
     const supabase = createRouteHandlerClient({ cookies });
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (error) {
-      console.error('AuthCallback: Error:', error);
+      // ⚠️ ATENCIÓN: Usar logger en lugar de console.error para consistencia con el resto del proyecto
+      // Solo loguear errores en desarrollo
+      // TODO: Reemplazar console.error con logger.error
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('AuthCallback: Error:', error);
+      }
       return NextResponse.redirect(new URL('/login?error=auth-failed', requestUrl.origin));
     }
 
@@ -31,7 +35,10 @@ export async function GET(request: Request) {
           { onConflict: 'id' }
         );
 
-      if (profileError) {
+      // ⚠️ ATENCIÓN: Usar logger en lugar de console.error para consistencia con el resto del proyecto
+      // TODO: Reemplazar console.error con logger.error
+      if (profileError && process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
         console.error('Profile creation error:', profileError);
       }
     }
