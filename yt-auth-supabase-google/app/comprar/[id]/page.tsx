@@ -775,21 +775,21 @@ export default function ComprarPage() {
          <VideoModal
             isOpen={isPremioVideoModalOpen}
             onClose={() => setIsPremioVideoModalOpen(false)}
-            videoSrc="/carrro.mp4"
+            youtubeUrl="https://www.youtube.com/watch?v=Am1abV7Ckb8"
          />
 
          {/* Modal de Video del Segundo Premio */}
          <VideoModal
             isOpen={isPremio2VideoModalOpen}
             onClose={() => setIsPremio2VideoModalOpen(false)}
-            videoSrc="/prenio.mp4"
+            youtubeUrl="https://www.youtube.com/watch?v=wpz5ODAjia0"
          />
 
          {/* Modal de Video del Tercer Premio */}
          <VideoModal
             isOpen={isPremio3VideoModalOpen}
             onClose={() => setIsPremio3VideoModalOpen(false)}
-            videoSrc="/premioo.mp4"
+            youtubeUrl="https://www.youtube.com/watch?v=uWmuNMR3QQM"
          />
       </main>
    );

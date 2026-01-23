@@ -4,11 +4,32 @@ import { useEffect } from 'react';
 
 interface VideoModalProps {
   videoSrc?: string;
+  youtubeUrl?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function VideoModal({ videoSrc, isOpen, onClose }: VideoModalProps) {
+// Función para extraer el ID del video de YouTube desde una URL
+function getYouTubeVideoId(url: string): string | null {
+  if (!url) return null;
+  
+  // Patrones comunes de URLs de YouTube
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /youtube\.com\/.*[?&]v=([^&\n?#]+)/
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  
+  return null;
+}
+
+export function VideoModal({ videoSrc, youtubeUrl, isOpen, onClose }: VideoModalProps) {
   // Cerrar con ESC
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -31,6 +52,10 @@ export function VideoModal({ videoSrc, isOpen, onClose }: VideoModalProps) {
 
   if (!isOpen) return null;
 
+  // Determinar si es un video de YouTube
+  const youtubeId = youtubeUrl ? getYouTubeVideoId(youtubeUrl) : null;
+  const isYouTube = !!youtubeId;
+
   // URL del video por defecto - Video promocional del sorteo (naturaleza/pájaros)
   // Si no hay videoSrc, usa el video local del proyecto
   const defaultVideoSrc = videoSrc || '/bg.mp4';
@@ -46,14 +71,19 @@ export function VideoModal({ videoSrc, isOpen, onClose }: VideoModalProps) {
         onClick={(e) => e.stopPropagation()}
         style={{
           background: '#360254',
-          color: '#fff'
+          color: '#fff',
+          border: '2px solid rgba(168, 62, 245, 0.3)'
         }}
       >
         {/* Botón cerrar */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:bg-white/20"
-          style={{ color: '#fff' }}
+          style={{ 
+            color: '#fff',
+            background: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)'
+          }}
           aria-label="Cerrar video"
         >
           <svg
@@ -68,19 +98,32 @@ export function VideoModal({ videoSrc, isOpen, onClose }: VideoModalProps) {
           </svg>
         </button>
 
-        {/* Video */}
+        {/* Video - YouTube o local */}
         <div className="p-4">
-          <video
-            className="w-full rounded"
-            controls
-            autoPlay
-            preload="metadata"
-            playsInline
-            style={{ maxHeight: '80vh' }}
-          >
-            <source src={defaultVideoSrc} type="video/mp4" />
-            Tu navegador no soporta el elemento de video.
-          </video>
+          {isYouTube ? (
+            <div className="relative w-full" style={{ aspectRatio: '16/9', maxHeight: '80vh' }}>
+              <iframe
+                className="w-full h-full rounded"
+                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                title="Video de YouTube"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ border: 'none' }}
+              />
+            </div>
+          ) : (
+            <video
+              className="w-full rounded"
+              controls
+              autoPlay
+              preload="metadata"
+              playsInline
+              style={{ maxHeight: '80vh' }}
+            >
+              <source src={defaultVideoSrc} type="video/mp4" />
+              Tu navegador no soporta el elemento de video.
+            </video>
+          )}
         </div>
       </div>
     </div>
