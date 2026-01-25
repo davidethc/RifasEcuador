@@ -168,19 +168,58 @@ export default function ComprarPage() {
                      </p>
 
                      <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
-                        <a href="#buy-section" className="px-6 md:px-8 py-3 md:py-4 rounded-xl text-base md:text-lg lg:text-xl font-bold uppercase hover:scale-105 transition-transform shadow-xl relative overflow-hidden" style={{ background: 'linear-gradient(0deg, #ffb200 0%, #f02080 100%)', color: '#fff' }}>
-                           PARTICIPA AHORA 1$
-                        </a>
-                        <button 
-                           onClick={() => setIsVideoModalOpen(true)}
-                           aria-label="Ver video explicativo"
-                           className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full hover:scale-110 transition-all shadow-xl flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" 
-                           style={{ background: '#A83EF5', color: '#fff' }}
+                        <a
+                           href="#buy-section"
+                           aria-label="Participa ahora desde $1"
+                           className="group px-6 md:px-8 py-3 md:py-4 rounded-xl text-base md:text-lg lg:text-xl font-bold uppercase hover:scale-105 transition-transform shadow-xl relative overflow-hidden inline-flex flex-col items-center sm:items-start"
+                           style={{ background: 'linear-gradient(0deg, #ffb200 0%, #f02080 100%)', color: '#fff' }}
                         >
-                           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 md:h-7 md:w-7" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                           </svg>
-                        </button>
+                           {/* Brillo sutil al hover (no cambia el diseño base) */}
+                           <span
+                              className="pointer-events-none absolute -inset-x-10 -top-10 h-24 rotate-12 opacity-0 group-hover:opacity-20 transition-opacity"
+                              style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)' }}
+                              aria-hidden="true"
+                           />
+
+                           <span className="flex items-center gap-3 leading-none font-[var(--font-comfortaa)] tracking-wide">
+                              <span>Participa ahora</span>
+                              <span
+                                 className="inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-sm md:text-base font-extrabold text-[#1A1A1A] shadow-sm"
+                                 style={{ boxShadow: '0 6px 18px rgba(0,0,0,0.2)' }}
+                              >
+                                 <span className="mr-1 text-xs md:text-sm font-bold opacity-80">$</span>
+                                 <span className="text-lg md:text-xl">1</span>
+                              </span>
+                           </span>
+                           <span className="mt-1 text-[11px] md:text-xs font-[var(--font-dm-sans)] text-white/90 normal-case">
+                              Compra segura · Números al instante
+                           </span>
+                        </a>
+                        {/* Botón play con señal UX sutil (sin cambiar diseño) */}
+                        <div className="flex flex-col items-center">
+                           <button 
+                              onClick={() => setIsVideoModalOpen(true)}
+                              aria-label="Ver video explicativo"
+                              className="relative w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full hover:scale-110 transition-all shadow-xl flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" 
+                              style={{ background: '#A83EF5', color: '#fff' }}
+                           >
+                              {/* Halo animado sutil para indicar interacción */}
+                              <span
+                                 className="absolute inset-0 rounded-full opacity-25 animate-ping pointer-events-none"
+                                 style={{ background: '#A83EF5' }}
+                                 aria-hidden="true"
+                              />
+                              <svg xmlns="http://www.w3.org/2000/svg" className="relative h-6 w-6 md:h-7 md:w-7" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                              </svg>
+                           </button>
+                           <span className="mt-2 text-xs font-semibold tracking-wide font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+                              Ver video
+                           </span>
+                           <span className="text-[11px] font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                              PREMIOS 
+                           </span>
+                        </div>
                      </div>
                   </div>
 
@@ -324,7 +363,7 @@ export default function ComprarPage() {
                   background: 'radial-gradient(circle, rgba(240, 32, 128, 0.3) 0%, transparent 70%)'
                }}></div>
             </div>
-            <div className="container mx-auto px-4 relative" style={{ zIndex: 1 }}>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
                <div className="text-center mb-12">
                   <h2 id="buy-section-heading" className="text-3xl md:text-5xl font-bold mb-4" style={{ color: '#F9FAFB', fontWeight: 700 }}>
                      Elige tu(s) número(s)
@@ -357,20 +396,20 @@ export default function ComprarPage() {
                   />
                </div>
 
-               {/* Payment Form (Only shown if numbers selected) - Usa todo el ancho disponible */}
+               {/* Payment Form (Only shown if numbers selected) - Layout optimizado con mejor uso del espacio */}
                {quantity > 0 && (
-                  <div id="payment-form" className="mt-8 md:mt-12 max-w-7xl mx-auto">
-                     <div className="rounded-2xl p-4 md:p-6 lg:p-8 border" style={{ 
+                  <div id="payment-form" className="mt-6 md:mt-8 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+                     <div className="rounded-xl p-4 md:p-5 lg:p-6 border w-full overflow-hidden" style={{ 
                        background: 'var(--bg-secondary)',
                        borderColor: 'var(--border-subtle)',
                        boxShadow: 'var(--shadow-lg)'
                      }}>
-                        {/* Header simplificado */}
-                        <div className="text-center mb-6 md:mb-8 pb-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
-                           <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2 font-[var(--font-comfortaa)]" style={{ color: 'var(--text-primary)' }}>
+                        {/* Header compacto */}
+                        <div className="text-center mb-4 md:mb-5 pb-3 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                           <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-1 font-[var(--font-comfortaa)]" style={{ color: 'var(--text-primary)' }}>
                               Completa tu compra
                            </h3>
-                           <p className="text-sm md:text-base font-[var(--font-dm-sans)]" style={{ color: 'var(--text-secondary)' }}>
+                           <p className="text-xs md:text-sm font-[var(--font-dm-sans)]" style={{ color: 'var(--text-secondary)' }}>
                               Ingresa tus datos para continuar
                            </p>
                         </div>
@@ -474,16 +513,18 @@ export default function ComprarPage() {
                                  </button>
                               </div>
                               <div className="p-5" style={{ background: 'rgba(15, 17, 23, 0.8)' }}>
-                                 <p className="font-bold text-lg" style={{ color: '#FFB200' }}>KIA RIO HATCHBACK</p>
-                                 <p className="text-sm mt-2 leading-relaxed" style={{ color: '#9CA3AF' }}>
-                                    <strong className="text-white">Tipo:</strong> Hatchback compacto<br/>
-                                    <strong className="text-white">Motor:</strong> 1.4L / 4 cilindros (según versión)<br/>
-                                    <strong className="text-white">Potencia:</strong> 100–107 HP aprox.<br/>
-                                    <strong className="text-white">Transmisión:</strong> Manual o automática<br/>
-                                    <strong className="text-white">Consumo:</strong> 15–18 km/L aprox.<br/>
-                                    <strong className="text-white">Capacidad:</strong> 5 pasajeros<br/>
-                                    <strong className="text-white">Uso ideal:</strong> Ciudad / diario / familiar<br/>
-                                    <strong className="text-white">Puntos fuertes:</strong> Rendimiento, espacio, mantenimiento económico
+                                 <p className="font-bold text-xl" style={{ color: '#FFB200', textShadow: '0 2px 10px rgba(255, 178, 0, 0.25)' }}>
+                                    KIA RIO HATCHBACK
+                                 </p>
+                                 <p className="text-base md:text-lg mt-3 leading-relaxed" style={{ color: '#D1D5DB' }}>
+                                    <strong style={{ color: '#F2C94C' }}>Tipo:</strong> Hatchback compacto<br/>
+                                    <strong style={{ color: '#F2C94C' }}>Motor:</strong> 1.4L / 4 cilindros<br/>
+                                    <strong style={{ color: '#F2C94C' }}>Potencia:</strong> 100–107 HP aprox.<br/>
+                                    <strong style={{ color: '#F2C94C' }}>Transmisión:</strong> Manual o automática<br/>
+                                    <strong style={{ color: '#F2C94C' }}>Consumo:</strong> 15–18 km/L aprox.<br/>
+                                    <strong style={{ color: '#F2C94C' }}>Capacidad:</strong> 5 pasajeros<br/>
+                                    <strong style={{ color: '#F2C94C' }}>Uso ideal:</strong> Ciudad / diario / familiar<br/>
+                                    <strong style={{ color: '#F2C94C' }}>Puntos fuertes:</strong> Rendimiento, espacio, mantenimiento económico
                                  </p>
                               </div>
                            </div>
@@ -491,7 +532,7 @@ export default function ComprarPage() {
 
                         {/* 2do y 3er PREMIO - Secundarios, más pequeños */}
                         <div className="space-y-6">
-                           {/* Prize 2 */}
+                           {/* Prize 2 (Yamaha MT-07) */}
                            <div className="relative group">
                               <div className="rounded-lg overflow-hidden border transition-all" style={{ 
                                  background: 'rgba(28, 32, 58, 0.5)',
@@ -506,8 +547,8 @@ export default function ComprarPage() {
                                  </div>
                                  <div className="aspect-[4/3] relative group/prize">
                                     <Image 
-                                       src="/cst.jpg" 
-                                       alt="CFMoto 300SR" 
+                                       src="/yamaha01.jpg" 
+                                       alt="Yamaha MT-07" 
                                        fill 
                                        sizes="(max-width: 768px) 100vw, 33vw"
                                        className="object-cover transition-transform duration-500" 
@@ -538,24 +579,26 @@ export default function ComprarPage() {
                                        </div>
                                     </button>
                                  </div>
-                                 <div className="p-4" style={{ background: 'rgba(15, 17, 23, 0.7)' }}>
-                                    <p className="font-semibold text-sm mb-2" style={{ color: '#E5E7EB' }}>CFMOTO 300SR</p>
-                                    <p className="text-xs leading-relaxed" style={{ color: '#9CA3AF' }}>
-                                       <strong className="text-white">Tipo:</strong> Moto deportiva carenada (sport)<br/>
-                                       <strong className="text-white">Motor:</strong> 292cc / 1 cilindro<br/>
-                                       <strong className="text-white">Potencia:</strong> 29–34 HP (según mercado)<br/>
-                                       <strong className="text-white">Inyección:</strong> EFI<br/>
-                                       <strong className="text-white">Transmisión:</strong> 6 velocidades<br/>
-                                       <strong className="text-white">Frenos:</strong> Disco delantero + Disco trasero con ABS<br/>
-                                       <strong className="text-white">Suspensión:</strong> KYB delantera + monoshock<br/>
-                                       <strong className="text-white">Uso ideal:</strong> Ciudad / carretera / estilo racing<br/>
-                                       <strong className="text-white">Puntos fuertes:</strong> Diseño agresivo, manejo deportivo, buena relación costo–prestaciones
+                                 <div className="p-4" style={{ background: 'rgba(15, 17, 23, 0.75)' }}>
+                                    <p className="font-bold text-lg md:text-xl mb-2" style={{ color: '#FFB200', textShadow: '0 2px 10px rgba(255, 178, 0, 0.18)' }}>
+                                       YAMAHA MT-07
+                                    </p>
+                                    <p className="text-sm md:text-base leading-relaxed" style={{ color: '#D1D5DB' }}>
+                                       <strong style={{ color: '#F2C94C' }}>Tipo:</strong> Moto Naked media cilindrada<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Motor:</strong> 689cc / 2 cilindros<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Potencia:</strong> 73–75 HP aprox.<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Par motor:</strong> 68 Nm<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Transmisión:</strong> 6 velocidades<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Frenos:</strong> Doble disco delantero + disco trasero <br/>
+                                       <strong style={{ color: '#F2C94C' }}>Peso:</strong> 179–182 kg<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Uso ideal:</strong> Ciudad / curvas / viajes<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Puntos fuertes:</strong> Par motor fuerte, ligereza, muy divertida de manejar
                                     </p>
                                  </div>
                               </div>
                            </div>
 
-                           {/* Prize 3 */}
+                           {/* Prize 3 (CFMOTO 300SR) */}
                            <div className="relative group">
                               <div className="rounded-lg overflow-hidden border transition-all" style={{ 
                                  background: 'rgba(28, 32, 58, 0.5)',
@@ -570,8 +613,8 @@ export default function ComprarPage() {
                                  </div>
                                  <div className="aspect-[4/3] relative group/prize">
                                     <Image 
-                                       src="/yamaha01.jpg" 
-                                       alt="Yamaha Motorcycle" 
+                                       src="/cst.jpg" 
+                                       alt="CFMOTO 300SR" 
                                        fill 
                                        sizes="(max-width: 768px) 100vw, 33vw"
                                        className="object-cover transition-transform duration-500" 
@@ -602,18 +645,20 @@ export default function ComprarPage() {
                                        </div>
                                     </button>
                                  </div>
-                                 <div className="p-4" style={{ background: 'rgba(15, 17, 23, 0.7)' }}>
-                                    <p className="font-semibold text-sm mb-2" style={{ color: '#E5E7EB' }}>YAMAHA MT-07</p>
-                                    <p className="text-xs leading-relaxed" style={{ color: '#9CA3AF' }}>
-                                       <strong className="text-white">Tipo:</strong> Moto Naked media cilindrada<br/>
-                                       <strong className="text-white">Motor:</strong> 689cc / 2 cilindros (CP2)<br/>
-                                       <strong className="text-white">Potencia:</strong> 73–75 HP aprox.<br/>
-                                       <strong className="text-white">Par motor:</strong> 68 Nm<br/>
-                                       <strong className="text-white">Transmisión:</strong> 6 velocidades<br/>
-                                       <strong className="text-white">Frenos:</strong> Doble disco delantero + disco trasero (ABS en versiones recientes)<br/>
-                                       <strong className="text-white">Peso:</strong> 179–182 kg<br/>
-                                       <strong className="text-white">Uso ideal:</strong> Ciudad / curvas / viajes<br/>
-                                       <strong className="text-white">Puntos fuertes:</strong> Par motor fuerte, ligereza, muy divertida de manejar
+                                 <div className="p-4" style={{ background: 'rgba(15, 17, 23, 0.75)' }}>
+                                    <p className="font-bold text-lg md:text-xl mb-2" style={{ color: '#FFB200', textShadow: '0 2px 10px rgba(255, 178, 0, 0.18)' }}>
+                                       CFMOTO 300SR
+                                    </p>
+                                    <p className="text-sm md:text-base leading-relaxed" style={{ color: '#D1D5DB' }}>
+                                       <strong style={{ color: '#F2C94C' }}>Tipo:</strong> Moto deportiva carenada (sport)<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Motor:</strong> 292cc / 1 cilindro<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Potencia:</strong> 29 HP (29 caballos de fuerza)<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Inyección:</strong> EFI<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Transmisión:</strong> 6 velocidades<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Frenos:</strong> Disco delantero + Disco trasero con ABS<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Suspensión:</strong> KYB delantera + monoshock<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Uso ideal:</strong> Ciudad / carretera / estilo racing<br/>
+                                       <strong style={{ color: '#F2C94C' }}>Puntos fuertes:</strong> Diseño agresivo, manejo deportivo, buena relación costo–prestaciones
                                     </p>
                                  </div>
                               </div>
@@ -638,9 +683,7 @@ export default function ComprarPage() {
                         <h5 className="font-semibold mb-3 text-sm uppercase tracking-wider" style={{ color: '#FFB200' }}>Participa ahora para tener la oportunidad de ganar</h5>
                         <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#F9FAFB' }}>{raffle.title}</h2>
                         <p className="text-base mb-6" style={{ color: '#9CA3AF' }}>
-                           Sorteo {raffle.end_date ? new Date(raffle.end_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Fecha por definir'}
-                           <span className="mx-3" style={{ color: '#6B7280' }}>|</span>
-                           <span style={{ color: '#9CA3AF' }}>Por las dos últimas cifras de la lotería del Paísita</span>
+                           Las cifras de la lotería del ECUADOR definen el ganador de este sorteo
                         </p>
 
                         <hr className="border-white/10 my-8" />
@@ -769,6 +812,7 @@ export default function ComprarPage() {
          <VideoModal
             isOpen={isVideoModalOpen}
             onClose={() => setIsVideoModalOpen(false)}
+            youtubeUrl="https://youtu.be/tb3KXOm2K2E"
          />
 
          {/* Modal de Video del Primer Premio */}
@@ -782,14 +826,14 @@ export default function ComprarPage() {
          <VideoModal
             isOpen={isPremio2VideoModalOpen}
             onClose={() => setIsPremio2VideoModalOpen(false)}
-            youtubeUrl="https://www.youtube.com/watch?v=wpz5ODAjia0"
+            youtubeUrl="https://www.youtube.com/watch?v=uWmuNMR3QQM"
          />
 
          {/* Modal de Video del Tercer Premio */}
          <VideoModal
             isOpen={isPremio3VideoModalOpen}
             onClose={() => setIsPremio3VideoModalOpen(false)}
-            youtubeUrl="https://www.youtube.com/watch?v=uWmuNMR3QQM"
+            youtubeUrl="https://www.youtube.com/watch?v=wpz5ODAjia0"
          />
       </main>
    );

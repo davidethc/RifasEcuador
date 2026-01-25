@@ -181,7 +181,6 @@ export async function GET(request: NextRequest) {
               .from('tickets')
               .update({
                 status: 'reserved',
-                payment_id: null,
               })
               .eq('raffle_id', order.raffle_id)
               .in('number', ticketNumbers);

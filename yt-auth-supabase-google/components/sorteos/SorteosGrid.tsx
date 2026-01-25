@@ -31,6 +31,22 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const getRaffleImageUrl = (imageUrl?: string | null) => {
+    if (!imageUrl) return "/cardrifa.jpg";
+
+    // Si ya es URL absoluta o asset local, usarlo tal cual.
+    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://") || imageUrl.startsWith("/")) {
+      return imageUrl;
+    }
+
+    // Si guardas solo el path del bucket (ej: "rifa/rifa1.png"), construir URL pública.
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl) return "/cardrifa.jpg";
+
+    const normalizedPath = imageUrl.replace(/^\/+/, "");
+    return `${supabaseUrl}/storage/v1/object/public/${normalizedPath}`;
+  };
+
   useEffect(() => {
     async function fetchRaffles() {
       try {
@@ -96,6 +112,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
 
   // Obtener boletos vendidos para cada sorteo
   const [soldCounts, setSoldCounts] = useState<Record<string, number>>({});
+  const [totalCounts, setTotalCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function fetchSoldCounts() {
@@ -112,6 +129,9 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         if (data.success && data.counts) {
           logger.log('✅ [SOLD_COUNTS] Conteos recibidos:', data.counts);
           setSoldCounts(data.counts);
+          if (data.totals) {
+            setTotalCounts(data.totals);
+          }
           } else {
           logger.error('❌ [SOLD_COUNTS] Error al obtener conteos:', data.error);
           // Fallback: poner todos en 0
@@ -120,6 +140,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
             counts[r.id] = 0;
           });
           setSoldCounts(counts);
+          setTotalCounts({});
         }
       } catch (err) {
         logger.error('❌ [SOLD_COUNTS] Error al obtener conteo de boletos:', err);
@@ -129,6 +150,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
           counts[r.id] = 0;
         });
         setSoldCounts(counts);
+        setTotalCounts({});
       }
     }
 
@@ -142,7 +164,7 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
     ? sorteos.map(s => ({ 
         ...s, 
         totalNumbers: 1000, 
-        soldNumbers: soldCounts[s.id] || 0  // Usar soldCounts en lugar de 0
+        soldNumbers: soldCounts[s.id] || 0,  // Usar soldCounts en lugar de 0
       }))
     : raffles.length > 0
     ? raffles.map((raffle) => ({
@@ -150,8 +172,10 @@ export function SorteosGrid({ sorteos }: SorteosGridProps) {
         titulo: raffle.title,
         premio: raffle.description || raffle.title,
         precio: raffle.price_per_ticket,
-        imagen: raffle.image_url || '/cardrifa.jpg',
-        totalNumbers: raffle.total_numbers || 1000,
+        imagen: getRaffleImageUrl(raffle.image_url),
+        // Usar el total real de tickets (tabla tickets) si está disponible,
+        // porque `raffle.total_numbers` puede estar desincronizado.
+        totalNumbers: totalCounts[raffle.id] ?? raffle.total_numbers ?? 1000,
         soldNumbers: soldCounts[raffle.id] || 0,
       }))
     : [

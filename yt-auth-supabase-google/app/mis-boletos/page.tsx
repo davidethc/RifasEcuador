@@ -86,15 +86,9 @@ export default function MisBoletosPage() {
 
   return (
     <main className="min-h-screen" aria-label="Mis boletos">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10 md:pt-6 md:pb-12">
         {/* Header */}
-        <div className="text-center mb-10 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 mb-6">
-            <span className="text-2xl">🎫</span>
-            <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 font-[var(--font-dm-sans)]">
-              Tus compras
-            </span>
-          </div>
+        <div className="text-center mb-6 md:mb-8">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 font-[var(--font-comfortaa)]">
             Mis Boletos
           </h1>

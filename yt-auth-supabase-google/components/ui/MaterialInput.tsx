@@ -16,6 +16,7 @@ interface MaterialInputProps {
   helperText?: string;
   variant?: 'filled' | 'outlined';
   autoFocus?: boolean;
+  showSuccess?: boolean; // Mostrar indicador de éxito cuando el campo está completo y válido
 }
 
 /**
@@ -39,6 +40,7 @@ export function MaterialInput({
   helperText,
   variant = 'filled',
   autoFocus = false,
+  showSuccess = false,
 }: MaterialInputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
@@ -72,6 +74,9 @@ export function MaterialInput({
   // Determinar si la etiqueta debe estar flotante
   const isLabelFloating = isFocused || hasValue;
 
+  // Determinar si mostrar el indicador de éxito (check verde)
+  const showSuccessIndicator = showSuccess && hasValue && !error && !isFocused;
+
   // Clases base para el contenedor
   const containerBaseClasses = 'relative w-full';
   
@@ -87,11 +92,12 @@ export function MaterialInput({
     'placeholder-transparent',
     // Fondo más claro para que resalte - usa bg-elevated siempre y más claro en focus
     isFocused && !error ? 'bg-[#2F2540]' : 'bg-[#2A1F3D]', // Más claro que bg-secondary
-    isFocused && !error ? 'border-[var(--primary-purple)]' : 'border-[rgba(168,62,245,0.3)]', // Borde más visible
+    isFocused && !error ? 'border-[var(--primary-purple)]' : showSuccessIndicator ? 'border-green-500' : 'border-[rgba(168,62,245,0.3)]', // Borde más visible
     error ? 'border-[var(--error)] bg-[#2A1F3D]' : '',
     disabled ? 'border-dashed border-[var(--border-subtle)] opacity-[0.38] bg-[var(--bg-primary)]' : '',
     'hover:border-[rgba(168,62,245,0.5)] hover:bg-[#2F2540] transition-all duration-200',
-    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.2)]' : 'shadow-sm',
+    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.2)]' : showSuccessIndicator ? 'shadow-[0_0_0_3px_rgba(34,197,94,0.15)]' : 'shadow-sm',
+    showSuccessIndicator ? 'pr-12' : '', // Espacio para el icono de éxito
   ].filter(Boolean).join(' ');
 
   // Estilos para variant outlined - MÁS RESALTANTE y visible
@@ -103,11 +109,12 @@ export function MaterialInput({
     'placeholder-transparent',
     // Fondo más claro y visible - resalta sobre el fondo oscuro
     isFocused && !error ? 'bg-[#2F2540]' : 'bg-[#2A1F3D]', // Más claro para destacar
-    isFocused && !error ? 'border-[var(--primary-purple)]' : 'border-[rgba(168,62,245,0.4)]', // Borde más visible siempre
+    isFocused && !error ? 'border-[var(--primary-purple)]' : showSuccessIndicator ? 'border-green-500' : 'border-[rgba(168,62,245,0.4)]', // Borde más visible siempre
     error ? 'border-[var(--error)] bg-[#2A1F3D]' : '',
     disabled ? 'border-dashed border-[var(--border-subtle)] opacity-[0.38] bg-[var(--bg-primary)]' : '',
     'hover:border-[rgba(168,62,245,0.6)] hover:bg-[#2F2540] transition-all duration-200',
-    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.25)]' : 'shadow-md',
+    isFocused && !error ? 'shadow-[0_0_0_3px_rgba(168,62,245,0.25)]' : showSuccessIndicator ? 'shadow-[0_0_0_3px_rgba(34,197,94,0.15)]' : 'shadow-md',
+    showSuccessIndicator ? 'pr-12' : '', // Espacio para el icono de éxito
   ].filter(Boolean).join(' ');
 
   const inputClasses = variant === 'filled' ? filledClasses : outlinedClasses;
@@ -184,6 +191,27 @@ export function MaterialInput({
           {label}
           {required && <span className="text-[var(--primary-purple)] ml-1">*</span>}
         </label>
+
+        {/* Indicador de éxito (check verde) */}
+        {showSuccessIndicator && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-lg animate-in fade-in duration-200">
+              <svg 
+                className="w-4 h-4 text-white" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={3} 
+                  d="M5 13l4 4L19 7" 
+                />
+              </svg>
+            </div>
+          </div>
+        )}
 
       </div>
 

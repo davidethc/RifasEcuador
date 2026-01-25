@@ -24,6 +24,7 @@ export function SorteoCard({
     soldNumbers = 0,
 }: SorteoCardProps) {
     const percentageSold = Math.min(100, Math.round((soldNumbers / totalNumbers) * 100));
+    const isPosterImage = imagen.includes("todospremiod.png");
 
     return (
         <div
@@ -31,13 +32,24 @@ export function SorteoCard({
             style={{ boxShadow: 'var(--shadow-sm)' }}
         >
             {/* Imagen del sorteo */}
-            <div className="relative aspect-[4/3] overflow-hidden">
+            <div
+                className={[
+                    "relative overflow-hidden",
+                    isPosterImage
+                        ? "aspect-[3/4] md:aspect-[4/5] bg-[var(--bg-elevated)]"
+                        : "aspect-[4/3]",
+                ].join(" ")}
+            >
                 <Image
                     src={imagen}
                     alt={`Imagen del sorteo ${titulo}`}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className={[
+                        isPosterImage
+                            ? "object-contain p-3"
+                            : "object-cover transition-transform duration-300 group-hover:scale-105",
+                    ].join(" ")}
                     loading="lazy"
                     quality={85}
                 />

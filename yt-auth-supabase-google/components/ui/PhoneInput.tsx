@@ -16,6 +16,7 @@ interface PhoneInputProps {
   helperText?: string;
   variant?: 'filled' | 'outlined';
   autoFocus?: boolean;
+  showSuccess?: boolean; // Mostrar indicador de éxito cuando el campo está completo y válido
 }
 
 /**
@@ -37,6 +38,7 @@ export function PhoneInput({
   helperText,
   variant = 'filled',
   autoFocus = false,
+  showSuccess = false,
 }: PhoneInputProps) {
   const [displayValue, setDisplayValue] = useState(() => {
     // Inicializar con formato si hay valor
@@ -108,6 +110,7 @@ export function PhoneInput({
       helperText={helperText}
       variant={variant}
       autoFocus={autoFocus}
+      showSuccess={showSuccess}
     />
   );
 }

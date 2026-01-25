@@ -550,8 +550,6 @@ async function processPaymentUpdate(
       created_at: new Date().toISOString(),
     };
 
-    let paymentId: string | null = null;
-
     if (existingPayment) {
       // Actualizar pago existente
       logger.debug('🔄 Actualizando pago existente:', existingPayment.id);
@@ -569,22 +567,18 @@ async function processPaymentUpdate(
         logger.error('❌ Error al actualizar payment:', updatePaymentError);
       } else {
         logger.debug('✅ Payment actualizado');
-        paymentId = existingPayment.id;
       }
     } else {
       // Crear nuevo registro de pago
       logger.debug('✨ Creando nuevo registro en payments...');
-      const { data: newPayment, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('payments')
-        .insert(paymentData)
-        .select('id')
-        .single();
+        .insert(paymentData);
       
       if (insertError) {
         logger.error('❌ Error al insertar en payments:', insertError);
       } else {
         logger.debug('✅ Registro creado en payments');
-        paymentId = newPayment?.id || null;
       }
     }
 
@@ -636,7 +630,6 @@ async function processPaymentUpdate(
             .from('tickets')
             .update({ 
               status: 'paid',
-              payment_id: paymentId
             })
             .eq('raffle_id', orderData.raffle_id)
             .in('number', ticketNumbers);

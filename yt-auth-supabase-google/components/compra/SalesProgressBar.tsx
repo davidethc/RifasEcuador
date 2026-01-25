@@ -14,6 +14,7 @@ interface SalesProgressBarProps {
  */
 export function SalesProgressBar({ raffleId, totalNumbers }: SalesProgressBarProps) {
   const [soldCount, setSoldCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(totalNumbers);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,12 +28,19 @@ export function SalesProgressBar({ raffleId, totalNumbers }: SalesProgressBarPro
 
         if (data.success && data.counts && data.counts[raffleId] !== undefined) {
           setSoldCount(data.counts[raffleId] || 0);
+          if (data.totals && data.totals[raffleId] !== undefined) {
+            setTotalCount(data.totals[raffleId] || totalNumbers);
+          } else {
+            setTotalCount(totalNumbers);
+          }
         } else {
           setSoldCount(0);
+          setTotalCount(totalNumbers);
         }
       } catch (err) {
         logger.error('Error al obtener conteo de boletos vendidos:', err);
         setSoldCount(0);
+        setTotalCount(totalNumbers);
       } finally {
         setIsLoading(false);
       }
@@ -43,7 +51,7 @@ export function SalesProgressBar({ raffleId, totalNumbers }: SalesProgressBarPro
     }
   }, [raffleId, totalNumbers]);
 
-  const percentage = totalNumbers > 0 ? Math.min(100, Math.round((soldCount / totalNumbers) * 100)) : 0;
+  const percentage = totalCount > 0 ? Math.min(100, Math.round((soldCount / totalCount) * 100)) : 0;
 
   return (
     <div className="w-full">

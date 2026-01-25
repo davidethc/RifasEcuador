@@ -329,9 +329,9 @@ export function PayphonePaymentBox({
         onError={handleScriptError}
       />
 
-      <div className="space-y-4">
+      <div className="space-y-4 w-full min-w-0 max-w-full overflow-hidden">
         {/* Información del monto - Consistente con formulario */}
-        <div className="rounded-lg border p-4" style={{ 
+        <div className="rounded-lg border p-4 w-full" style={{ 
           background: 'rgba(28, 32, 58, 0.6)',
           borderColor: 'rgba(255, 255, 255, 0.1)'
         }}>
@@ -361,7 +361,7 @@ export function PayphonePaymentBox({
         <div
           ref={containerRef}
           id="pp-button"
-          className="min-h-[200px] flex justify-center items-center rounded-lg"
+          className="min-h-[200px] flex justify-center items-center rounded-lg w-full max-w-full overflow-hidden"
           style={{ 
             background: 'rgba(15, 17, 23, 0.4)',
             border: '1px solid rgba(255, 255, 255, 0.1)'

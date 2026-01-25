@@ -23,8 +23,8 @@ export function HeroSection() {
   
   const heroCarouselImages = [
     { src: gifUrl, alt: "Video de diseño de premios", isGif: true },
-    { src: "/carasuel3.jpg", alt: "Premios del sorteo" },
     { src: "/carusuel8.png", alt: "Premios del sorteo" },
+    { src: "/motos.jpg", alt: "Motos del sorteo" },
   ];
 
   // Cargar boletos del usuario cuando esté autenticado
@@ -63,12 +63,12 @@ export function HeroSection() {
 
 
   return (
-    <section className="relative w-full min-h-[50vh] flex items-center justify-center pt-6 md:pt-16 pb-12 md:pb-20 overflow-hidden" style={{
+    <section className="relative w-full min-h-[50vh] flex items-center justify-center pt-2 md:pt-4 pb-12 md:pb-20 overflow-hidden" style={{
       background: 'linear-gradient(180deg, #1F1935 0%, #2A1F3D 30%, #360254 70%, #4A1F5C 100%)'
     }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         {/* Carrusel con margen transparente 3D */}
-        <div className="w-full flex justify-center py-8 md:py-12">
+        <div className="w-full flex justify-center py-4 md:py-6">
           <div 
             className="relative w-full max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw]"
             style={{ 

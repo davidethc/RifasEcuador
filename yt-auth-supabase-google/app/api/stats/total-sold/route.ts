@@ -27,7 +27,26 @@ export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
     
-    // Obtener todos los sorteos activos
+    // Preferir vista agregada (evita N+1 y usa el total real de tickets)
+    const { data: progressRows, error: progressError } = await supabase
+      .from('raffle_sales_progress')
+      .select('raffle_id,total_tickets,sold_tickets');
+
+    if (!progressError && progressRows) {
+      const totalSold = progressRows.reduce((acc: number, row: { sold_tickets: number }) => acc + (row.sold_tickets || 0), 0);
+      const totalTickets = progressRows.reduce((acc: number, row: { total_tickets: number }) => acc + (row.total_tickets || 0), 0);
+      const percentage = totalTickets > 0 ? Math.round((totalSold / totalTickets) * 100) : 0;
+
+      return NextResponse.json({
+        success: true,
+        totalSold,
+        totalTickets,
+        percentage,
+        rafflesCount: progressRows.length,
+      });
+    }
+
+    // Fallback legacy: obtener sorteos activos + N+1 (si la vista no existe)
     const { data: raffles, error: rafflesError } = await supabase
       .from('raffles')
       .select('id')
@@ -66,7 +85,6 @@ export async function GET() {
           )
         `)
         .eq('raffle_id', raffleId)
-        .eq('status', 'completed')
         .eq('payments.status', 'approved')
         .not('numbers', 'is', null);
 
@@ -82,7 +100,6 @@ export async function GET() {
           .from('orders')
           .select('id, numbers')
           .eq('raffle_id', raffleId)
-          .eq('status', 'completed')
           .not('numbers', 'is', null);
 
         if (completedOrders && completedOrders.length > 0) {
@@ -107,11 +124,7 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      totalSold: totalCount,
-      rafflesCount: raffles.length
-    });
+    return NextResponse.json({ success: true, totalSold: totalCount, rafflesCount: raffles.length });
 
   } catch (error) {
     logger.error('Error al calcular total de boletos vendidos:', error);

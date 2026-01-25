@@ -19,7 +19,7 @@ export function PremiosSection() {
     {
       etiqueta: "Tercer Premio",
       titulo: "Yamaha MT-07",
-      descripcion: "Moto Naked media cilindrada con motor 689cc / 2 cilindros (CP2), potencia 73–75 HP, par motor 68 Nm, transmisión 6 velocidades, frenos doble disco delantero + disco trasero (ABS en versiones recientes), peso 179–182 kg. Ideal para ciudad, curvas y viajes. Puntos fuertes: Par motor fuerte, ligereza, muy divertida de manejar.",
+      descripcion: "Moto Naked media cilindrada con motor 689cc / 2 cilindros (CP2), potencia 73–75 HP, par motor 68 Nm, transmisión 6 velocidades, frenos doble disco delantero + disco trasero, peso 179–182 kg. Ideal para ciudad, curvas y viajes. Puntos fuertes: Par motor fuerte, ligereza, muy divertida de manejar.",
     },
   ];
 

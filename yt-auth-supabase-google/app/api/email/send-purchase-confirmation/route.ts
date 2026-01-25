@@ -158,29 +158,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // IMPORTANTE: Calcular el total correcto basado en tickets PAGADOS (no todos los tickets)
-    // Los combos incluyen tickets gratis:
-    // - Combo 10: 15 tickets totales (10 pagados + 5 gratis)
-    // - Combo 20: 27 tickets totales (20 pagados + 7 gratis)
-    // - Otros: cantidad exacta pagada
+    // IMPORTANTE: Calcular el total correcto basado en tickets PAGADOS (no todos los tickets).
+    // No inferimos "pagados vs gratis" por la cantidad total de tickets porque puede ser ambiguo (ej: 12 podría ser compra normal o combo).
+    // En su lugar, derivamos la cantidad pagada desde el total de la orden y el precio por ticket.
     const totalTickets = ticketNumbers.length;
-    let paidQuantity = totalTickets;
-    
-    if (totalTickets === 15) {
-      // Combo 10: 10 pagados + 5 gratis
-      paidQuantity = 10;
-    } else if (totalTickets === 27) {
-      // Combo 20: 20 pagados + 7 gratis
-      paidQuantity = 20;
-    }
-    
-    // Calcular el total correcto: cantidad pagada * precio por ticket
-    const correctTotal = paidQuantity * (raffle?.price_per_ticket || 0);
+    const pricePerTicket = raffle?.price_per_ticket || 0;
+
+    const paidQuantityRaw =
+      pricePerTicket > 0 ? (typedOrderData.total ?? 0) / pricePerTicket : totalTickets;
+
+    // paidQuantity debe ser un entero razonable y no puede exceder totalTickets
+    const paidQuantityInt = Number.isFinite(paidQuantityRaw)
+      ? Math.round(paidQuantityRaw + 1e-9) // tolerancia a ruido flotante
+      : totalTickets;
+
+    const paidQuantity = Math.min(Math.max(paidQuantityInt, 0), totalTickets);
+    const correctTotal = paidQuantity * pricePerTicket;
     
     logger.debug('💰 [EMAIL_PRICE_CORRECTION] Corrigiendo total en correo:', {
       totalTickets,
       paidQuantity,
-      pricePerTicket: raffle?.price_per_ticket,
+      pricePerTicket,
       totalDeOrden: orderData.total,
       totalCorrecto: correctTotal,
     });

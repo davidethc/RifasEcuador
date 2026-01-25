@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
   /* config options here */
   
@@ -11,6 +13,19 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Permitir imágenes desde Supabase Storage (mis-boletos / confirmaciones)
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'mmkqihvjruwdkhrylhxc.supabase.co',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        pathname: '/**',
+      },
+    ],
   },
   
   // Optimizaciones de compilación
@@ -31,7 +46,7 @@ const nextConfig: NextConfig = {
   
   // Headers de seguridad, performance y Payphone
   async headers() {
-    return [
+    const headers = [
       {
         // Aplicar a todas las rutas
         source: '/:path*',
@@ -56,17 +71,33 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      {
-        // Cache para assets estáticos
-        source: '/:path*\\.(jpg|jpeg|png|gif|webp|svg|ico|mp4|webm|woff|woff2|ttf|eot)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-    ];
+    ] as Awaited<ReturnType<NonNullable<NextConfig["headers"]>>>;
+
+    // Evitar que imágenes de /public queden "pegadas" 1 año con immutable.
+    // Esto era la causa principal de que en producción no se reflejen cambios de imágenes.
+    headers.push({
+      // Media (imágenes / video): revalidar siempre en prod; sin cache en dev.
+      source: '/:path*\\.(jpg|jpeg|png|gif|webp|svg|ico|mp4|webm)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: isProd ? 'public, max-age=0, must-revalidate' : 'no-store',
+        },
+      ],
+    });
+
+    headers.push({
+      // Fuentes: cache fuerte en prod; sin cache en dev.
+      source: '/:path*\\.(woff|woff2|ttf|eot)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: isProd ? 'public, max-age=31536000, immutable' : 'no-store',
+        },
+      ],
+    });
+
+    return headers;
   },
 };
 

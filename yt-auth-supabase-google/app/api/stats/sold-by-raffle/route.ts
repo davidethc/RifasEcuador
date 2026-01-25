@@ -39,12 +39,43 @@ export async function GET(request: NextRequest) {
 
     const raffleIds = raffleIdsParam.split(',').filter(Boolean);
     const counts: Record<string, number> = {};
+    const totals: Record<string, number> = {};
+    const percentages: Record<string, number> = {};
 
-    // Para cada sorteo, contar boletos vendidos
+    // Preferir vista agregada (evita N+1 y usa el total real de tickets por sorteo)
+    const { data: progressRows, error: progressError } = await supabase
+      .from('raffle_sales_progress')
+      .select('raffle_id,total_tickets,sold_tickets,sold_percentage')
+      .in('raffle_id', raffleIds);
+
+    if (!progressError && progressRows) {
+      progressRows.forEach((row: { raffle_id: string; total_tickets: number; sold_tickets: number; sold_percentage: number | string }) => {
+        counts[row.raffle_id] = row.sold_tickets || 0;
+        totals[row.raffle_id] = row.total_tickets || 0;
+        percentages[row.raffle_id] = typeof row.sold_percentage === 'string'
+          ? Number(row.sold_percentage)
+          : (row.sold_percentage || 0);
+      });
+
+      // Asegurar claves para sorteos solicitados aunque no existan filas (por ejemplo, sin tickets)
+      raffleIds.forEach((raffleId) => {
+        if (counts[raffleId] === undefined) counts[raffleId] = 0;
+        if (totals[raffleId] === undefined) totals[raffleId] = 0;
+        if (percentages[raffleId] === undefined) percentages[raffleId] = 0;
+      });
+
+      return NextResponse.json({
+        success: true,
+        counts,
+        totals,
+        percentages,
+      });
+    }
+
+    // Fallback ultra-seguro: método anterior (por si la vista no existe)
     for (const raffleId of raffleIds) {
       let totalCount = 0;
 
-      // Intentar consulta con join primero
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -56,7 +87,6 @@ export async function GET(request: NextRequest) {
           )
         `)
         .eq('raffle_id', raffleId)
-        .eq('status', 'completed')
         .eq('payments.status', 'approved')
         .not('numbers', 'is', null);
 
@@ -66,43 +96,12 @@ export async function GET(request: NextRequest) {
             totalCount += order.numbers.length;
           }
         });
-      } else {
-        // Fallback: método anterior
-        const { data: completedOrders } = await supabase
-          .from('orders')
-          .select('id, numbers')
-          .eq('raffle_id', raffleId)
-          .eq('status', 'completed')
-          .not('numbers', 'is', null);
-
-        if (completedOrders && completedOrders.length > 0) {
-          const orderIds = completedOrders.map(o => o.id).filter(Boolean);
-          
-          const { data: approvedPayments } = await supabase
-            .from('payments')
-            .select('order_id')
-            .in('order_id', orderIds)
-            .eq('status', 'approved');
-
-          if (approvedPayments && approvedPayments.length > 0) {
-            const approvedOrderIds = new Set(approvedPayments.map(p => p.order_id));
-            
-            completedOrders.forEach(order => {
-              if (approvedOrderIds.has(order.id) && order.numbers && Array.isArray(order.numbers)) {
-                totalCount += order.numbers.length;
-              }
-            });
-          }
-        }
       }
 
       counts[raffleId] = totalCount;
     }
 
-    return NextResponse.json({
-      success: true,
-      counts
-    });
+    return NextResponse.json({ success: true, counts, totals: {}, percentages: {} });
 
   } catch (error) {
     logger.error('Error al calcular boletos vendidos por sorteo:', error);

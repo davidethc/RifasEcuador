@@ -175,10 +175,12 @@ export function PurchaseFormWithPayment({
     }).format(price);
   };
 
+  const bonusTickets = quantity === 10 ? 2 : quantity === 20 ? 4 : 0;
+  const paidPlusBonusLabel = bonusTickets > 0 ? `${quantity} + ${bonusTickets} gratis` : `${quantity}`;
 
   // Mostrar formulario y método de pago en la misma vista cuando está completado
   return (
-    <div className="min-h-screen">
+    <div>
       {/* Banner de números reservados - Solo cuando está completado */}
       {isFormSubmitted && saleId && ticketNumbers.length > 0 && (
         <div className="mb-4 bg-[rgba(34,197,94,0.1)] rounded-2xl border border-green-800/30 p-4 md:p-5 shadow-xl">
@@ -210,17 +212,17 @@ export function PurchaseFormWithPayment({
 
       {/* Layout principal: Grid que cambia según el estado */}
       {!isFormSubmitted ? (
-        // Estado inicial: Solo formulario
-        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
+        // Estado inicial: Solo formulario - Layout optimizado
+        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
             {/* Columna izquierda: Formulario */}
-            <div className="xl:col-span-2 rounded-2xl border p-4 md:p-6 lg:p-8 space-y-3 md:space-y-4 transition-all duration-200" style={{
+            <div className="lg:col-span-2 rounded-xl border p-4 md:p-5 space-y-3 transition-all duration-200" style={{
               background: 'var(--bg-secondary)',
               borderColor: 'var(--border-subtle)',
               boxShadow: 'var(--shadow-md)'
             }}>
               {/* Fila 1: Nombre y Apellido - 2 columnas en desktop */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <MaterialInput
                   id="name"
                   label="Nombre(s)"
@@ -232,6 +234,7 @@ export function PurchaseFormWithPayment({
                   required
                   error={errors.name && touched.has('name') ? errors.name : undefined}
                   variant="outlined"
+                  showSuccess={!!formData.name && !errors.name && touched.has('name')}
                 />
                 <MaterialInput
                   id="lastName"
@@ -244,6 +247,7 @@ export function PurchaseFormWithPayment({
                   required
                   error={errors.lastName && touched.has('lastName') ? errors.lastName : undefined}
                   variant="outlined"
+                  showSuccess={!!formData.lastName && !errors.lastName && touched.has('lastName')}
                 />
               </div>
 
@@ -256,9 +260,10 @@ export function PurchaseFormWithPayment({
                 required
                 error={errors.whatsapp && touched.has('whatsapp') ? errors.whatsapp : undefined}
                 variant="outlined"
+                showSuccess={!!formData.whatsapp && !errors.whatsapp && touched.has('whatsapp')}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <MaterialInput
                   id="email"
                   label="Correo Electrónico"
@@ -270,6 +275,7 @@ export function PurchaseFormWithPayment({
                   required
                   error={errors.email && touched.has('email') ? errors.email : undefined}
                   variant="outlined"
+                  showSuccess={!!formData.email && !errors.email && touched.has('email')}
                 />
                 <MaterialInput
                   id="confirmEmail"
@@ -282,6 +288,7 @@ export function PurchaseFormWithPayment({
                   required
                   error={errors.confirmEmail && touched.has('confirmEmail') ? errors.confirmEmail : undefined}
                   variant="outlined"
+                  showSuccess={!!formData.confirmEmail && !errors.confirmEmail && touched.has('confirmEmail')}
                 />
               </div>
 
@@ -296,52 +303,72 @@ export function PurchaseFormWithPayment({
                 required
                 error={errors.documentId && touched.has('documentId') ? errors.documentId : undefined}
                 variant="outlined"
+                showSuccess={!!formData.documentId && !errors.documentId && touched.has('documentId')}
               />
             </div>
 
-            {/* Columna derecha: Resumen */}
-            <div className="xl:col-span-1 space-y-4">
-              <div className="rounded-2xl border p-4 md:p-6 transition-all duration-200 sticky top-4" style={{
+            {/* Columna derecha: Resumen y Nota - Compacto */}
+            <div className="lg:col-span-1 space-y-3">
+              <div className="rounded-xl border p-4 transition-all duration-200 sticky top-4" style={{
                 background: 'var(--bg-secondary)',
                 borderColor: 'var(--border-subtle)',
                 boxShadow: 'var(--shadow-md)'
               }}>
-                <h3 className="text-lg font-bold mb-4 font-[var(--font-comfortaa)]" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-base font-bold mb-3 font-[var(--font-comfortaa)]" style={{ color: 'var(--text-primary)' }}>
                   Resumen de la compra
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs md:text-sm font-[var(--font-dm-sans)] pb-2 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Cantidad de boletos:</span>
-                    <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{quantity}</span>
+                    <span className="font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                      {bonusTickets > 0 ? (
+                        <>
+                          <span>{quantity}</span>
+                          <span
+                            className="px-2 py-0.5 rounded-full text-xs font-bold"
+                            style={{
+                              background: 'rgba(34, 197, 94, 0.15)',
+                              border: '1px solid rgba(34, 197, 94, 0.35)',
+                              color: '#22C55E',
+                              boxShadow: '0 0 12px rgba(34, 197, 94, 0.12)',
+                            }}
+                          >
+                            + {bonusTickets} gratis
+                          </span>
+                        </>
+                      ) : (
+                        <span>{paidPlusBonusLabel}</span>
+                      )}
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center text-sm font-[var(--font-dm-sans)] pb-3 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                  <div className="flex justify-between items-center text-xs md:text-sm font-[var(--font-dm-sans)] pb-2 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Precio unitario:</span>
                     <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
                       {formatPrice(totalAmount / quantity)}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center text-base font-bold pt-4 border-t font-[var(--font-comfortaa)]" style={{ borderColor: 'var(--border-subtle)' }}>
+                  <div className="flex justify-between items-center text-sm md:text-base font-bold pt-2 border-t font-[var(--font-comfortaa)]" style={{ borderColor: 'var(--border-subtle)' }}>
                     <span style={{ color: 'var(--text-primary)' }}>Total a pagar:</span>
-                    <span className="font-bold text-xl" style={{ color: 'var(--text-accent)' }}>{formatPrice(totalAmount)}</span>
+                    <span className="font-bold text-lg md:text-xl" style={{ color: 'var(--text-accent)' }}>{formatPrice(totalAmount)}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl p-4 border" style={{
-                background: 'var(--bg-secondary)',
-                borderColor: 'var(--border-subtle)',
+              {/* Nota importante - Integrada de forma más compacta */}
+              <div className="rounded-xl p-3 border" style={{
+                background: 'rgba(168, 62, 245, 0.08)',
+                borderColor: 'rgba(168, 62, 245, 0.2)',
                 boxShadow: 'var(--shadow-sm)'
               }}>
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center" style={{
-                    background: 'rgba(168, 62, 245, 0.15)',
-                    border: '1px solid var(--border-purple)'
+                <div className="flex gap-2">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center" style={{
+                    background: 'rgba(168, 62, 245, 0.2)',
                   }}>
-                    <svg className="w-4 h-4" style={{ color: 'var(--primary-purple)' }} fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-3.5 h-3.5" style={{ color: 'var(--primary-purple)' }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold mb-1 font-[var(--font-dm-sans)]" style={{ color: 'var(--text-primary)' }}>
                       Nota importante
                     </p>
@@ -354,8 +381,8 @@ export function PurchaseFormWithPayment({
             </div>
           </div>
 
-          {/* Botones de acción */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+          {/* Botones de acción - Compacto */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-3">
             {onBack && (
               <button
                 type="button"
@@ -427,10 +454,10 @@ export function PurchaseFormWithPayment({
           </div>
         </form>
       ) : (
-        // Estado completado: Formulario y método de pago lado a lado
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        // Estado completado: Formulario y método de pago lado a lado - Layout fijo
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 w-full max-w-full">
           {/* Columna izquierda: Datos personales (formulario en modo lectura) */}
-          <div className="rounded-2xl border p-4 md:p-6 space-y-4" style={{ 
+          <div className="rounded-2xl border p-4 md:p-6 space-y-4 w-full min-w-0 overflow-hidden" style={{ 
             background: 'linear-gradient(135deg, #1A1525 0%, #2A1F3D 50%, #1F1A2E 100%)',
             borderColor: '#3A2F5A',
             boxShadow: '0 10px 30px rgba(168, 62, 245, 0.15)'
@@ -479,20 +506,36 @@ export function PurchaseFormWithPayment({
               )}
             </div>
 
-            {/* Botón para editar datos */}
+            {/* Botón para editar datos - Mejorado para mejor visibilidad */}
             <button
               onClick={() => setIsFormSubmitted(false)}
-              className="mt-4 w-full text-sm text-[#8B8FAF] transition-colors font-[var(--font-dm-sans)] flex items-center justify-center gap-2 hover:text-white py-2"
+              className="mt-4 w-full text-sm font-semibold transition-all duration-200 font-[var(--font-dm-sans)] flex items-center justify-center gap-2 py-3 px-4 rounded-lg border"
+              style={{
+                color: '#F9FAFB',
+                borderColor: 'rgba(168, 62, 245, 0.3)',
+                background: 'rgba(168, 62, 245, 0.08)',
+                textShadow: '0 1px 10px rgba(0, 0, 0, 0.25)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#FFFFFF';
+                e.currentTarget.style.borderColor = 'rgba(168, 62, 245, 0.6)';
+                e.currentTarget.style.background = 'rgba(168, 62, 245, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#F9FAFB';
+                e.currentTarget.style.borderColor = 'rgba(168, 62, 245, 0.3)';
+                e.currentTarget.style.background = 'rgba(168, 62, 245, 0.08)';
+              }}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              <span>Editar datos</span>
+              <span className="font-bold">Editar datos</span>
             </button>
           </div>
 
-          {/* Columna derecha: Método de pago */}
-          <div className="rounded-2xl" style={{ 
+          {/* Columna derecha: Método de pago - Ancho fijo */}
+          <div className="rounded-2xl w-full min-w-0 overflow-hidden" style={{ 
             background: 'transparent'
           }}>
             <PaymentMethod

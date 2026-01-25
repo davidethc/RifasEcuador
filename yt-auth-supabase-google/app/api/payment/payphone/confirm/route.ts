@@ -327,7 +327,6 @@ export async function POST(request: NextRequest) {
             .from('tickets')
             .update({
               status: 'paid',
-              payment_id: existingPayment?.id || null
             })
             .eq('raffle_id', orderData.raffle_id)
             .in('number', ticketNumbers);
