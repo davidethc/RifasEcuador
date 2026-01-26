@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { logger } from '@/utils/logger';
+import { buildPayphoneErrorExplanation } from '@/utils/payphoneUserMessage';
 
 /**
  * Página de callback de Payphone
@@ -32,7 +33,10 @@ function PayphoneCallbackContent() {
         logger.log('📥 Callback de Payphone recibido:', { id, clientTxId });
 
         if (!id || !clientTxId) {
-          throw new Error('Parámetros faltantes en la URL');
+          const explanation = buildPayphoneErrorExplanation({
+            rawError: 'Parámetros faltantes en la URL',
+          });
+          throw new Error(explanation.userMessage);
         }
 
         // Llamar al endpoint de confirmación
@@ -51,12 +55,21 @@ function PayphoneCallbackContent() {
 
         const data = await response.json();
 
-        if (!data.success) {
-          throw new Error(data.error || 'Error al confirmar el pago');
+        if (!response.ok || !data.success) {
+          const explanation = buildPayphoneErrorExplanation({
+            rawError: data?.error || `Error HTTP ${response.status} al confirmar el pago`,
+          });
+          throw new Error(explanation.userMessage);
         }
 
         const transaction = data.transaction;
         logger.log('✅ Transacción confirmada:', transaction);
+
+        // El orderId completo viene del endpoint de confirmación
+        // que lo buscó en la base de datos por el prefijo
+        const orderId: string | null = data.orderId || transaction.optionalParameter || null;
+
+        logger.log('🔍 OrderId recibido:', orderId);
 
         // Verificar el estado de la transacción
         // Strict check: statusCode 3 AND transactionStatus 'Approved' (case insensitive)
@@ -67,12 +80,6 @@ function PayphoneCallbackContent() {
           // Aprobado
           setStatus('success');
           setMessage('¡Pago aprobado! Redirigiendo...');
-
-          // El orderId completo viene del endpoint de confirmación
-          // que lo buscó en la base de datos por el prefijo
-          const orderId: string | null = data.orderId || transaction.optionalParameter || null;
-
-          logger.log('🔍 OrderId recibido:', orderId);
 
           // Redirigir a la página de confirmación después de 2 segundos
           setTimeout(() => {
@@ -85,31 +92,55 @@ function PayphoneCallbackContent() {
 
         } else if (transaction.statusCode === 2 || (transaction.statusCode === 3 && !isApproved)) {
           // Cancelado o Rechazado (aunque tenga statusCode 3 si no es Approved es rechazo)
+          const explanation = buildPayphoneErrorExplanation({
+            statusCode: transaction.statusCode,
+            transactionStatus: transaction.transactionStatus,
+            message: transaction.message ?? null,
+            messageCode: transaction.messageCode ?? null,
+          });
+
           setStatus('error');
-          setMessage(`Pago no aprobado: ${transaction.transactionStatus || 'Cancelado'}`);
+          setMessage(explanation.userMessage);
 
           setTimeout(() => {
-            router.push(`/comprar/error?message=${encodeURIComponent('Pago no aprobado: ' + (transaction.transactionStatus || 'Cancelado'))}`);
+            const params = new URLSearchParams();
+            params.set('message', explanation.userMessage);
+            params.set('reason', explanation.reason);
+            if (orderId) params.set('orderId', orderId);
+            if (id) params.set('transactionId', id);
+            router.push(`/comprar/error?${params.toString()}`);
           }, 3000);
 
         } else {
           // Pendiente
           setStatus('loading');
-          setMessage('Pago pendiente de confirmación');
+          setMessage('Pago pendiente de confirmación. Espera un momento...');
 
           setTimeout(() => {
-            router.push('/');
+            if (orderId) {
+              router.push(`/comprar/${orderId}/confirmacion?status=pending&transactionId=${id}`);
+            } else {
+              router.push('/');
+            }
           }, 3000);
         }
 
       } catch (error) {
         logger.error('❌ Error en callback:', error);
         setStatus('error');
-        setMessage(error instanceof Error ? error.message : 'Error al procesar el pago');
+        const explanation = buildPayphoneErrorExplanation({
+          rawError: error instanceof Error ? error.message : 'Error al procesar el pago',
+        });
+        setMessage(explanation.userMessage);
 
         setTimeout(() => {
-          const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago';
-          router.push('/comprar/error?message=' + encodeURIComponent(errorMessage));
+          const params = new URLSearchParams();
+          params.set(
+            'message',
+            (error instanceof Error ? error.message : 'Error al procesar el pago') || 'Error al procesar el pago'
+          );
+          params.set('reason', explanation.reason);
+          router.push('/comprar/error?' + params.toString());
         }, 3000);
       }
     };

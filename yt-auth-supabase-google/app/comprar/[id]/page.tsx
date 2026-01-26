@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { supabase } from '@/utils/supabase';
@@ -25,7 +25,7 @@ const SalesProgressBar = dynamic(() => import('@/components/compra/SalesProgress
 export default function ComprarPage() {
    const params = useParams();
    const router = useRouter();
-   const { isLoading: authLoading } = useAuth();
+   const { user, isLoading: authLoading } = useAuth();
    const raffleId = params.id as string;
 
    // Estado para rotación de imágenes en el HeroCarousel
@@ -95,6 +95,33 @@ export default function ComprarPage() {
    const handlePurchase = async (data: PurchaseFormData) => {
       return await createPurchase(data);
    };
+
+   const initialPurchaseData = useMemo<Partial<PurchaseFormData> | undefined>(() => {
+      if (!user) return undefined;
+
+      const email = user.email || '';
+      const fullName =
+         user.user_metadata?.full_name ||
+         user.user_metadata?.name ||
+         user.user_metadata?.display_name ||
+         '';
+
+      const parts = fullName
+         .toString()
+         .trim()
+         .split(/\s+/)
+         .filter(Boolean);
+
+      const name = parts.length > 0 ? parts[0] : '';
+      const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+
+      return {
+         name,
+         lastName,
+         email,
+         confirmEmail: email,
+      };
+   }, [user]);
 
    // Rotación automática de imágenes en el HeroCarousel con efecto zoom
    useEffect(() => {
@@ -412,9 +439,43 @@ export default function ComprarPage() {
                            <p className="text-xs md:text-sm font-[var(--font-dm-sans)]" style={{ color: 'var(--text-secondary)' }}>
                               Ingresa tus datos para continuar
                            </p>
+                           {/* Estado de sesión (logueado / no logueado) */}
+                           <div className="mt-3 flex justify-center">
+                              {user ? (
+                                 <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs md:text-sm font-[var(--font-dm-sans)]" style={{
+                                    background: 'rgba(34, 197, 94, 0.08)',
+                                    borderColor: 'rgba(34, 197, 94, 0.25)',
+                                    color: '#D1FAE5',
+                                 }}>
+                                    <span className="font-semibold">Sesión activa:</span>
+                                    <span className="opacity-90">{user.email}</span>
+                                    <span className="hidden md:inline opacity-70">·</span>
+                                    <span className="hidden md:inline opacity-90">Tu compra se asociará a tu cuenta</span>
+                                 </div>
+                              ) : (
+                                 <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs md:text-sm font-[var(--font-dm-sans)]" style={{
+                                    background: 'rgba(168, 62, 245, 0.08)',
+                                    borderColor: 'rgba(168, 62, 245, 0.22)',
+                                    color: '#E5D4FF',
+                                 }}>
+                                    <span className="font-semibold">Compra como invitado</span>
+                                    <span className="opacity-70">·</span>
+                                    <button
+                                       type="button"
+                                       onClick={() => router.push('/login')}
+                                       className="underline hover:no-underline font-semibold"
+                                       style={{ color: '#A83EF5' }}
+                                    >
+                                       Inicia sesión
+                                    </button>
+                                    <span className="hidden md:inline opacity-90">para ver tus boletos en “Mis boletos”</span>
+                                 </div>
+                              )}
+                           </div>
                         </div>
 
                         <PurchaseFormWithPayment
+                           initialData={initialPurchaseData}
                            onSubmit={handlePurchase}
                            quantity={quantity}
                            totalAmount={quantity * raffle.price_per_ticket}
@@ -561,16 +622,16 @@ export default function ComprarPage() {
                                     {/* Botón de reproducir */}
                                     <button
                                        onClick={() => setIsPremio2VideoModalOpen(true)}
-                                       className="absolute inset-0 flex items-center justify-center z-20 transition-all opacity-0 group-hover/prize:opacity-100"
-                                       aria-label="Ver video del premio"
+                                       className="absolute inset-0 flex items-center justify-center z-20 transition-all opacity-100 lg:opacity-0 lg:group-hover/prize:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500"
+                                       aria-label="Ver video del 2do premio"
                                     >
-                                       <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ 
+                                       <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ 
                                           background: 'rgba(168, 62, 245, 0.9)',
                                           boxShadow: '0 4px 20px rgba(168, 62, 245, 0.5)'
                                        }}>
                                           <svg 
                                              xmlns="http://www.w3.org/2000/svg" 
-                                             className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white ml-1" 
+                                             className="h-5 w-5 sm:h-6 sm:w-6 md:h-6 md:w-6 text-white ml-1" 
                                              fill="currentColor" 
                                              viewBox="0 0 24 24"
                                           >
@@ -627,16 +688,16 @@ export default function ComprarPage() {
                                     {/* Botón de reproducir */}
                                     <button
                                        onClick={() => setIsPremio3VideoModalOpen(true)}
-                                       className="absolute inset-0 flex items-center justify-center z-20 transition-all opacity-0 group-hover/prize:opacity-100"
-                                       aria-label="Ver video del premio"
+                                       className="absolute inset-0 flex items-center justify-center z-20 transition-all opacity-100 lg:opacity-0 lg:group-hover/prize:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500"
+                                       aria-label="Ver video del 3er premio"
                                     >
-                                       <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ 
+                                       <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ 
                                           background: 'rgba(168, 62, 245, 0.9)',
                                           boxShadow: '0 4px 20px rgba(168, 62, 245, 0.5)'
                                        }}>
                                           <svg 
                                              xmlns="http://www.w3.org/2000/svg" 
-                                             className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white ml-1" 
+                                             className="h-5 w-5 sm:h-6 sm:w-6 md:h-6 md:w-6 text-white ml-1" 
                                              fill="currentColor" 
                                              viewBox="0 0 24 24"
                                           >

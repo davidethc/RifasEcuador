@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PayphonePaymentBox } from './PayphonePaymentBox';
 import { logger } from '@/utils/logger';
+import { buildPayphoneErrorExplanation, type PayphoneErrorExplanation } from '@/utils/payphoneUserMessage';
 
 interface PaymentMethodProps {
   orderId?: string;
@@ -34,6 +35,12 @@ export function PaymentMethod({
   const [selectedMethod, setSelectedMethod] = useState<'payphone' | 'transfer' | null>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
   const [copiedReference, setCopiedReference] = useState(false);
+  const [payphoneError, setPayphoneError] = useState<PayphoneErrorExplanation | null>(null);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofUploading, setProofUploading] = useState(false);
+  const [proofResult, setProofResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [transferNotifying, setTransferNotifying] = useState(false);
+  const [transferNotice, setTransferNotice] = useState<{ ok: boolean; message: string } | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-EC', {
@@ -45,10 +52,17 @@ export function PaymentMethod({
 
   const handleMethodSelect = (method: 'payphone' | 'transfer') => {
     setSelectedMethod(method);
+    setPayphoneError(null);
+    setProofResult(null);
+    if (method === 'transfer') {
+      // Make the order visible in Admin → Transferencias even before uploading proof
+      void notifyTransfer();
+    }
   };
 
   const handlePayphoneSuccess = (transactionId: string) => {
     logger.log('✅ Pago exitoso con Payphone:', transactionId);
+    setPayphoneError(null);
     if (onSuccess) {
       onSuccess();
     }
@@ -56,8 +70,88 @@ export function PaymentMethod({
 
   const handlePayphoneError = (error: string) => {
     logger.error('❌ Error en Payphone:', error);
+    const explanation = buildPayphoneErrorExplanation({ rawError: error });
+    setPayphoneError(explanation);
     if (onError) {
-      onError(error);
+      onError(explanation.userMessage);
+    }
+  };
+
+  const notifyTransfer = async () => {
+    if (!orderId) {
+      setTransferNotice({ ok: false, message: 'Falta el ID de la orden' });
+      return;
+    }
+
+    setTransferNotifying(true);
+    setTransferNotice(null);
+    try {
+      const res = await fetch('/api/payment/transfer/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          email: customerData.email,
+          phone: customerData.whatsapp,
+        }),
+      });
+
+      const data = (await res.json()) as { success?: boolean; message?: string; error?: string };
+      if (!res.ok || !data?.success) {
+        setTransferNotice({ ok: false, message: data?.error || 'No se pudo avisar al sistema' });
+        return;
+      }
+
+      setTransferNotice({ ok: true, message: data?.message || 'Listo: tu orden quedó registrada como transferencia.' });
+    } catch (e) {
+      setTransferNotice({ ok: false, message: e instanceof Error ? e.message : 'Error inesperado' });
+    } finally {
+      setTransferNotifying(false);
+    }
+  };
+
+  const retryPayphone = () => {
+    setPayphoneError(null);
+    // Forzar remount del widget (el componente se desmonta y vuelve a montar)
+    setSelectedMethod(null);
+    setTimeout(() => setSelectedMethod('payphone'), 50);
+  };
+
+  const uploadTransferProof = async () => {
+    if (!orderId) {
+      setProofResult({ ok: false, message: 'Falta el ID de la orden' });
+      return;
+    }
+    if (!proofFile) {
+      setProofResult({ ok: false, message: 'Selecciona un comprobante (imagen o PDF)' });
+      return;
+    }
+
+    setProofUploading(true);
+    setProofResult(null);
+    try {
+      const form = new FormData();
+      form.append('orderId', orderId);
+      form.append('email', customerData.email);
+      form.append('phone', customerData.whatsapp);
+      form.append('file', proofFile);
+
+      const res = await fetch('/api/payment/transfer/upload-proof', {
+        method: 'POST',
+        body: form,
+      });
+
+      const data = (await res.json()) as { success?: boolean; message?: string; error?: string };
+      if (!res.ok || !data?.success) {
+        setProofResult({ ok: false, message: data?.error || 'No se pudo subir el comprobante' });
+        return;
+      }
+
+      setProofResult({ ok: true, message: data?.message || 'Comprobante recibido. Quedará en revisión.' });
+    } catch (e) {
+      setProofResult({ ok: false, message: e instanceof Error ? e.message : 'Error inesperado' });
+    } finally {
+      setProofUploading(false);
     }
   };
 
@@ -241,6 +335,60 @@ export function PaymentMethod({
           {/* Área para Cajita de Pagos de Payphone - Ancho fijo */}
           {selectedMethod === 'payphone' && orderId && (
             <div className="mt-4 w-full min-w-0 max-w-full overflow-hidden">
+              {payphoneError && (
+                <div
+                  className="mb-4 rounded-xl border p-4"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.10)',
+                    borderColor: 'rgba(239, 68, 68, 0.25)',
+                  }}
+                >
+                  <div className="flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 flex-shrink-0 mt-0.5"
+                      style={{ color: '#FCA5A5' }}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold mb-1 font-[var(--font-dm-sans)]" style={{ color: '#FCA5A5' }}>
+                        {payphoneError.title}
+                      </p>
+                      <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+                        {payphoneError.userMessage}
+                      </p>
+                      <ul className="mt-2 text-xs list-disc pl-5 space-y-1 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                        {payphoneError.possibleCauses.slice(0, 3).map((cause) => (
+                          <li key={cause}>{cause}</li>
+                        ))}
+                      </ul>
+                      <div className="mt-3 flex flex-wrap gap-3">
+                        <button
+                          type="button"
+                          onClick={retryPayphone}
+                          className="text-xs font-semibold underline hover:no-underline"
+                          style={{ color: '#A83EF5' }}
+                        >
+                          Intentar nuevamente
+                        </button>
+                        {payphoneError.technicalHint && (
+                          <span className="text-[11px] font-mono" style={{ color: '#6B7280' }}>
+                            {payphoneError.technicalHint}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <PayphonePaymentBox
                 orderId={orderId}
                 amount={amount}
@@ -255,6 +403,110 @@ export function PaymentMethod({
           {/* Instrucciones para Transferencia - Rediseño UX Mejorado */}
           {selectedMethod === 'transfer' && (
             <div className="mt-4 w-full min-w-0 max-w-full overflow-hidden space-y-4">
+              {/* Subir comprobante (web) - Mantiene WhatsApp como respaldo */}
+              {orderId && (
+                <div
+                  className="rounded-xl border p-5"
+                  style={{
+                    background: 'rgba(15, 17, 23, 0.6)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{
+                        background: 'rgba(34, 197, 94, 0.18)',
+                        border: '1px solid rgba(34, 197, 94, 0.35)',
+                      }}
+                    >
+                      <span className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#22C55E' }}>
+                        0
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-base font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
+                      Sube tu comprobante aquí (recomendado)
+                    </h4>
+                  </div>
+
+                  <p className="text-sm font-[var(--font-dm-sans)] mb-3" style={{ color: '#E5D4FF' }}>
+                    Así tu pago queda en revisión inmediata en el sistema. También puedes enviarlo por WhatsApp como respaldo.
+                  </p>
+
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={notifyTransfer}
+                      disabled={transferNotifying}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-50"
+                      style={{
+                        background: 'rgba(255,255,255,0.10)',
+                        color: '#E5E7EB',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                      }}
+                    >
+                      {transferNotifying ? 'Avisando…' : 'Avisar al sistema'}
+                    </button>
+                    <span className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                      (para que aparezca en Admin → Transferencias)
+                    </span>
+                  </div>
+
+                  {transferNotice && (
+                    <div
+                      className="mb-3 rounded-lg border p-3"
+                      style={{
+                        background: transferNotice.ok ? 'rgba(34, 197, 94, 0.10)' : 'rgba(239, 68, 68, 0.10)',
+                        borderColor: transferNotice.ok ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)',
+                        color: '#E5E7EB',
+                      }}
+                    >
+                      <p className="text-sm font-[var(--font-dm-sans)]">{transferNotice.message}</p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+                      className="flex-1 text-sm"
+                      style={{ color: '#E5E7EB' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={uploadTransferProof}
+                      disabled={proofUploading || !proofFile}
+                      className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        background: '#22C55E',
+                        color: '#0F1117',
+                      }}
+                    >
+                      {proofUploading ? 'Subiendo...' : 'Enviar comprobante'}
+                    </button>
+                  </div>
+
+                  {proofResult && (
+                    <div
+                      className="mt-3 rounded-lg border p-3"
+                      style={{
+                        background: proofResult.ok ? 'rgba(34, 197, 94, 0.10)' : 'rgba(239, 68, 68, 0.10)',
+                        borderColor: proofResult.ok ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)',
+                        color: '#E5E7EB',
+                      }}
+                    >
+                      <p className="text-sm font-[var(--font-dm-sans)]">{proofResult.message}</p>
+                      {proofResult.ok && (
+                        <p className="mt-1 text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                          Ya debería aparecer en Admin → Transferencias (máximo 15s).
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Paso 1: Datos Bancarios - Destacado y fácil de copiar */}
               <div className="rounded-xl border p-5" style={{ 
                 background: 'linear-gradient(135deg, rgba(168, 62, 245, 0.1) 0%, rgba(15, 17, 23, 0.6) 100%)',

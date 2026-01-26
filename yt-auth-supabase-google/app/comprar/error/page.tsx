@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { buildPayphoneErrorExplanation, type PayphoneFailureReason } from '@/utils/payphoneUserMessage';
 
 /**
  * Página de error en el proceso de compra
@@ -12,14 +13,33 @@ export default function ErrorPage() {
   const searchParams = useSearchParams();
   const [message, setMessage] = useState('');
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [reason, setReason] = useState<PayphoneFailureReason | null>(null);
+
+  const supportWhatsApp = '593986910158';
 
   useEffect(() => {
     const errorMessage = searchParams.get('message') || 'Ocurrió un error inesperado';
     const orderIdParam = searchParams.get('orderId');
+    const transactionIdParam = searchParams.get('transactionId');
+    const reasonParam = searchParams.get('reason') as PayphoneFailureReason | null;
 
     setMessage(errorMessage);
     setOrderId(orderIdParam);
+    setTransactionId(transactionIdParam);
+    setReason(reasonParam);
   }, [searchParams]);
+
+  const explanation = reason
+    ? buildPayphoneErrorExplanation({ rawError: message, forcedReason: reason })
+    : null;
+
+  const waSupportText = encodeURIComponent(
+    `Hola, necesito ayuda con mi compra.\n\n` +
+      `${orderId ? `🧾 Orden: ${orderId}\n` : ''}` +
+      `${transactionId ? `💳 Transacción Payphone: ${transactionId}\n` : ''}` +
+      `📌 Error: ${message}`
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
@@ -55,6 +75,37 @@ export default function ErrorPage() {
           </p>
         </div>
 
+        {/* Explicación amigable (Payphone) */}
+        {reason && (
+          <div className="bg-gray-50 dark:bg-legacy-purple-deep rounded-xl p-5 mb-8 text-left">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2 font-[var(--font-dm-sans)]">
+              ¿Por qué pudo pasar?
+            </p>
+            <ul className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)] list-disc pl-5 space-y-1">
+              {(explanation?.possibleCauses?.length ? explanation.possibleCauses : [
+                'Fondos/cupo insuficiente.',
+                'Rechazo del banco por seguridad o límites.',
+                'Pago cancelado antes de completarse.',
+              ]).slice(0, 4).map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+
+            <p className="text-sm font-semibold text-gray-900 dark:text-white mt-4 mb-2 font-[var(--font-dm-sans)]">
+              ¿Qué puedes hacer?
+            </p>
+            <ul className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)] list-disc pl-5 space-y-1">
+              {(explanation?.nextSteps?.length ? explanation.nextSteps : [
+                'Intenta nuevamente.',
+                'Prueba con otra tarjeta o método de pago.',
+                'Si persiste, contáctanos por WhatsApp con tu ID de orden.',
+              ]).slice(0, 4).map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Información adicional */}
         <div className="bg-gray-50 dark:bg-legacy-purple-deep rounded-xl p-4 mb-8">
           <p className="text-sm text-gray-600 dark:text-gray-400 font-[var(--font-dm-sans)]">
@@ -64,6 +115,11 @@ export default function ErrorPage() {
           {orderId && (
             <p className="text-xs text-gray-500 dark:text-gray-500 mt-3 font-mono">
               ID de Orden: {orderId}
+            </p>
+          )}
+          {transactionId && (
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 font-mono">
+              ID de Transacción: {transactionId}
             </p>
           )}
         </div>
@@ -101,7 +157,7 @@ export default function ErrorPage() {
           </p>
           <div className="flex items-center justify-center gap-4">
             <a
-              href="https://wa.me/593999999999"
+              href={`https://wa.me/${supportWhatsApp}?text=${waSupportText}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm text-green-600 dark:text-green-400 hover:underline font-[var(--font-dm-sans)]"
