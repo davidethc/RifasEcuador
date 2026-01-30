@@ -13,8 +13,8 @@ interface SalesProgressBarProps {
  * Usa colores dorados para comunicar valor, premio y confianza
  */
 export function SalesProgressBar({ raffleId, totalNumbers }: SalesProgressBarProps) {
-  const [soldCount, setSoldCount] = useState(0);
-  const [totalCount, setTotalCount] = useState(totalNumbers);
+  const [_soldCount, setSoldCount] = useState(0);
+  const [_totalCount, setTotalCount] = useState(totalNumbers);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

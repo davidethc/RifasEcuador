@@ -20,8 +20,8 @@ export function SorteoCard({
     premio,
     precio,
     imagen = "/cardrifa.jpg",
-    totalNumbers = 1000,
-    soldNumbers = 0,
+    totalNumbers: _totalNumbers = 1000,
+    soldNumbers: _soldNumbers = 0,
 }: SorteoCardProps) {
     // Porcentaje quemado en 8 (mostrar siempre 8% hasta que se desee usar el real)
     const percentageSold = 8;
