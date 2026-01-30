@@ -48,7 +48,6 @@ export default function AdminHomePage() {
     }, 15000); // 15s
 
     return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const m = data?.metrics;
