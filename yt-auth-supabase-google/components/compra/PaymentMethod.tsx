@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { PayphonePaymentBox } from './PayphonePaymentBox';
 import { logger } from '@/utils/logger';
 import { buildPayphoneErrorExplanation, type PayphoneErrorExplanation } from '@/utils/payphoneUserMessage';
@@ -524,6 +525,31 @@ export function PaymentMethod({
                     Realiza la Transferencia
                   </h4>
                 </div>
+
+                {/* QR para pago (deuna! / Banco Pichincha) */}
+                <div className="flex justify-center mb-4">
+                  <div className="rounded-xl overflow-hidden p-4 text-center" style={{ 
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                  }}>
+                    <p className="text-xs font-semibold uppercase tracking-wide mb-3 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                      Paga con QR
+                    </p>
+                    <div className="relative inline-block rounded-lg overflow-hidden" style={{ maxWidth: 220 }}>
+                      <Image
+                        src="/qr.jpg"
+                        alt="QR para transferencia - Banco Pichincha / deuna!"
+                        width={220}
+                        height={220}
+                        className="object-contain w-full h-auto"
+                        unoptimized
+                      />
+                    </div>
+                    <p className="text-xs mt-2 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                      Escanea con tu app de banca y paga al instante
+                    </p>
+                  </div>
+                </div>
                 
                 {/* Datos bancarios en formato destacado */}
                 <div className="space-y-3">
@@ -539,7 +565,7 @@ export function PaymentMethod({
                       <button
                         onClick={async () => {
                           try {
-                            await navigator.clipboard.writeText('2100123456');
+                            await navigator.clipboard.writeText('2209782102');
                             setCopiedAccount(true);
                             setTimeout(() => setCopiedAccount(false), 2000);
                           } catch (err) {
@@ -581,7 +607,7 @@ export function PaymentMethod({
                       </button>
                     </div>
                     <p className="font-mono text-xl font-bold font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
-                      2100123456
+                      2209782102
                     </p>
                   </div>
 
@@ -593,12 +619,12 @@ export function PaymentMethod({
                     </div>
                     <div>
                       <p className="text-xs font-medium mb-1 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>Tipo</p>
-                      <p className="font-semibold text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>Cuenta Corriente</p>
+                      <p className="font-semibold text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>Cuenta de ahorro transaccional</p>
                     </div>
                   </div>
                   <div>
                     <p className="text-xs font-medium mb-1 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>Titular</p>
-                    <p className="font-semibold text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>RifasEcuador S.A.</p>
+                    <p className="font-semibold text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>Santiago Ismael Carpio Zavala</p>
                   </div>
                 </div>
               </div>
