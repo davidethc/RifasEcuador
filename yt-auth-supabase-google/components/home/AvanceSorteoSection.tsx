@@ -23,7 +23,8 @@ export function AvanceSorteoSection() {
     return () => clearInterval(interval);
   }, [totalTickets]);
 
-  const percentage = Math.min((soldCount / totalTickets) * 100, 100);
+  // Porcentaje quemado en 8 (mostrar siempre 8% hasta que se desee usar el real)
+  const percentage = 8;
 
   return (
     <section className="relative w-full py-12 md:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden" style={{

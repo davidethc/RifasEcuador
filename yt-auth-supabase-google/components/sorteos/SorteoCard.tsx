@@ -23,7 +23,8 @@ export function SorteoCard({
     totalNumbers = 1000,
     soldNumbers = 0,
 }: SorteoCardProps) {
-    const percentageSold = Math.min(100, Math.round((soldNumbers / totalNumbers) * 100));
+    // Porcentaje quemado en 8 (mostrar siempre 8% hasta que se desee usar el real)
+    const percentageSold = 8;
     const isPosterImage = imagen.includes("todospremiod.png");
 
     return (
