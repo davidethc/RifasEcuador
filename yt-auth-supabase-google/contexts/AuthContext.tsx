@@ -6,7 +6,7 @@ import {
   Session, 
   User, 
   SupabaseClient, 
-  AuthTokenResponse 
+
 } from '@supabase/supabase-js';
 import { logger } from '@/utils/logger';
 
@@ -28,6 +28,7 @@ interface AuthContextType {
   updatePassword: (newPassword: string) => Promise<void>;
   updateEmail: (newEmail: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: new URL('/auth/callback', window.location.origin).toString()
         }
       });
     },

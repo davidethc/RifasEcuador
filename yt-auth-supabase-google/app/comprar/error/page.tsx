@@ -16,7 +16,7 @@ export default function ErrorPage() {
   const [transactionId, setTransactionId] = useState<string | null>(null);
   const [reason, setReason] = useState<PayphoneFailureReason | null>(null);
 
-  const supportWhatsApp = '593986910158';
+  const supportWhatsApp = '593960948984';
 
   useEffect(() => {
     const errorMessage = searchParams.get('message') || 'Ocurrió un error inesperado';

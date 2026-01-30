@@ -724,7 +724,7 @@ export function PaymentMethod({
                 {/* Botón CTA Principal - Más prominente */}
                 {orderId && (
                   <a
-                    href={`https://wa.me/593986910158?text=${encodeURIComponent(
+                    href={`https://wa.me/593960948984?text=${encodeURIComponent(
                       `¡Hola! He realizado el pago por transferencia bancaria.\n\n` +
                       `📋 *Detalles de mi compra:*\n` +
                       `• ID de Orden: ${orderId}\n` +

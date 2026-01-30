@@ -126,8 +126,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // Número de WhatsApp (formato: código país + número, sin + ni espacios)
-  // Ejemplo: '593939039191' para Ecuador
-  const whatsappNumber = '593986910158'; // Cambia este número por el tuyo
+  // Ejemplo: '+593 96 094 8984' → '593960948984' para Ecuador
+  const whatsappNumber = '593960948984';
 
   return (
     <html lang="es" suppressHydrationWarning>

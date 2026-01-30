@@ -227,68 +227,125 @@ export async function POST(request: NextRequest) {
     logger.debug('📧 [EMAIL] Numbers text formateado:', numbersText);
     logger.debug('📧 [EMAIL] Numbers HTML generado:', numbersHtml.substring(0, 200) + '...');
 
-    // Crear template HTML del correo
+    // Crear template HTML del correo (diseño tipo factura/comprobante)
     const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Confirmación de Compra</title>
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #3b82f6 0%, #fbbf24 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0;">¡Compra Exitosa! 🎉</h1>
-          </div>
-          
-          <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
-            <p style="font-size: 18px; margin-bottom: 20px;">Hola <strong>${client.name}</strong>,</p>
-            
-            <p>Tu compra ha sido procesada exitosamente. Aquí están los detalles:</p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
-              <h2 style="margin-top: 0; color: #3b82f6;">${raffle?.title || 'Sorteo'}</h2>
-              
-              <div style="margin: 15px 0;">
-                <strong style="font-size: 16px; color: #1f2937;">🎟️ Números de boletos asignados:</strong>
-                <div style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 2px solid #059669;">
-                  ${numbersHtml}
-                </div>
-                ${ticketNumbers.length > 0 ? `<p style="margin-top: 10px; font-size: 14px; color: #6b7280;">Total: <strong>${ticketNumbers.length} número${ticketNumbers.length !== 1 ? 's' : ''}</strong></p>` : ''}
-              </div>
-              
-              <div style="margin: 15px 0;">
-                <strong>Cantidad de boletos:</strong> ${ticketNumbers.length}
-                ${totalTickets !== paidQuantity ? ` <span style="color: #059669; font-size: 14px;">(${paidQuantity} pagados + ${totalTickets - paidQuantity} gratis 🎁)</span>` : ''}
-              </div>
-              
-              <div style="margin: 15px 0;">
-                <strong>Precio por boleto:</strong> $${(raffle?.price_per_ticket || 0).toFixed(2)}
-              </div>
-              
-              <div style="margin: 15px 0;">
-                <strong>Total pagado:</strong> 
-                <span style="font-size: 20px; font-weight: bold; color: #059669;">
-                  $${correctTotal.toFixed(2)}
-                </span>
-              </div>
-              
-              <div style="margin: 15px 0;">
-                <strong>ID de orden:</strong> ${orderId}
-              </div>
-            </div>
-            
-            <p style="margin-top: 30px;">Guarda este correo como comprobante de tu compra.</p>
-            
-            <p style="margin-top: 20px;">¡Mucha suerte en el sorteo! 🍀</p>
-            
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px;">
-              <p>Este es un correo automático, por favor no respondas.</p>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante de Compra</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #111827; background: #f3f4f6; margin: 0; padding: 0;">
+    <div style="max-width: 700px; margin: 0 auto; background: #ffffff;">
+      <!-- Cabecera -->
+      <div style="background: linear-gradient(135deg,#0f172a,#1d4ed8); padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; color: #f9fafb;">
+        <div>
+          <div style="font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8;">Comprobante de compra</div>
+          <div style="font-size: 24px; font-weight: 700; margin-top: 4px;">${raffle?.title || 'Sorteo'}</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 20px; font-weight: 700;">ALTOKEEC</div>
+          <div style="font-size: 12px; opacity: 0.85;">www.altokeec.com</div>
+        </div>
+      </div>
+
+      <div style="padding: 24px 32px 8px 32px;">
+        <!-- Datos cliente / empresa -->
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 24px;">
+          <div style="flex: 1 1 260px;">
+            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">Datos del cliente</div>
+            <div style="font-size: 14px;">
+              <div><strong>Nombre:</strong> ${client.name}</div>
+              ${client.email ? `<div><strong>Mail:</strong> ${client.email}</div>` : ''}
+              ${client.phone ? `<div><strong>Teléfono:</strong> ${client.phone}</div>` : ''}
             </div>
           </div>
-        </body>
-      </html>
-    `;
+
+          <div style="flex: 1 1 260px;">
+            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">Datos de la empresa</div>
+            <div style="font-size: 14px;">
+              <div><strong>Nombre:</strong> ALTOKEEC</div>
+              <div><strong>Dirección:</strong> Calle Ejemplo 123, Quito, Ecuador</div>
+              <div><strong>Mail:</strong> soporte@altokeec.com</div>
+              <div><strong>Teléfono:</strong> +593 99 999 9999</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fecha + ID -->
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; font-size: 14px; margin-bottom: 24px;">
+          <div><strong>Fecha:</strong> ${new Date(typedOrderData.created_at).toLocaleDateString('es-EC')}</div>
+          <div><strong>ID de orden:</strong> ${orderId}</div>
+        </div>
+
+        <!-- Tabla de conceptos -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 16px;">
+          <thead>
+            <tr>
+              <th style="background: #0f172a; color: #f9fafb; padding: 10px; text-align: left;">Concepto</th>
+              <th style="background: #0f172a; color: #f9fafb; padding: 10px; text-align: center;">Cantidad</th>
+              <th style="background: #0f172a; color: #f9fafb; padding: 10px; text-align: right;">Precio</th>
+              <th style="background: #0f172a; color: #f9fafb; padding: 10px; text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border-bottom: 1px solid #e5e7eb; padding: 8px 10px;">
+                Compra de boletos - ${raffle?.title || 'Sorteo'}
+              </td>
+              <td style="border-bottom: 1px solid #e5e7eb; padding: 8px 10px; text-align: center;">
+                ${paidQuantity}
+              </td>
+              <td style="border-bottom: 1px solid #e5e7eb; padding: 8px 10px; text-align: right;">
+                $${(raffle?.price_per_ticket || 0).toFixed(2)}
+              </td>
+              <td style="border-bottom: 1px solid #e5e7eb; padding: 8px 10px; text-align: right;">
+                $${correctTotal.toFixed(2)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Resumen -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+          <table style="font-size: 14px;">
+            <tr>
+              <td style="padding: 4px 8px; text-align: right;"><strong>Total pagado:</strong></td>
+              <td style="padding: 4px 8px; text-align: right; font-size: 18px; font-weight: 700; color: #16a34a;">
+                $${correctTotal.toFixed(2)}
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Números de boletos -->
+        <div style="margin-top: 24px; font-size: 14px;">
+          <div style="font-weight: 600; margin-bottom: 8px;">Números de boletos asignados:</div>
+          <div style="padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb;">
+            ${ticketNumbers.length
+              ? ticketNumbers.map(num =>
+                  `<span style="display:inline-block;margin:2px 4px;padding:6px 10px;border-radius:4px;background:#1d4ed8;color:#ffffff;font-weight:600;">${num}</span>`
+                ).join('')
+              : '<span style="color:#b91c1c;">No se encontraron números asignados.</span>'
+            }
+          </div>
+          ${ticketNumbers.length && totalTickets !== paidQuantity
+            ? `<p style="margin-top:6px;font-size:12px;color:#6b7280;">Incluye ${paidQuantity} boletos pagados y ${totalTickets - paidQuantity} de cortesía.</p>`
+            : ''
+          }
+        </div>
+
+        <!-- Notas -->
+        <div style="margin-top: 24px; font-size: 12px; color: #6b7280;">
+          <p>Guarda este correo como comprobante de tu compra. En caso de dudas, contáctanos a <strong>soporte@altokeec.com</strong>.</p>
+          <p>Este correo es generado automáticamente, por favor no respondas directamente.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+`;
 
     // Enviar correo usando Resend
     // Usar dominio verificado yt.bytemind.space
