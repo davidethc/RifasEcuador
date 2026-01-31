@@ -4,7 +4,14 @@ const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  
+
+  // Evitar 404 en /favicon.ico (el navegador lo pide por defecto; no hay app/favicon.ico)
+  async rewrites() {
+    return [
+      { source: '/favicon.ico', destination: '/logosrifaweb.png' },
+    ];
+  },
+
   // Optimización de imágenes
   images: {
     formats: ['image/avif', 'image/webp'],

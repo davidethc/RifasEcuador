@@ -54,6 +54,25 @@ Cuando termine, tendrás una URL tipo:
 
 ---
 
+## ⚠️ Página en blanco o "Invalid URL"
+
+Si **altokeec.com** (o tu dominio) se ve en blanco o en consola sale `TypeError: Failed to construct 'URL': Invalid URL`:
+
+1. **Root Directory**  
+   En Vercel → **Settings** → **General** → **Root Directory**:  
+   - Si el repo es "RifasEcuador" y la app está en la subcarpeta, debe ser **`yt-auth-supabase-google`**.  
+   - Si no, Vercel construye desde la raíz del repo y puede no encontrar la app Next.js.
+
+2. **NEXT_PUBLIC_APP_URL**  
+   En **Settings** → **Environment Variables**:  
+   - Debe ser una URL completa: **`https://altokeec.com`** (con `https://`).  
+   - No uses solo `altokeec.com` ni valores vacíos.
+
+3. **Redeploy**  
+   Después de cambiar variables o Root Directory: **Deployments** → los tres puntos del último deploy → **Redeploy**.
+
+---
+
 ## Parte 2: Dominio y subdominio
 
 Tienes dos casos: **dominio comprado en Vercel** o **dominio que ya tienes en otro proveedor** (GoDaddy, Namecheap, Cloudflare, etc.).
