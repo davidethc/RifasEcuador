@@ -266,9 +266,8 @@ export async function POST(request: NextRequest) {
             <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">Datos de la empresa</div>
             <div style="font-size: 14px;">
               <div><strong>Nombre:</strong> ALTOKEEC</div>
-              <div><strong>Dirección:</strong> Calle Ejemplo 123, Quito, Ecuador</div>
-              <div><strong>Mail:</strong> soporte@altokeec.com</div>
-              <div><strong>Teléfono:</strong> +593 99 999 9999</div>
+              <div><strong>Mail:</strong> administracion@altokeec.com</div>
+              <div><strong>Teléfono:</strong> +593 96 094 8984</div>
             </div>
           </div>
         </div>
@@ -338,7 +337,7 @@ export async function POST(request: NextRequest) {
 
         <!-- Notas -->
         <div style="margin-top: 24px; font-size: 12px; color: #6b7280;">
-          <p>Guarda este correo como comprobante de tu compra. En caso de dudas, contáctanos a <strong>soporte@altokeec.com</strong>.</p>
+          <p>Guarda este correo como comprobante de tu compra. En caso de dudas, contáctanos a <strong>administracion@altokeec.com</strong>.</p>
           <p>Este correo es generado automáticamente, por favor no respondas directamente.</p>
         </div>
       </div>
