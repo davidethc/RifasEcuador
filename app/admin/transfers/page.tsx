@@ -223,7 +223,7 @@ export default function AdminTransfersPage() {
             </p>
             {lookupOrder.payment_method !== 'transfer' && (
               <div className="mt-3 rounded-lg border p-3 text-sm" style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#9CA3AF' }}>
-                Esta orden <b>no está marcada como transferencia</b>. Pide al cliente que presione <b>“Avisar al sistema”</b> o que suba el comprobante en la web.
+                Esta orden <b>no está marcada como transferencia</b>. Pide al cliente que presione <b>“Notificar que ya pagué”</b> o que suba el comprobante en la web.
               </div>
             )}
             <div className="mt-3 flex flex-col md:flex-row gap-2 flex-wrap">

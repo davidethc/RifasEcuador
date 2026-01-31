@@ -86,8 +86,8 @@ export async function POST(request: Request) {
       orderId,
       status: nextStatus,
       message: hasProof
-        ? 'Listo: tu comprobante ya está en revisión.'
-        : 'Listo: tu orden quedó registrada como transferencia (pendiente). Sube el comprobante para que el admin la apruebe.',
+        ? 'Listo. Tu comprobante está en revisión.'
+        : 'Listo. Sube tu comprobante y te confirmamos el pago pronto.',
     });
   } catch (error) {
     return NextResponse.json(

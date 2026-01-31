@@ -401,354 +401,208 @@ export function PaymentMethod({
             </div>
           )}
 
-          {/* Instrucciones para Transferencia - Rediseño UX Mejorado */}
+          {/* Instrucciones para Transferencia - Un solo contenedor, mejor uso del espacio */}
           {selectedMethod === 'transfer' && (
-            <div className="mt-4 w-full min-w-0 max-w-full overflow-hidden space-y-4">
-              {/* Subir comprobante (web) - Mantiene WhatsApp como respaldo */}
-              {orderId && (
-                <div
-                  className="rounded-xl border p-5"
-                  style={{
-                    background: 'rgba(15, 17, 23, 0.6)',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center"
-                      style={{
-                        background: 'rgba(34, 197, 94, 0.18)',
-                        border: '1px solid rgba(34, 197, 94, 0.35)',
-                      }}
-                    >
-                      <span className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#22C55E' }}>
-                        0
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-base font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
-                      Sube tu comprobante aquí (recomendado)
+            <div className="mt-4 w-full min-w-0 max-w-full overflow-hidden">
+              <div
+                className="rounded-xl border p-5 md:p-6"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(25, 22, 40, 0.98) 0%, rgba(15, 17, 23, 0.99) 100%)',
+                  borderColor: 'rgba(255, 178, 0, 0.3)',
+                  boxShadow: '0 0 0 1px rgba(255, 178, 0, 0.12), 0 8px 32px rgba(0,0,0,0.35)',
+                }}
+              >
+                {/* Sección 1: Subir comprobante (solo si hay orderId) */}
+                {orderId && (
+                  <>
+                    <h4 className="font-bold text-base font-[var(--font-comfortaa)] mb-1" style={{ color: '#FFFFFF' }}>
+                      Sube tu comprobante
                     </h4>
-                  </div>
-
-                  <p className="text-sm font-[var(--font-dm-sans)] mb-3" style={{ color: '#E5D4FF' }}>
-                    Así tu pago queda en revisión inmediata en el sistema. También puedes enviarlo por WhatsApp como respaldo.
-                  </p>
-
-                  <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={notifyTransfer}
-                      disabled={transferNotifying}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-50"
-                      style={{
-                        background: 'rgba(255,255,255,0.10)',
-                        color: '#E5E7EB',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                      }}
-                    >
-                      {transferNotifying ? 'Avisando…' : 'Avisar al sistema'}
-                    </button>
-                    <span className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-                      (para que aparezca en Admin → Transferencias)
-                    </span>
-                  </div>
-
-                  {transferNotice && (
-                    <div
-                      className="mb-3 rounded-lg border p-3"
-                      style={{
-                        background: transferNotice.ok ? 'rgba(34, 197, 94, 0.10)' : 'rgba(239, 68, 68, 0.10)',
-                        borderColor: transferNotice.ok ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)',
-                        color: '#E5E7EB',
-                      }}
-                    >
-                      <p className="text-sm font-[var(--font-dm-sans)]">{transferNotice.message}</p>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col md:flex-row gap-3">
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,application/pdf"
-                      onChange={(e) => setProofFile(e.target.files?.[0] || null)}
-                      className="flex-1 text-sm"
-                      style={{ color: '#E5E7EB' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={uploadTransferProof}
-                      disabled={proofUploading || !proofFile}
-                      className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        background: '#22C55E',
-                        color: '#0F1117',
-                      }}
-                    >
-                      {proofUploading ? 'Subiendo...' : 'Enviar comprobante'}
-                    </button>
-                  </div>
-
-                  {proofResult && (
-                    <div
-                      className="mt-3 rounded-lg border p-3"
-                      style={{
-                        background: proofResult.ok ? 'rgba(34, 197, 94, 0.10)' : 'rgba(239, 68, 68, 0.10)',
-                        borderColor: proofResult.ok ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)',
-                        color: '#E5E7EB',
-                      }}
-                    >
-                      <p className="text-sm font-[var(--font-dm-sans)]">{proofResult.message}</p>
-                      {proofResult.ok && (
-                        <p className="mt-1 text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-                          Ya debería aparecer en Admin → Transferencias (máximo 15s).
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Paso 1: Datos Bancarios - Destacado y fácil de copiar */}
-              <div className="rounded-xl border p-5" style={{ 
-                background: 'linear-gradient(135deg, rgba(168, 62, 245, 0.1) 0%, rgba(15, 17, 23, 0.6) 100%)',
-                borderColor: 'rgba(168, 62, 245, 0.3)',
-                boxShadow: '0 4px 20px rgba(168, 62, 245, 0.15)'
-              }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ 
-                    background: 'rgba(168, 62, 245, 0.2)',
-                    border: '1px solid rgba(168, 62, 245, 0.4)'
-                  }}>
-                    <span className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#A83EF5' }}>1</span>
-                  </div>
-                  <h4 className="font-bold text-base font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
-                    Realiza la Transferencia
-                  </h4>
-                </div>
-
-                {/* QR para pago (deuna! / Banco Pichincha) */}
-                <div className="flex justify-center mb-4">
-                  <div className="rounded-xl overflow-hidden p-4 text-center" style={{ 
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)'
-                  }}>
-                    <p className="text-xs font-semibold uppercase tracking-wide mb-3 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-                      Paga con QR
+                    <p className="text-sm font-[var(--font-dm-sans)] mb-3" style={{ color: '#E5D4FF' }}>
+                      Sube la foto o PDF de tu transferencia y la revisaremos pronto. También puedes enviarlo por WhatsApp.
                     </p>
-                    <div className="relative inline-block rounded-lg overflow-hidden" style={{ maxWidth: 220 }}>
-                      <Image
-                        src="/qr.jpg"
-                        alt="QR para transferencia - Banco Pichincha / deuna!"
-                        width={220}
-                        height={220}
-                        className="object-contain w-full h-auto"
-                        unoptimized
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={notifyTransfer}
+                        disabled={transferNotifying}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-50"
+                        style={{
+                          background: 'rgba(255,255,255,0.10)',
+                          color: '#E5E7EB',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                        }}
+                      >
+                        {transferNotifying ? 'Avisando…' : 'Notificar que ya pagué'}
+                      </button>
+                    </div>
+                    {transferNotice && (
+                      <div className="mb-3 rounded-lg p-3" style={{
+                        background: transferNotice.ok ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                        color: '#E5E7EB',
+                      }}>
+                        <p className="text-sm font-[var(--font-dm-sans)]">{transferNotice.message}</p>
+                      </div>
+                    )}
+                    <div className="flex flex-col md:flex-row gap-3 mb-5 pb-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,application/pdf"
+                        onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+                        className="flex-1 text-sm min-w-0"
+                        style={{ color: '#E5E7EB' }}
                       />
+                      <button
+                        type="button"
+                        onClick={uploadTransferProof}
+                        disabled={proofUploading || !proofFile}
+                        className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                        style={{ background: '#22C55E', color: '#0F1117' }}
+                      >
+                        {proofUploading ? 'Subiendo...' : 'Enviar comprobante'}
+                      </button>
                     </div>
-                    <p className="text-xs mt-2 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-                      Escanea con tu app de banca y paga al instante
-                    </p>
+                    {proofResult && (
+                      <div className="mb-5 pb-5 rounded-lg p-3" style={{
+                        background: proofResult.ok ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                        color: '#E5E7EB',
+                      }}>
+                        <p className="text-sm font-[var(--font-dm-sans)]">{proofResult.message}</p>
+                        {proofResult.ok && (
+                          <p className="mt-1 text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+                            Te avisaremos cuando verifiquemos tu pago.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Sección 2: Datos para depositar - Cuenta, monto, referencia */}
+                <h4 className="font-bold text-lg font-[var(--font-comfortaa)] mb-1" style={{ color: '#FFFFFF' }}>
+                  Realiza la transferencia
+                </h4>
+                <p className="text-sm font-[var(--font-dm-sans)] mb-5" style={{ color: '#A78BFA' }}>
+                  Escanea con tu app de banca y paga al instante
+                </p>
+
+                {/* QR sin caja extra */}
+                <div className="flex justify-center mb-6">
+                  <div className="relative inline-block rounded-lg overflow-hidden" style={{ maxWidth: 200 }}>
+                    <Image
+                      src="/qr.jpg"
+                      alt="QR para transferencia - Banco Pichincha / deuna!"
+                      width={200}
+                      height={200}
+                      className="object-contain w-full h-auto"
+                      unoptimized
+                    />
                   </div>
                 </div>
-                
-                {/* Datos bancarios en formato destacado */}
-                <div className="space-y-3">
-                  {/* Número de cuenta - Lo más importante */}
-                  <div className="rounded-lg p-4" style={{ 
-                    background: 'rgba(255, 178, 0, 0.15)',
-                    border: '2px solid rgba(255, 178, 0, 0.3)'
-                  }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-semibold font-[var(--font-dm-sans)] uppercase tracking-wide" style={{ color: '#FFB200' }}>
-                        Número de Cuenta
-                      </p>
+
+                {/* Número de cuenta - Lo más visible */}
+                <div className="mb-5 pb-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <p className="text-xs font-bold font-[var(--font-dm-sans)] uppercase tracking-wider" style={{ color: '#FFB200' }}>
+                      Número de cuenta
+                    </p>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText('2209782102');
+                          setCopiedAccount(true);
+                          setTimeout(() => setCopiedAccount(false), 2000);
+                        } catch (err) {
+                          logger.error('Error al copiar:', err);
+                        }
+                      }}
+                      className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1.5 shrink-0"
+                      style={{ 
+                        color: copiedAccount ? '#22C55E' : '#0F1117',
+                        background: copiedAccount ? '#22C55E' : '#FFB200',
+                        border: 'none'
+                      }}
+                    >
+                      {copiedAccount ? (
+                        <><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg><span>Copiado</span></>
+                      ) : (
+                        <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>Copiar</span></>
+                      )}
+                    </button>
+                  </div>
+                  <p className="font-mono text-2xl md:text-3xl font-bold tracking-wider" style={{ color: '#FFB200', textShadow: '0 0 20px rgba(255, 178, 0, 0.4)' }}>
+                    2209782102
+                  </p>
+                  <p className="text-sm font-[var(--font-dm-sans)] mt-2" style={{ color: '#C4B5FD' }}>
+                    Banco Pichincha · Cuenta de ahorro · Santiago Ismael Carpio Zavala
+                  </p>
+                </div>
+
+                {/* Monto - Muy visible */}
+                <div className="mb-5 pb-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <p className="text-xs font-bold font-[var(--font-dm-sans)] uppercase tracking-wider mb-1" style={{ color: '#FFB200' }}>
+                    Monto a transferir
+                  </p>
+                  <p className="font-bold text-3xl md:text-4xl font-[var(--font-comfortaa)]" style={{ color: '#FFB200', textShadow: '0 0 24px rgba(255, 178, 0, 0.35)' }}>
+                    {formatPrice(amount)}
+                  </p>
+                </div>
+
+                {/* Referencia - Obligatoria y visible */}
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <p className="text-xs font-bold font-[var(--font-dm-sans)]" style={{ color: '#FBBF24' }}>
+                      Referencia (obligatoria)
+                    </p>
+                    {orderId && (
                       <button
                         onClick={async () => {
                           try {
-                            await navigator.clipboard.writeText('2209782102');
-                            setCopiedAccount(true);
-                            setTimeout(() => setCopiedAccount(false), 2000);
+                            await navigator.clipboard.writeText(orderId);
+                            setCopiedReference(true);
+                            setTimeout(() => setCopiedReference(false), 2000);
                           } catch (err) {
                             logger.error('Error al copiar:', err);
                           }
                         }}
-                        className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5"
+                        className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1.5 shrink-0"
                         style={{ 
-                          color: copiedAccount ? '#22C55E' : '#FFB200',
-                          background: copiedAccount ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 178, 0, 0.2)',
-                          border: `1px solid ${copiedAccount ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 178, 0, 0.3)'}`
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!copiedAccount) {
-                            e.currentTarget.style.background = 'rgba(255, 178, 0, 0.3)';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!copiedAccount) {
-                            e.currentTarget.style.background = 'rgba(255, 178, 0, 0.2)';
-                          }
+                          color: copiedReference ? '#22C55E' : '#0F1117',
+                          background: copiedReference ? '#22C55E' : '#FBBF24',
+                          border: 'none'
                         }}
                       >
-                        {copiedAccount ? (
-                          <>
-                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            <span>Copiado</span>
-                          </>
+                        {copiedReference ? (
+                          <><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg><span>Copiado</span></>
                         ) : (
-                          <>
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            <span>Copiar</span>
-                          </>
+                          <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>Copiar</span></>
                         )}
                       </button>
-                    </div>
-                    <p className="font-mono text-xl font-bold font-[var(--font-dm-sans)]" style={{ color: '#FFFFFF' }}>
-                      2209782102
-                    </p>
-                  </div>
-
-                  {/* Otros datos en grid compacto */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-xs font-medium mb-1 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>Banco</p>
-                      <p className="font-semibold text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>Banco Pichincha</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium mb-1 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>Tipo</p>
-                      <p className="font-semibold text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>Cuenta de ahorro transaccional</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium mb-1 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>Titular</p>
-                    <p className="font-semibold text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>Santiago Ismael Carpio Zavala</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Paso 2: Monto y Referencia - Destacado */}
-              <div className="rounded-xl border p-5" style={{ 
-                background: 'rgba(15, 17, 23, 0.6)',
-                borderColor: 'rgba(255, 255, 255, 0.1)'
-              }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ 
-                    background: 'rgba(255, 178, 0, 0.2)',
-                    border: '1px solid rgba(255, 178, 0, 0.4)'
-                  }}>
-                    <span className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#FFB200' }}>2</span>
-                  </div>
-                  <h4 className="font-bold text-base font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
-                    Monto y Referencia
-                  </h4>
-                </div>
-                
-                <div className="space-y-3">
-                  {/* Monto destacado */}
-                  <div className="rounded-lg p-4 text-center" style={{ 
-                    background: 'rgba(255, 178, 0, 0.1)',
-                    border: '1px solid rgba(255, 178, 0, 0.2)'
-                  }}>
-                    <p className="text-xs font-medium mb-2 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-                      Monto a Transferir
-                    </p>
-                    <p className="font-bold text-3xl font-[var(--font-comfortaa)]" style={{ color: '#FFB200' }}>
-                      {formatPrice(amount)}
-                    </p>
-                  </div>
-
-                  {/* Referencia con botón copiar */}
-                  <div className="rounded-lg p-4" style={{ 
-                    background: 'rgba(42, 45, 69, 0.4)',
-                    border: '1px solid rgba(168, 62, 245, 0.3)'
-                  }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-semibold font-[var(--font-dm-sans)]" style={{ color: '#A83EF5' }}>
-                        ⚠️ Referencia (OBLIGATORIA)
-                      </p>
-                      {orderId && (
-                        <button
-                          onClick={async () => {
-                            try {
-                              await navigator.clipboard.writeText(orderId);
-                              setCopiedReference(true);
-                              setTimeout(() => setCopiedReference(false), 2000);
-                            } catch (err) {
-                              logger.error('Error al copiar:', err);
-                            }
-                          }}
-                          className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5"
-                          style={{ 
-                            color: copiedReference ? '#22C55E' : '#A83EF5',
-                            background: copiedReference ? 'rgba(34, 197, 94, 0.2)' : 'rgba(168, 62, 245, 0.2)',
-                            border: `1px solid ${copiedReference ? 'rgba(34, 197, 94, 0.4)' : 'rgba(168, 62, 245, 0.3)'}`
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!copiedReference) {
-                              e.currentTarget.style.background = 'rgba(168, 62, 245, 0.3)';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!copiedReference) {
-                              e.currentTarget.style.background = 'rgba(168, 62, 245, 0.2)';
-                            }
-                          }}
-                        >
-                          {copiedReference ? (
-                            <>
-                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                              <span>Copiado</span>
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                              <span>Copiar</span>
-                            </>
-                          )}
-                        </button>
-                      )}
-                    </div>
-                    {orderId && (
-                      <p className="font-mono text-sm p-2 rounded break-all bg-black/20" style={{ color: '#E5E7EB' }}>
-                        {orderId}
-                      </p>
                     )}
                   </div>
+                  {orderId && (
+                    <p className="font-mono text-sm md:text-base font-bold break-all" style={{ color: '#FCD34D', textShadow: '0 0 12px rgba(252, 211, 77, 0.25)' }}>
+                      {orderId}
+                    </p>
+                  )}
+                  <p className="text-xs font-semibold mt-3 mb-1 font-[var(--font-dm-sans)]" style={{ color: '#A78BFA' }}>
+                    Cédula (para la transferencia)
+                  </p>
+                  <p className="font-mono text-lg font-bold" style={{ color: '#C4B5FD', textShadow: '0 0 10px rgba(167, 139, 250, 0.3)' }}>
+                    0605844828
+                  </p>
                 </div>
-              </div>
 
-              {/* Paso 3: Confirmar Pago - CTA Principal */}
-              <div className="rounded-xl border p-5" style={{ 
-                background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(15, 17, 23, 0.6) 100%)',
-                borderColor: 'rgba(34, 197, 94, 0.3)',
-                boxShadow: '0 4px 20px rgba(34, 197, 94, 0.15)'
-              }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ 
-                    background: 'rgba(34, 197, 94, 0.2)',
-                    border: '1px solid rgba(34, 197, 94, 0.4)'
-                  }}>
-                    <span className="text-lg font-bold font-[var(--font-comfortaa)]" style={{ color: '#22C55E' }}>3</span>
-                  </div>
-                  <h4 className="font-bold text-base font-[var(--font-comfortaa)]" style={{ color: '#FFFFFF' }}>
-                    Confirma tu Pago
+                {/* Sección 3: Confirma tu pago - mismo contenedor */}
+                <div className="mt-6 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                  <h4 className="font-bold text-base font-[var(--font-comfortaa)] mb-1" style={{ color: '#FFFFFF' }}>
+                    Confirma tu pago
                   </h4>
-                </div>
-                
-                <p className="text-sm font-[var(--font-dm-sans)] mb-4 leading-relaxed" style={{ color: '#9CA3AF' }}>
-                  Después de realizar la transferencia, envía el comprobante por WhatsApp. 
-                  <strong style={{ color: '#E5E7EB' }}> Tu orden será confirmada en menos de 24 horas.</strong>
-                </p>
-                
-                {/* Botón CTA Principal - Más prominente */}
-                {orderId && (
+                  <p className="text-sm font-[var(--font-dm-sans)] mb-4 leading-relaxed" style={{ color: '#9CA3AF' }}>
+                    Después de realizar la transferencia, envía el comprobante por WhatsApp. 
+                    <strong style={{ color: '#E5E7EB' }}> Tu orden será confirmada en menos de 24 horas.</strong>
+                  </p>
+                  {orderId && (
                   <a
                     href={`https://wa.me/593960948984?text=${encodeURIComponent(
                       `¡Hola! He realizado el pago por transferencia bancaria.\n\n` +
@@ -798,10 +652,10 @@ export function PaymentMethod({
                   </svg>
                   <span>Confirmación en menos de 24 horas hábiles</span>
                 </div>
+                </div>
               </div>
             </div>
           )}
-          </div>
 
         {/* Información de seguridad */}
         <div className="rounded-lg border p-3 md:p-4" style={{ 
@@ -823,6 +677,7 @@ export function PaymentMethod({
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

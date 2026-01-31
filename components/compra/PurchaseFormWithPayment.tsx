@@ -215,12 +215,8 @@ export function PurchaseFormWithPayment({
         // Estado inicial: Solo formulario - Layout optimizado
         <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
-            {/* Columna izquierda: Formulario */}
-            <div className="lg:col-span-2 rounded-xl border p-4 md:p-5 space-y-3 transition-all duration-200" style={{
-              background: 'var(--bg-secondary)',
-              borderColor: 'var(--border-subtle)',
-              boxShadow: 'var(--shadow-md)'
-            }}>
+            {/* Columna izquierda: Formulario (sin contenedor interno, un solo contenedor general) */}
+            <div className="lg:col-span-2 space-y-3">
               {/* Fila 1: Nombre y Apellido - 2 columnas en desktop */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <MaterialInput
@@ -307,13 +303,9 @@ export function PurchaseFormWithPayment({
               />
             </div>
 
-            {/* Columna derecha: Resumen y Nota - Compacto */}
+            {/* Columna derecha: Resumen y Nota - Sin caja extra, mismo contenedor general */}
             <div className="lg:col-span-1 space-y-3">
-              <div className="rounded-xl border p-4 transition-all duration-200 sticky top-4" style={{
-                background: 'var(--bg-secondary)',
-                borderColor: 'var(--border-subtle)',
-                boxShadow: 'var(--shadow-md)'
-              }}>
+              <div className="p-4 pt-0 lg:pt-4 sticky top-4">
                 <h3 className="text-base font-bold mb-3 font-[var(--font-comfortaa)]" style={{ color: 'var(--text-primary)' }}>
                   Resumen de la compra
                 </h3>
@@ -354,11 +346,9 @@ export function PurchaseFormWithPayment({
                 </div>
               </div>
 
-              {/* Nota importante - Integrada de forma más compacta */}
-              <div className="rounded-xl p-3 border" style={{
-                background: 'rgba(168, 62, 245, 0.08)',
-                borderColor: 'rgba(168, 62, 245, 0.2)',
-                boxShadow: 'var(--shadow-sm)'
+              {/* Nota importante - Integrada sin caja extra */}
+              <div className="p-3 rounded-lg" style={{
+                background: 'rgba(168, 62, 245, 0.06)',
               }}>
                 <div className="flex gap-2">
                   <div className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center" style={{

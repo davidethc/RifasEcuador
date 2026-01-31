@@ -425,7 +425,7 @@ export default function ComprarPage() {
 
                {/* Payment Form (Only shown if numbers selected) - Layout optimizado con mejor uso del espacio */}
                {quantity > 0 && (
-                  <div id="payment-form" className="mt-6 md:mt-8 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+                  <div id="payment-form" className="mt-6 md:mt-8 max-w-7xl mx-auto w-full px-0 sm:px-6 lg:px-8">
                      <div className="rounded-xl p-4 md:p-5 lg:p-6 border w-full overflow-hidden" style={{ 
                        background: 'var(--bg-secondary)',
                        borderColor: 'var(--border-subtle)',
