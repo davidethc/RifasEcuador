@@ -12,14 +12,18 @@ const publicRoutes = ['/', '/login', '/signup', '/verify-email', '/reset-passwor
 const isPublicRoute = (pathname: string): boolean => {
   // Check exact matches first
   if (publicRoutes.includes(pathname)) return true;
-  
+
+  // Admin section: auth is handled by AdminGuard; avoid redirecting to main /login
+  // so admin.altokeec.com/admin/login doesn't flicker/redirect loop
+  if (pathname.startsWith('/admin')) return true;
+
   // Check if it's a sorteo detail page (matches /sorteos/[any-id])
   if (pathname.startsWith('/sorteos/')) return true;
-  
+
   // Comprar pages are public - allow guest checkout (no authentication required)
   // Includes: /comprar/[id], /comprar/[id]/confirmacion, /comprar/error
   if (pathname.startsWith('/comprar/')) return true;
-  
+
   return false;
 };
 
