@@ -1,0 +1,1145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ===========================================
+     SISTEMA DE DISEÑO UNIFICADO - VENDER BOLETOS
+     =========================================== */
+
+  /* Colores Primarios (CTAs y acciones principales) */
+  --primary-gold: #FFB200;      /* Botón principal: Comprar Boletos */
+  --primary-purple: #A83EF5;    /* Acentos, links importantes */
+  --primary-pink: #f02080;      /* Acentos secundarios */
+  --primary-gold-hover: #F59E0B; /* Hover del botón principal */
+  --primary-purple-hover: #683DF5; /* Hover del botón secundario */
+
+  /* Colores de Fondo */
+  --bg-primary: #100235;        /* Fondo principal oscuro */
+  --bg-secondary: #1A1525;      /* Cards, containers */
+  --bg-elevated: #2A1F3D;       /* Elementos elevados */
+  --bg-input: #2A1F3D;          /* Fondo de inputs - más claro para resaltar */
+  --bg-input-focus: #2F2540;    /* Fondo de inputs en focus - aún más claro */
+  --bg-overlay: rgba(16, 2, 53, 0.95); /* Overlays, modales */
+
+  /* Colores de Texto */
+  --text-primary: #FFFFFF;      /* Texto principal */
+  --text-secondary: #E5E7EB;    /* Texto secundario */
+  --text-muted: #9CA3AF;        /* Texto deshabilitado/helper */
+  --text-accent: #FFB200;       /* Precios, números importantes */
+
+  /* Estados */
+  --success: #22C55E;
+  --error: #EF4444;
+  --warning: #F59E0B;
+
+  /* Bordes */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-purple: rgba(168, 62, 245, 0.4); /* Más visible para inputs */
+  --border-purple-focus: rgba(168, 62, 245, 0.6);
+  --border-gold: rgba(255, 178, 0, 0.3);
+
+  /* Sombras y Glows (sutiles, no excesivos) */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glow-purple: 0 0 16px rgba(168, 62, 245, 0.3);
+  --glow-gold: 0 0 20px rgba(255, 178, 0, 0.4);
+
+  /* Espaciado Consistente */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Legacy (mantener para compatibilidad temporal) */
+  --bg-1: #100235;
+  --bg-2: #360254;
+  --text-white: #ffffff;
+  --text-light-gray: #e5e7eb;
+  --text-gray: #9ca3af;
+  --text-gold: #FFB200;
+  --accent-purple: #A83EF5;
+  --accent-pink: #f02080;
+  --accent-gold: #FFB200;
+  --btn-gradient-start: #ffb200;
+  --btn-gradient-end: #f02080;
+  --btn-purple: #A83EF5;
+  --background: #100235;
+  --foreground: #ffffff;
+}
+
+body {
+  color: var(--foreground);
+  font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  
+  /* Optimización de tipografía para modo claro */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 1.6;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #A83EF5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #683DF5;
+}
+
+/* Animación suave para el botón de WhatsApp */
+@keyframes whatsapp-pulse-smooth {
+
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.05;
+    transform: scale(1.2);
+  }
+}
+
+.whatsapp-pulse-smooth {
+  animation: whatsapp-pulse-smooth 3s ease-in-out infinite;
+}
+
+/* Gradiente fosforescente animado para navbar */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradient-rotate {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.navbar-phosphorescent {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(248, 250, 252, 0.98) 50%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar-phosphorescent::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    rgba(100, 150, 220, 0.06) 0%,
+    rgba(140, 110, 180, 0.08) 25%,
+    rgba(120, 160, 200, 0.07) 50%,
+    rgba(140, 110, 180, 0.08) 75%,
+    rgba(100, 150, 220, 0.06) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 10s ease infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.navbar-phosphorescent::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 160, 200, 0.05) 25%,
+    transparent 50%,
+    rgba(140, 110, 180, 0.05) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-shift 8s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.navbar-phosphorescent > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================================
+   LEGACY TEMPLATE ANIMATIONS & EFFECTS
+   ========================================= */
+
+/* Sunburst Effect */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* Tipografía exacta del template Bootstrap */
+.josefin-sans-700 {
+  font-family: var(--font-josefin), "Josefin Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.josefin-sans-regular {
+  font-family: "Josefin Sans", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Tamaños exactos display-2 del template Bootstrap */
+.display-2-hero {
+  font-size: 2rem; /* Mobile por defecto */
+  line-height: 1.2;
+}
+
+@media (min-width: 992px) {
+  .display-2-hero {
+    font-size: 3rem !important;
+  }
+}
+
+@media (min-width: 1366px) {
+  .display-2-hero {
+    font-size: 4.5rem !important;
+  }
+}
+
+/* Clase t1 para texto amarillo con sombra */
+.t1 {
+  color: #FFB200 !important;
+  text-shadow: 
+    0 0 10px rgba(255, 178, 0, 0.5),
+    0 0 20px rgba(255, 178, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Estilos del botón b1 */
+.btn.b1, a.b1 {
+  color: #fff !important;
+  background: linear-gradient(135deg, #ffb200 0%, #f02080 100%) !important;
+  font-weight: 700;
+  border: none !important;
+  box-shadow: 
+    0 4px 16px rgba(255, 178, 0, 0.3),
+    0 0 12px rgba(240, 32, 128, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn.b1:hover, a.b1:hover {
+  background: linear-gradient(135deg, #f02080 0%, #ffb200 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(255, 178, 0, 0.4),
+    0 0 20px rgba(240, 32, 128, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Sparkles / Diamonds */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.animate-twinkle {
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.diamond-shape {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* Text shadows for better contrast */
+.text-shadow-soft {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.text-shadow-high {
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.text-shadow-hero {
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 16px 50px rgba(0, 0, 0, 0.65);
+}
+
+.twinkle-strong {
+  animation: twinkle 1.8s ease-in-out infinite;
+}
+
+.diamond-glow {
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.95), 0 0 48px rgba(255, 255, 255, 0.6);
+}
+
+/* =========================================
+   PREMIUM DARK-NEON FUTURISTIC SYSTEM
+   ========================================= */
+
+/* Base gradient backgrounds - nunca fondos planos */
+.bg-gradient-dark-primary {
+  background: linear-gradient(180deg, #100235 0%, #1a0a3d 50%, #360254 100%);
+}
+
+.bg-gradient-dark-secondary {
+  background: linear-gradient(180deg, #360254 0%, #4a0f6b 50%, #5A0B5C 100%);
+}
+
+.bg-gradient-hero {
+  background: linear-gradient(180deg, #b92163 0%, #360254 100%);
+}
+
+/* Neon glow effects - suaves y controlados */
+.neon-glow-pink {
+  box-shadow: 
+    0 0 8px rgba(185, 33, 99, 0.4),
+    0 0 16px rgba(185, 33, 99, 0.3),
+    0 0 24px rgba(240, 32, 128, 0.2),
+    inset 0 0 8px rgba(185, 33, 99, 0.1);
+}
+
+.neon-glow-purple {
+  box-shadow: 
+    0 0 8px rgba(168, 62, 245, 0.4),
+    0 0 16px rgba(168, 62, 245, 0.3),
+    0 0 24px rgba(104, 61, 245, 0.2),
+    inset 0 0 8px rgba(168, 62, 245, 0.1);
+}
+
+.neon-glow-gold {
+  box-shadow: 
+    0 0 10px rgba(255, 178, 0, 0.5),
+    0 0 20px rgba(255, 178, 0, 0.4),
+    0 0 30px rgba(255, 178, 0, 0.3),
+    inset 0 0 10px rgba(255, 178, 0, 0.15);
+}
+
+/* Neon glow hover states */
+.neon-glow-pink:hover {
+  box-shadow: 
+    0 0 12px rgba(185, 33, 99, 0.5),
+    0 0 24px rgba(185, 33, 99, 0.4),
+    0 0 36px rgba(240, 32, 128, 0.3),
+    inset 0 0 12px rgba(185, 33, 99, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-glow-purple:hover {
+  box-shadow: 
+    0 0 12px rgba(168, 62, 245, 0.5),
+    0 0 24px rgba(168, 62, 245, 0.4),
+    0 0 36px rgba(104, 61, 245, 0.3),
+    inset 0 0 12px rgba(168, 62, 245, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-glow-gold:hover {
+  box-shadow: 
+    0 0 14px rgba(255, 178, 0, 0.6),
+    0 0 28px rgba(255, 178, 0, 0.5),
+    0 0 42px rgba(255, 178, 0, 0.4),
+    inset 0 0 14px rgba(255, 178, 0, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-text-pink {
+  text-shadow: 
+    0 0 10px rgba(185, 33, 99, 0.8),
+    0 0 20px rgba(240, 32, 128, 0.6),
+    0 0 30px rgba(185, 33, 99, 0.4);
+}
+
+.neon-text-purple {
+  text-shadow: 
+    0 0 10px rgba(168, 62, 245, 0.8),
+    0 0 20px rgba(104, 61, 245, 0.6),
+    0 0 30px rgba(168, 62, 245, 0.4);
+}
+
+.neon-text-gold {
+  text-shadow: 
+    0 0 10px rgba(255, 178, 0, 0.9),
+    0 0 20px rgba(255, 178, 0, 0.7),
+    0 0 30px rgba(255, 178, 0, 0.5);
+}
+
+/* Sparkle animation */
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Pulse glow animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(255, 16, 240, 0.4),
+      0 0 20px rgba(255, 16, 240, 0.3),
+      0 0 30px rgba(255, 16, 240, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(255, 16, 240, 0.6),
+      0 0 40px rgba(255, 16, 240, 0.5),
+      0 0 60px rgba(255, 16, 240, 0.4);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Premium floating cards - dark semi-transparent con glow sutil */
+.card-floating {
+  background: rgba(22, 2, 53, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 62, 245, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-floating:hover {
+  transform: translateY(-6px);
+  border-color: rgba(168, 62, 245, 0.4);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 24px rgba(168, 62, 245, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Glass morphism premium */
+.glass-card {
+  background: rgba(16, 2, 53, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 62, 245, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 62, 245, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(168, 62, 245, 0.1);
+}
+
+/* Radial light behind hero images */
+.hero-radial-glow {
+  position: relative;
+}
+
+.hero-radial-glow::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+    circle at center,
+    rgba(168, 62, 245, 0.2) 0%,
+    rgba(185, 33, 99, 0.15) 30%,
+    transparent 70%
+  );
+  z-index: -1;
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.bg-legacy-bursts {
+  background-image:
+    radial-gradient(circle 500px at 50% 80px, rgba(236,72,153,0.25), transparent 70%),
+    radial-gradient(circle 600px at 80% 120px, rgba(56,8,180,0.18), transparent 75%),
+    radial-gradient(circle 600px at 20% 140px, rgba(56,8,180,0.18), transparent 75%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 10px, transparent 10px 22px);
+}
+
+.ray-lines {
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 18px);
+}
+
+.star-dust {
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 1px, transparent 3px),
+    radial-gradient(circle at 30% 40%, rgba(255,255,255,0.7) 1.5px, transparent 4px),
+    radial-gradient(circle at 60% 25%, rgba(255,255,255,0.6) 1px, transparent 3px),
+    radial-gradient(circle at 80% 50%, rgba(255,255,255,0.7) 1.5px, transparent 4px),
+    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.6) 1px, transparent 3px);
+  background-size: cover;
+}
+
+.card-purple-gradient {
+  background: linear-gradient(180deg, rgba(104, 61, 245, 0.35), rgba(185, 33, 99, 0.25));
+}
+
+.card-glow {
+  box-shadow: 0 12px 30px rgba(168, 62, 245, 0.25), inset 0 0 24px rgba(185, 33, 99, 0.15);
+}
+
+.faq-card {
+  background: linear-gradient(135deg, rgba(104, 61, 245, 0.3), rgba(185, 33, 99, 0.22));
+  color: #ffffff;
+}
+
+/* FAQ items con color naranja */
+.faq-item-orange[open] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 237, 213, 0.9) 100%) !important;
+  border-color: rgba(236, 102, 36, 0.5) !important;
+}
+
+/* ===========================================
+   BOTONES UNIFICADOS - SISTEMA DE DISEÑO
+   =========================================== */
+
+/* Botón Primario (CTA Principal) - Comprar Boletos */
+.btn-primary {
+  background: var(--primary-gold);
+  color: #1A1A1A;
+  font-weight: 700;
+  border: none;
+  min-height: 48px; /* Accesibilidad móvil */
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--primary-gold-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-gold);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Botón Secundario */
+.btn-secondary {
+  background: var(--primary-purple);
+  color: var(--text-primary);
+  font-weight: 600;
+  border: 1px solid var(--border-purple);
+  min-height: 48px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--primary-purple-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-purple);
+}
+
+/* Botón Terciario/Ghost */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border: 1px solid var(--border-subtle);
+  min-height: 48px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-purple);
+  color: var(--text-primary);
+}
+
+/* Legacy (mantener para compatibilidad temporal) */
+.btn-cta-primary {
+  background: var(--primary-gold);
+  color: #1A1A1A;
+  font-weight: 700;
+  border: none;
+  min-height: 48px;
+  transition: all 0.2s ease;
+}
+
+.btn-cta-primary:hover {
+  background: var(--primary-gold-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-gold);
+}
+
+.btn-cta-secondary {
+  background: var(--primary-purple);
+  color: var(--text-primary);
+  font-weight: 600;
+  border: 1px solid var(--border-purple);
+  min-height: 48px;
+  transition: all 0.2s ease;
+}
+
+.btn-cta-secondary:hover {
+  background: var(--primary-purple-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-purple);
+}
+
+/* Neutral dark button */
+.btn-neutral {
+  background: rgba(22, 2, 53, 0.8);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-neutral:hover {
+  background: rgba(54, 2, 84, 0.9);
+  border-color: rgba(168, 62, 245, 0.3);
+  color: #ffffff;
+}
+
+/* Scroll reveal animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-reveal {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* ===========================================
+   EFECTOS GALÁCTICOS PARA PREMIOS
+   =========================================== */
+
+/* Animación de partículas flotantes */
+@keyframes particle-float {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px) rotate(360deg) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Animación de estrellas titilantes */
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* Animación de brillo galáctico pulsante */
+@keyframes galactic-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 30px rgba(168, 62, 245, 0.4),
+      0 0 60px rgba(168, 62, 245, 0.2),
+      0 0 90px rgba(240, 32, 128, 0.1),
+      inset 0 0 30px rgba(168, 62, 245, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 50px rgba(168, 62, 245, 0.6),
+      0 0 100px rgba(168, 62, 245, 0.4),
+      0 0 150px rgba(240, 32, 128, 0.3),
+      inset 0 0 50px rgba(168, 62, 245, 0.2);
+  }
+}
+
+/* Animación de anillo orbital */
+@keyframes orbital-rotate {
+  0% {
+    transform: rotate(0deg) translateX(150px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(150px) rotate(-360deg);
+  }
+}
+
+@keyframes orbital-rotate-reverse {
+  0% {
+    transform: rotate(0deg) translateX(120px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg) translateX(120px) rotate(360deg);
+  }
+}
+
+/* Animación de ondas galácticas */
+@keyframes galactic-wave {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+/* Animación de estrellas que caen */
+@keyframes star-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Animación de brillo rotatorio */
+@keyframes rotate-glow {
+  0% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Animación de pulso neón */
+@keyframes neon-pulse {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px rgba(168, 62, 245, 0.8),
+      0 0 20px rgba(168, 62, 245, 0.6),
+      0 0 30px rgba(240, 32, 128, 0.4);
+  }
+  50% {
+    text-shadow: 
+      0 0 20px rgba(168, 62, 245, 1),
+      0 0 40px rgba(168, 62, 245, 0.8),
+      0 0 60px rgba(240, 32, 128, 0.6);
+  }
+}
+
+/* Animación de brillo que se mueve */
+@keyframes shine-sweep {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Animación de partículas que explotan */
+@keyframes particle-explode {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Contenedor galáctico */
+.galactic-container {
+  position: relative;
+  overflow: visible;
+  will-change: transform; /* Optimización de rendimiento */
+}
+
+/* Ondas galácticas */
+.galactic-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid;
+  border-image: linear-gradient(45deg, rgba(168, 62, 245, 0.4), rgba(240, 32, 128, 0.4), rgba(255, 178, 0, 0.3)) 1;
+  animation: galactic-wave 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Estrellas que caen */
+.galactic-falling-star {
+  position: absolute;
+  width: 2px;
+  height: 30px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
+  box-shadow: 0 0 10px rgba(168, 62, 245, 0.8);
+  animation: star-fall 8s linear infinite;
+  pointer-events: none;
+}
+
+/* Brillo rotatorio */
+.galactic-rotating-glow {
+  position: absolute;
+  inset: -50px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(168, 62, 245, 0.3) 90deg,
+    rgba(240, 32, 128, 0.3) 180deg,
+    rgba(255, 178, 0, 0.2) 270deg,
+    transparent 360deg
+  );
+  border-radius: 50%;
+  animation: rotate-glow 10s linear infinite;
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Partícula que explota */
+.galactic-explosion {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(168, 62, 245, 1), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(168, 62, 245, 0.8);
+  animation: particle-explode 2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Efecto de brillo galáctico */
+.galactic-glow {
+  animation: galactic-pulse 3s ease-in-out infinite;
+  position: relative;
+}
+
+.galactic-glow::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 62, 245, 0.3) 0%, transparent 70%);
+  filter: blur(30px);
+  z-index: -1;
+  animation: galactic-pulse 3s ease-in-out infinite;
+}
+
+.galactic-glow::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 32, 128, 0.2) 0%, transparent 70%);
+  filter: blur(40px);
+  z-index: -2;
+  animation: galactic-pulse 4s ease-in-out infinite reverse;
+}
+
+/* Partículas flotantes - Optimizadas */
+.galactic-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(168, 62, 245, 0.8), 0 0 20px rgba(240, 32, 128, 0.6);
+  animation: particle-float 15s linear infinite;
+  will-change: transform, opacity; /* Optimización */
+  transform: translateZ(0); /* Aceleración GPU */
+}
+
+/* Estrellas alrededor - Optimizadas */
+.galactic-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(168, 62, 245, 1);
+  animation: star-twinkle 2s ease-in-out infinite;
+  will-change: transform, opacity; /* Optimización */
+  transform: translateZ(0); /* Aceleración GPU */
+}
+
+/* Anillos orbitales - Optimizados */
+.galactic-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(0);
+  width: 300px;
+  height: 300px;
+  border: 2px solid;
+  border-image: linear-gradient(45deg, rgba(168, 62, 245, 0.3), rgba(240, 32, 128, 0.3), rgba(255, 178, 0, 0.3)) 1;
+  border-radius: 50%;
+  animation: orbital-rotate 20s linear infinite;
+  pointer-events: none;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.galactic-orbit::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(168, 62, 245, 1), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(168, 62, 245, 0.8);
+  transform: translateX(-50%);
+}
+
+.galactic-orbit-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  height: 240px;
+  border: 1px solid;
+  border-image: linear-gradient(45deg, rgba(240, 32, 128, 0.2), rgba(168, 62, 245, 0.2)) 1;
+  border-radius: 50%;
+  animation: orbital-rotate-reverse 15s linear infinite;
+}
+
+.galactic-orbit-inner::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(240, 32, 128, 1), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(240, 32, 128, 0.8);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* =========================================
+   MATERIAL DESIGN FORM STANDARDS
+   ========================================= */
+
+/* Material Design Dark Theme Backgrounds */
+.material-bg-base {
+  background-color: #121212; /* Nivel 0 - Fondo base */
+}
+
+.material-bg-surface {
+  background-color: #1E1E1E; /* Nivel 1 - Superficie (5-8% más claro) */
+}
+
+.material-bg-card {
+  background-color: #252525; /* Nivel 2 - Tarjetas */
+}
+
+.material-bg-dialog {
+  background-color: #2C2C2C; /* Nivel 3 - Diálogos/Modales */
+}
+
+/* Material Design Text Opacity Levels */
+.material-text-high {
+  color: rgba(255, 255, 255, 0.87); /* Alto énfasis - Títulos */
+}
+
+.material-text-medium {
+  color: rgba(255, 255, 255, 0.60); /* Medio énfasis - Cuerpo */
+}
+
+.material-text-disabled {
+  color: rgba(255, 255, 255, 0.38); /* Deshabilitado */
+}
+
+/* Material Design Input States */
+.material-input-focused {
+  border-width: 2px;
+  border-color: #A83EF5; /* Color primario desaturado */
+}
+
+.material-input-error {
+  border-color: #EF4444; /* Rojo error */
+}
+
+.material-input-disabled {
+  opacity: 0.38;
+  border-style: dashed;
+}
+
+/* Material Design Form Container */
+.material-form-container {
+  background-color: #1E1E1E;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Material Design Elevation Shadows */
+.material-elevation-1 {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.material-elevation-2 {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.material-elevation-3 {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Material Design Ripple Effect */
+@keyframes material-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.material-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.material-ripple::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  top: 50%;
+  left: 50%;
+  animation: material-ripple 0.6s;
+  opacity: 0;
+}
+
+.material-ripple:active::after {
+  animation: material-ripple 0.6s;
+  opacity: 1;
+}

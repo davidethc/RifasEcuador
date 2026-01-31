@@ -1,2 +1,0 @@
-export { TransparentProcess } from './TransparentProcess';
-
