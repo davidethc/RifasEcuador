@@ -355,6 +355,19 @@ export function Header() {
                       Participar - Desde $1.00
                     </AnimatedButton>
                   </div>
+                  <div className="px-6 py-4 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full px-4 py-3 text-sm font-medium text-center rounded-xl font-dm-sans text-red-400 hover:text-white hover:bg-red-500/20 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500/50"
+                      aria-label="Cerrar sesión"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
