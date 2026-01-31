@@ -38,27 +38,30 @@ export default function VerifyEmailPage() {
       <div className="max-w-md w-full space-y-8 p-6 bg-white dark:bg-legacy-purple-deep rounded-xl shadow-lg">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
-            Check Your Email
+            Revisa tu correo
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            We sent a verification link to{' '}
+            Enviamos un enlace de verificación a{' '}
             <span className="font-medium">{email}</span>
           </p>
         </div>
 
-        <div className="mt-8 space-y-6">
+          <div className="mt-8 space-y-6">
           <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>Please check your email and click the verification link to continue.</p>
+            <p>Revisa tu correo y haz clic en el enlace de verificación para continuar.</p>
+            <p className="mt-2 text-xs">
+              El correo puede tardar unos minutos. Revisa también la carpeta de <strong>spam</strong> o correo no deseado.
+            </p>
             <p className="mt-4">
-              Didn&apos;t receive the email? You can request a new one{' '}
+              ¿No llegó el correo? Puedes solicitar uno nuevo{' '}
               {countdown > 0 ? (
-                <span>in {countdown} seconds</span>
+                <span>en {countdown} segundos</span>
               ) : (
                 <button
                   onClick={handleResendEmail}
                   className="text-blue-600 dark:text-amber-400 hover:text-blue-500 dark:hover:text-amber-500 transition-colors"
                 >
-                  now
+                  ahora
                 </button>
               )}
             </p>
@@ -69,7 +72,7 @@ export default function VerifyEmailPage() {
               onClick={() => router.push('/login')}
               className="text-sm text-blue-600 dark:text-amber-400 hover:text-blue-500 dark:hover:text-amber-500 transition-colors"
             >
-              ← Back to login
+              ← Volver al inicio de sesión
             </button>
           </div>
         </div>

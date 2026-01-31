@@ -14,6 +14,7 @@ type ClientRow = {
   last_order_status?: string | null;
   last_order_payment_method?: string | null;
   last_order_total?: number | null;
+  last_order_numbers?: string[] | null;
   last_order_created_at?: string | null;
   last_payment_status?: string | null;
   last_payment_provider?: string | null;
@@ -45,6 +46,17 @@ const prettyStatus = (s: string | null | undefined) => {
   if (v === 'completed') return 'Pagado';
   if (v === 'pending_approval') return 'Pendiente (comprobante)';
   if (v === 'rejected') return 'Rechazado';
+  if (v === 'pending') return 'Pendiente';
+  if (v === 'reserved') return 'Reservado';
+  return v;
+};
+
+/** Método de pago: solo mostrar transfer/payphone; "pending" o vacío = "-" */
+const prettyPaymentMethod = (method: string | null | undefined, provider: string | null | undefined) => {
+  const v = (method || provider || '').toLowerCase().trim();
+  if (!v || v === 'pending') return '-';
+  if (v === 'transfer') return 'Transferencia';
+  if (v === 'payphone') return 'Payphone';
   return v;
 };
 
@@ -112,6 +124,26 @@ export default function AdminClientsPage() {
     void load(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Actualización automática: cada 20s y al volver a la pestaña (pagos en tiempo casi real)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        void load(page);
+      }
+    }, 20_000);
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') void load(page);
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
   const createClient = async () => {
     setCreating(true);
@@ -264,10 +296,13 @@ export default function AdminClientsPage() {
                   Estado (última orden)
                 </th>
                 <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
-                  Método
+                  Método de pago (última orden)
                 </th>
                 <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
                   Monto (última)
+                </th>
+                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
+                  Números (última orden)
                 </th>
                 <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
                   Total pagado
@@ -291,10 +326,15 @@ export default function AdminClientsPage() {
                     {prettyStatus(c.last_order_status || null)}
                   </td>
                   <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
-                    {c.last_order_payment_method || c.last_payment_provider || '-'}
+                    {prettyPaymentMethod(c.last_order_payment_method ?? null, c.last_payment_provider ?? null)}
                   </td>
                   <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
                     {c.last_order_total != null ? formatMoney(c.last_order_total) : '-'}
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs" style={{ color: '#E5D4FF' }}>
+                    {Array.isArray(c.last_order_numbers) && c.last_order_numbers.length > 0
+                      ? c.last_order_numbers.join(', ')
+                      : '-'}
                   </td>
                   <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
                     {formatMoney(c.total_paid)}
@@ -306,14 +346,14 @@ export default function AdminClientsPage() {
               ))}
               {!loading && clients.length === 0 && (
                 <tr>
-                  <td className="px-4 py-4" colSpan={8} style={{ color: '#9CA3AF' }}>
+                  <td className="px-4 py-4" colSpan={9} style={{ color: '#9CA3AF' }}>
                     Sin resultados
                   </td>
                 </tr>
               )}
               {loading && clients.length === 0 && (
                 <tr>
-                  <td className="px-4 py-4 text-white" colSpan={8}>
+                  <td className="px-4 py-4 text-white" colSpan={9}>
                     Cargando...
                   </td>
                 </tr>

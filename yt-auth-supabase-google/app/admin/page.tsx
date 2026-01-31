@@ -42,21 +42,36 @@ export default function AdminHomePage() {
   useEffect(() => {
     void fetchDashboard(false);
 
-    // Simple near-real-time refresh (keeps UX simple, no websockets)
+    // Actualización automática: cada 15 s y al volver a la pestaña
     const id = window.setInterval(() => {
       void fetchDashboard(true);
-    }, 15000); // 15s
+    }, 15000);
 
-    return () => window.clearInterval(id);
+    const onVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        void fetchDashboard(true);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   const m = data?.metrics;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-extrabold text-white font-[var(--font-comfortaa)]">Dashboard</h1>
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-white font-[var(--font-comfortaa)]">Dashboard</h1>
+          <p className="text-sm font-[var(--font-dm-sans)] mt-1" style={{ color: '#9CA3AF' }}>
+            Resumen de tu negocio: ventas, reservas y recaudación. Se actualiza solo cada 15 segundos.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
           {lastUpdatedAt && (
             <span className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               Actualizado: {lastUpdatedAt}
@@ -88,12 +103,23 @@ export default function AdminHomePage() {
 
       {!loading && data?.success && m && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <StatCard title="Boletos vendidos" value={`${m.soldTickets}`} subtitle={`Total: ${m.totalTickets}`} />
-          <StatCard title="Reservados" value={`${m.reservedTickets}`} subtitle={`Disponibles: ${m.availableTickets}`} />
+          <StatCard
+            title="Boletos vendidos"
+            help="Ya pagados y confirmados"
+            value={`${m.soldTickets}`}
+            subtitle={`De ${m.totalTickets} total · Quedan ${m.availableTickets} por vender`}
+          />
+          <StatCard
+            title="Reservados"
+            help="Con reserva, aún no pagados"
+            value={`${m.reservedTickets}`}
+            subtitle={`Disponibles para vender: ${m.availableTickets}`}
+          />
           <StatCard
             title="Recaudación"
+            help="Dinero ya cobrado"
             value={`$${m.totalRevenue.toFixed(2)}`}
-            subtitle={`Payphone: $${m.revenuePayphone.toFixed(2)} · Transfer: $${m.revenueTransfer.toFixed(2)} · Pendientes transfer: ${m.pendingTransfers}`}
+            subtitle={`Payphone: $${m.revenuePayphone.toFixed(2)} · Transferencia: $${m.revenueTransfer.toFixed(2)} · Pendientes por aprobar: ${m.pendingTransfers}`}
           />
         </div>
       )}
@@ -101,7 +127,17 @@ export default function AdminHomePage() {
   );
 }
 
-function StatCard({ title, value, subtitle }: { title: string; value: string; subtitle: string }) {
+function StatCard({
+  title,
+  help,
+  value,
+  subtitle,
+}: {
+  title: string;
+  help?: string;
+  value: string;
+  subtitle: string;
+}) {
   return (
     <div
       className="rounded-2xl border p-6"
@@ -113,6 +149,11 @@ function StatCard({ title, value, subtitle }: { title: string; value: string; su
       <p className="text-sm font-semibold font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
         {title}
       </p>
+      {help && (
+        <p className="text-xs font-[var(--font-dm-sans)] mt-0.5" style={{ color: '#9CA3AF' }}>
+          {help}
+        </p>
+      )}
       <p className="mt-2 text-3xl font-extrabold font-[var(--font-comfortaa)]" style={{ color: '#FFB200' }}>
         {value}
       </p>

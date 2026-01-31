@@ -30,7 +30,7 @@ export default function TerminosPage() {
     {
       numero: 5,
       titulo: 'Premios',
-      descripcion: 'Al ganador tendrá un plazo de contactarse máximo de 10 días para poder reclamar el premio, pasado los 10 días se buscará otro ganador.',
+      descripcion: 'En caso de que se haya intentado contactar al ganador y no se obtenga respuesta por parte del mismo en el plazo establecido, se procederá a declarar desierto el premio y se buscará otro ganador.',
     },
     {
       numero: 6,

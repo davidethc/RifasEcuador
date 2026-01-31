@@ -27,8 +27,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="rounded-2xl border p-4 h-fit"
               style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(15, 17, 23, 0.6)' }}
             >
-              <p className="text-sm font-semibold mb-3 font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
+              <p className="text-sm font-semibold mb-1 font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
                 Panel Admin
+              </p>
+              <p className="text-xs font-[var(--font-dm-sans)] mb-3" style={{ color: '#9CA3AF' }}>
+                Resumen de ventas, transferencias y clientes
               </p>
               <nav className="space-y-2">
                 {navItems.map((item) => {

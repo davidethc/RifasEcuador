@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdminFromRequest } from '@/lib/server/adminAuth';
 import { getSupabaseAdmin } from '@/lib/server/supabaseAdmin';
+import { logger } from '@/utils/logger';
 
 export async function POST(request: Request) {
   const auth = await requireAdminFromRequest(request);
@@ -88,6 +89,21 @@ export async function POST(request: Request) {
     resource: `orders:${orderId}`,
     created_at: new Date().toISOString(),
   });
+
+  // Enviar correo de confirmación / factura al cliente (igual que con tarjeta)
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const emailRes = await fetch(`${baseUrl}/api/email/send-purchase-confirmation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId }),
+    });
+    if (!emailRes.ok) {
+      logger.error('[transfer approve] Error al enviar correo:', await emailRes.text());
+    }
+  } catch (e) {
+    logger.error('[transfer approve] Error al enviar correo:', e);
+  }
 
   return NextResponse.json({ success: true, orderId, status: 'completed' });
 }

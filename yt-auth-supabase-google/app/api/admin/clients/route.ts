@@ -17,6 +17,7 @@ type OrderMini = {
   total: number | null;
   status: string | null;
   payment_method: string | null;
+  numbers: string[] | null;
   created_at: string | null;
 };
 
@@ -33,6 +34,7 @@ type ClientWithStats = ClientRow & {
   last_order_status: string | null;
   last_order_payment_method: string | null;
   last_order_total: number | null;
+  last_order_numbers: string[] | null;
   last_order_created_at: string | null;
   last_payment_status: string | null;
   last_payment_provider: string | null;
@@ -132,7 +134,7 @@ export async function GET(request: Request) {
   if (clientIds.length > 0) {
     const { data: ordersData } = await supabase
       .from('orders')
-      .select('id,client_id,total,status,payment_method,created_at')
+      .select('id,client_id,total,status,payment_method,numbers,created_at')
       .in('client_id', clientIds)
       .order('created_at', { ascending: false });
 
@@ -201,6 +203,7 @@ export async function GET(request: Request) {
       last_order_status: lastOrder?.status || null,
       last_order_payment_method: lastOrder?.payment_method || null,
       last_order_total: typeof lastOrder?.total === 'number' ? lastOrder.total : null,
+      last_order_numbers: Array.isArray(lastOrder?.numbers) ? lastOrder.numbers : null,
       last_order_created_at: lastOrder?.created_at || null,
       last_payment_status: lastPayment?.status || null,
       last_payment_provider: lastPayment?.provider || null,

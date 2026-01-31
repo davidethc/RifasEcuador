@@ -67,10 +67,16 @@ export default function AdminTransfersPage() {
 
   useEffect(() => {
     void load(false);
-    const id = window.setInterval(() => {
-      void load(true);
-    }, 15000);
-    return () => window.clearInterval(id);
+
+    const id = window.setInterval(() => void load(true), 15000);
+    const onVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') void load(true);
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   const pendingCount = useMemo(() => orders.length, [orders]);
@@ -131,10 +137,13 @@ export default function AdminTransfersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
         <div>
           <h1 className="text-3xl font-extrabold text-white font-[var(--font-comfortaa)]">Transferencias</h1>
-          <p className="text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
+          <p className="text-sm font-[var(--font-dm-sans)] mt-1" style={{ color: '#9CA3AF' }}>
+            Órdenes pagadas por transferencia que esperan tu aprobación o el comprobante del cliente.
+          </p>
+          <p className="text-sm font-[var(--font-dm-sans)] mt-0.5" style={{ color: '#E5D4FF' }}>
             Pendientes: {pendingCount} · Con comprobante: {withProofCount} · Sin comprobante: {withoutProofCount}
           </p>
         </div>

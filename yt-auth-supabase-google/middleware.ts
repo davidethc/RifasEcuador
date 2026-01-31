@@ -30,6 +30,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Rutas de auth que existen en app/ (verify-email, login, reset-password, etc.).
+  // Si las reescribimos a /admin/verify-email no existe esa página → 404 en producción.
+  const authPaths = ['/verify-email', '/login', '/reset-password', '/update-password'];
+  if (authPaths.includes(pathname)) {
+    return NextResponse.next();
+  }
+
   // Public files in /public (avoid rewriting assets like png/jpg/json/etc.)
   // Example: /logosrifaweb.png, /manifest.json
   const lastSegment = pathname.split('/').pop() || '';
