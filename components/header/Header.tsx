@@ -110,7 +110,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-3 group">
             <Image
               src="/logosrifaweb.png"
-              alt="ATOKEEC"
+              alt="ALTOKEEC"
               width={180}
               height={72}
               sizes="(max-width: 768px) 140px, 180px"
@@ -120,7 +120,7 @@ export function Header() {
             />
             {/* Texto eliminado en desktop para dar prioridad al logo gráfico más grande */}
             <span className="font-atokeec-title text-2xl font-bold tracking-[0.25em] text-gray-100 uppercase group-hover:text-white transition-colors hidden lg:block">
-              ATOKEEC
+              ALTOKEEC
             </span>
           </Link>
         </div>
@@ -130,7 +130,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logosrifaweb.png"
-              alt="ATOKEEC"
+              alt="ALTOKEEC"
               width={96}
               height={38}
               sizes="96px"
@@ -141,7 +141,7 @@ export function Header() {
             <span
               className={`font-atokeec-title text-lg font-bold tracking-[0.2em] text-gray-100 uppercase whitespace-nowrap transition-all duration-300 ${mobileMenuOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}
             >
-              ATOKEEC
+              ALTOKEEC
             </span>
           </Link>
         </div>
