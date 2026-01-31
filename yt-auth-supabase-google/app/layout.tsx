@@ -38,7 +38,12 @@ const josefinSans = Josefin_Sans({
 });
 
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://altokeec.com';
+// Base URL para metadata e iconos. Debe ser absoluta (https://...) para no lanzar "Invalid URL" en producción.
+const rawAppUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+const appUrl =
+  rawAppUrl.startsWith('http://') || rawAppUrl.startsWith('https://')
+    ? rawAppUrl
+    : 'https://altokeec.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
