@@ -163,7 +163,7 @@ export function TicketSelector({
                 {(bundle.quantity === 10 || bundle.quantity === 20) && (
                   <div className="mt-2 pt-2 border-t" style={{ borderColor: 'rgba(26, 26, 26, 0.2)' }}>
                     <p className="text-xs font-semibold font-[var(--font-dm-sans)]" style={{ color: '#1A1A1A', opacity: 0.9 }}>
-                      {bundle.quantity === 10 ? 'Te regalamos 2 chances más' : 'Te regalamos 4 chances más'}
+                      {bundle.quantity === 10 ? 'Te regalamos 2 oportunidades más' : 'Te regalamos 4 oportunidades más'}
                     </p>
                   </div>
                 )}
