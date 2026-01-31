@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Comfortaa, DM_Sans, Space_Grotesk, Josefin_Sans } from "next/font/google";
+import { Comfortaa, DM_Sans, Space_Grotesk, Josefin_Sans, Playwrite_NZ } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -34,6 +34,12 @@ const josefinSans = Josefin_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-josefin",
+  display: "swap",
+});
+
+const playwriteNz = Playwrite_NZ({
+  weight: ["100", "200", "300", "400"],
+  variable: "--font-atokeec-title",
   display: "swap",
 });
 
@@ -141,7 +147,7 @@ export default function RootLayout({
         <link rel="preload" href="/logosrifaweb.png" as="image" />
         <link rel="dns-prefetch" href="https://mmkqihvjruwdkhrylhxc.supabase.co" />
       </head>
-      <body className={`${comfortaa.variable} ${dmSans.variable} ${spaceGrotesk.variable} ${josefinSans.variable} antialiased`} suppressHydrationWarning>
+      <body className={`${comfortaa.variable} ${dmSans.variable} ${spaceGrotesk.variable} ${josefinSans.variable} ${playwriteNz.variable} antialiased`} suppressHydrationWarning>
         <StructuredData />
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false} disableTransitionOnChange>
           {/* Fondo global con paleta oficial */}

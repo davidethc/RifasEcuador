@@ -13,31 +13,26 @@ const getSupabaseClient = (): SupabaseClient => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Durante el build (SSR), si no hay variables de entorno, crear un cliente placeholder
-  // Esto permite que el build continúe sin errores
+  // Si no hay variables de entorno, usar cliente placeholder (build, SSR y cliente)
+  // Evita que React Refresh / HMR fallen al inspeccionar el módulo y que la app devuelva 500
   if (!supabaseUrl || !supabaseAnonKey) {
-    if (typeof window === 'undefined') {
-      // Build time: crear cliente placeholder
-      supabaseInstance = createClient(
-        'https://placeholder.supabase.co',
-        'placeholder-key',
-        {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-          },
-        }
+    if (typeof window !== 'undefined') {
+      logger.error(
+        'Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY. ' +
+        'Configure them in Replit Secrets or .env.local. Using placeholder client.'
       );
-      return supabaseInstance;
     }
-    // Runtime en cliente: lanzar error con mensaje más descriptivo
-    const missingVars = [];
-    if (!supabaseUrl) missingVars.push('NEXT_PUBLIC_SUPABASE_URL');
-    if (!supabaseAnonKey) missingVars.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-    throw new Error(
-      `Missing Supabase environment variables: ${missingVars.join(', ')}. ` +
-      'Please configure them in your hosting platform.'
+    supabaseInstance = createClient(
+      'https://placeholder.supabase.co',
+      'placeholder-key',
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      }
     );
+    return supabaseInstance;
   }
 
   // Crear el cliente real

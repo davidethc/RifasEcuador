@@ -110,7 +110,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-3 group">
             <Image
               src="/logosrifaweb.png"
-              alt="ALTOKEE"
+              alt="ATOKEEC"
               width={180}
               height={72}
               sizes="(max-width: 768px) 140px, 180px"
@@ -119,8 +119,8 @@ export function Header() {
               quality={85}
             />
             {/* Texto eliminado en desktop para dar prioridad al logo gráfico más grande */}
-            <span className="font-space-grotesk text-2xl font-medium tracking-[0.25em] text-gray-100 uppercase group-hover:text-white transition-colors hidden lg:block">
-              Altokee
+            <span className="font-atokeec-title text-2xl font-bold tracking-[0.25em] text-gray-100 uppercase group-hover:text-white transition-colors hidden lg:block">
+              ATOKEEC
             </span>
           </Link>
         </div>
@@ -130,7 +130,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logosrifaweb.png"
-              alt="ALTOKEE"
+              alt="ATOKEEC"
               width={96}
               height={38}
               sizes="96px"
@@ -139,9 +139,9 @@ export function Header() {
               quality={85}
             />
             <span
-              className={`font-space-grotesk text-lg font-medium tracking-[0.2em] text-gray-100 uppercase whitespace-nowrap transition-all duration-300 ${mobileMenuOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}
+              className={`font-atokeec-title text-lg font-bold tracking-[0.2em] text-gray-100 uppercase whitespace-nowrap transition-all duration-300 ${mobileMenuOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}
             >
-              Altokee
+              ATOKEEC
             </span>
           </Link>
         </div>

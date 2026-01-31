@@ -335,6 +335,26 @@ export async function POST(request: NextRequest) {
           }
         </div>
 
+        <!-- Enlace WhatsApp: enviar números por WhatsApp -->
+        ${ticketNumbers.length > 0
+          ? (() => {
+              const waMessage = encodeURIComponent(
+                `¡Hola! Acabo de comprar mis boletos.\n\n` +
+                `📋 *Resumen de mi compra:*\n` +
+                `• Orden: ${orderId}\n` +
+                `• Sorteo: ${raffle?.title || 'Sorteo'}\n` +
+                `• Números: ${ticketNumbers.join(', ')}\n` +
+                `• Total: $${correctTotal.toFixed(2)}\n\n` +
+                `Guardo este mensaje para tener mis números a mano.`
+              );
+              return `
+        <div style="margin-top: 20px; text-align: center;">
+          <a href="https://wa.me/593960948984?text=${waMessage}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #25D366; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">Enviar mis números por WhatsApp</a>
+        </div>`;
+            })()
+          : ''
+        }
+
         <!-- Notas -->
         <div style="margin-top: 24px; font-size: 12px; color: #6b7280;">
           <p>Guarda este correo como comprobante de tu compra. En caso de dudas, contáctanos a <strong>administracion@altokeec.com</strong>.</p>

@@ -48,6 +48,7 @@ export default {
         'dm-sans': ['var(--font-dm-sans)', 'sans-serif'],
         'josefin': ['var(--font-josefin)', 'sans-serif'],
         'space-grotesk': ['var(--font-space-grotesk)', 'sans-serif'],
+        'atokeec-title': ['var(--font-atokeec-title)', 'cursive'],
       },
     },
   },

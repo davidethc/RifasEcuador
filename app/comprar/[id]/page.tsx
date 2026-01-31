@@ -32,9 +32,9 @@ export default function ComprarPage() {
    const [currentImageIndex, setCurrentImageIndex] = useState(0);
    const [isZooming, setIsZooming] = useState(false);
    const heroImages = [
-      { src: "/kiario23.png", alt: "KIA Rio" },
-      { src: "/Yamaha MT-07.png", alt: "Yamaha MT-07" },
-      { src: "/KTM.png", alt: "KTM" },
+      { src: "/kiario23.png", alt: "KIA Rio", videoUrl: "https://www.youtube.com/watch?v=Am1abV7Ckb8" },
+      { src: "/Yamaha MT-07.png", alt: "Yamaha MT-07", videoUrl: "https://www.youtube.com/watch?v=uWmuNMR3QQM" },
+      { src: "/KTM.png", alt: "KTM", videoUrl: "https://www.youtube.com/watch?v=wpz5ODAjia0" },
    ];
 
    const [raffle, setRaffle] = useState<Raffle | null>(null);
@@ -283,18 +283,25 @@ export default function ComprarPage() {
                      <div className="relative z-10 w-full max-w-[1000px] mx-auto">
                         <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
                            {heroImages.map((image, index) => (
-                              <div
+                              <button
+                                 type="button"
                                  key={image.src}
-                                 className={`absolute inset-0 transition-all duration-700 ${
+                                 className={`absolute inset-0 transition-all duration-700 cursor-pointer group/heroimg block w-full h-full ${
                                     index === currentImageIndex 
                                        ? 'opacity-100 z-10' 
-                                       : 'opacity-0 z-0'
+                                       : 'opacity-0 z-0 pointer-events-none'
                                  }`}
                                  style={{
                                     transform: isZooming && index === currentImageIndex 
                                        ? 'scale(1.2)' 
                                        : 'scale(1)',
                                  }}
+                                 onClick={() => {
+                                    if (index === 0) setIsPremioVideoModalOpen(true);
+                                    else if (index === 1) setIsPremio2VideoModalOpen(true);
+                                    else setIsPremio3VideoModalOpen(true);
+                                 }}
+                                 aria-label={`Ver video del premio: ${image.alt}`}
                               >
                                  <Image 
                                     src={image.src} 
@@ -305,7 +312,13 @@ export default function ComprarPage() {
                                     loading={index === 0 ? "eager" : "lazy"}
                                     quality={90}
                                  />
-                              </div>
+                                 {/* Overlay play al hover para indicar que es clickable */}
+                                 <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/heroimg:opacity-100 transition-opacity bg-black/20 rounded-lg" aria-hidden="true">
+                                    <span className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-xl" style={{ background: 'rgba(168, 62, 245, 0.9)' }}>
+                                       <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 md:h-8 md:w-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    </span>
+                                 </span>
+                              </button>
                            ))}
                         </div>
                      </div>
