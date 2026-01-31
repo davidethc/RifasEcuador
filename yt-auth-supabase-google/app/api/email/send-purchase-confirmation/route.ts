@@ -347,26 +347,33 @@ export async function POST(request: NextRequest) {
 </html>
 `;
 
-    // Enviar correo usando Resend
-    // Usar dominio verificado yt.bytemind.space
-    // Puedes configurar RESEND_FROM_EMAIL en las variables de entorno
-    // Si no está configurado, usa el dominio verificado por defecto
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Rifas Ecuador <noreply@yt.bytemind.space>';
-    
-    // Si el email contiene dominios de proveedores gratuitos, usar el dominio verificado
-    const finalFromEmail = fromEmail.includes('@gmail.com') || 
-                          fromEmail.includes('@yahoo.com') || 
-                          fromEmail.includes('@hotmail.com') ||
-                          fromEmail.includes('@outlook.com')
-                          ? 'Rifas Ecuador <noreply@yt.bytemind.space>'
-                          : fromEmail;
-    
-    const emailSubject = `✅ Confirmación de Compra - ${raffle?.title || 'Sorteo'}`;
+    // Correo emisor oficial: Altokeec <administracion@altokeec.com>
+    // Opcional en Vercel: RESEND_FROM_EMAIL (mismo formato). No usar @gmail.com como FROM.
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Altokeec <administracion@altokeec.com>';
+    const finalFromEmail =
+      fromEmail.includes('@gmail.com') ||
+      fromEmail.includes('@yahoo.com') ||
+      fromEmail.includes('@hotmail.com') ||
+      fromEmail.includes('@outlook.com')
+        ? 'Altokeec <administracion@altokeec.com>'
+        : fromEmail;
+
+    const emailSubject = 'Factura de tu compra – Altokeec';
     
     logger.debug('📧 [EMAIL] Enviando correo a:', client.email);
     logger.debug('📧 [EMAIL] Desde (original):', fromEmail);
     logger.debug('📧 [EMAIL] Desde (final):', finalFromEmail);
     logger.debug('📧 [EMAIL] Asunto:', emailSubject);
+
+    // BCC opcional: en Vercel añade RESEND_BCC_EMAIL (ej. tu Gmail) para recibir copia de cada factura
+    const bccEmail = process.env.RESEND_BCC_EMAIL?.trim() || undefined;
+    const payload: { from: string; to: string; subject: string; html: string; bcc?: string } = {
+      from: finalFromEmail,
+      to: client.email,
+      subject: emailSubject,
+      html: emailHtml,
+    };
+    if (bccEmail) payload.bcc = bccEmail;
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -374,12 +381,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${resendApiKey}`,
       },
-      body: JSON.stringify({
-        from: finalFromEmail,
-        to: client.email,
-        subject: emailSubject,
-        html: emailHtml,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const responseText = await resendResponse.text();

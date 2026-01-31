@@ -31,6 +31,8 @@ export default function AdminTransfersPage() {
   const [lookupId, setLookupId] = useState('');
   const [lookupOrder, setLookupOrder] = useState<TransferOrder | null>(null);
   const [lookupLoading, setLookupLoading] = useState(false);
+  const [invoiceSending, setInvoiceSending] = useState<string | null>(null);
+  const [invoiceMessage, setInvoiceMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
 
   const load = async (isAutoRefresh: boolean) => {
     if (isAutoRefresh) setRefreshing(true);
@@ -135,6 +137,25 @@ export default function AdminTransfersPage() {
     }
   };
 
+  const sendInvoice = async (orderId: string) => {
+    setInvoiceMessage(null);
+    setInvoiceSending(orderId);
+    try {
+      const res = await adminFetch('/api/admin/send-invoice', {
+        method: 'POST',
+        body: JSON.stringify({ orderId }),
+      });
+      const json = (await res.json()) as { success: boolean; error?: string; message?: string };
+      if (!json.success) throw new Error(json.error || 'No se pudo enviar');
+      setInvoiceMessage({ type: 'ok', text: 'Factura enviada al correo del cliente' });
+      setTimeout(() => setInvoiceMessage(null), 4000);
+    } catch (e) {
+      setInvoiceMessage({ type: 'error', text: e instanceof Error ? e.message : 'Error al enviar factura' });
+    } finally {
+      setInvoiceSending(null);
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
@@ -205,7 +226,7 @@ export default function AdminTransfersPage() {
                 Esta orden <b>no está marcada como transferencia</b>. Pide al cliente que presione <b>“Avisar al sistema”</b> o que suba el comprobante en la web.
               </div>
             )}
-            <div className="mt-3 flex flex-col md:flex-row gap-2">
+            <div className="mt-3 flex flex-col md:flex-row gap-2 flex-wrap">
               <button
                 type="button"
                 onClick={() => approve(lookupOrder.id)}
@@ -224,6 +245,15 @@ export default function AdminTransfersPage() {
               >
                 Rechazar
               </button>
+              <button
+                type="button"
+                onClick={() => sendInvoice(lookupOrder.id)}
+                disabled={invoiceSending === lookupOrder.id || !lookupOrder.clients?.email}
+                className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50"
+                style={{ background: '#FFB200', color: '#0F1117' }}
+              >
+                {invoiceSending === lookupOrder.id ? 'Enviando...' : 'Factura'}
+              </button>
             </div>
           </div>
         )}
@@ -232,6 +262,18 @@ export default function AdminTransfersPage() {
           {error && (
             <div className="mb-4 rounded-xl border p-4" style={{ background: 'rgba(239, 68, 68, 0.10)', borderColor: 'rgba(239, 68, 68, 0.25)', color: '#E5E7EB' }}>
               {error}
+            </div>
+          )}
+          {invoiceMessage && (
+            <div
+              className="mb-4 rounded-xl border p-4"
+              style={
+                invoiceMessage.type === 'ok'
+                  ? { background: 'rgba(34, 197, 94, 0.10)', borderColor: 'rgba(34, 197, 94, 0.25)', color: '#E5E7EB' }
+                  : { background: 'rgba(239, 68, 68, 0.10)', borderColor: 'rgba(239, 68, 68, 0.25)', color: '#E5E7EB' }
+              }
+            >
+              {invoiceMessage.text}
             </div>
           )}
 
@@ -298,6 +340,16 @@ export default function AdminTransfersPage() {
                           style={{ background: '#22C55E', color: '#0F1117' }}
                         >
                           {acting === o.id ? 'Procesando...' : 'Aprobar'}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => sendInvoice(o.id)}
+                          disabled={invoiceSending === o.id || !o.clients?.email}
+                          className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50"
+                          style={{ background: '#FFB200', color: '#0F1117' }}
+                        >
+                          {invoiceSending === o.id ? 'Enviando...' : 'Factura'}
                         </button>
 
                         <div className="flex gap-2">
