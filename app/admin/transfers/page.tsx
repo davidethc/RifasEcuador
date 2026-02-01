@@ -33,6 +33,8 @@ export default function AdminTransfersPage() {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [invoiceSending, setInvoiceSending] = useState<string | null>(null);
   const [invoiceMessage, setInvoiceMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
+  const [sendingPastComprobantes, setSendingPastComprobantes] = useState(false);
+  const [pastComprobantesResult, setPastComprobantesResult] = useState<{ sent: number; failed: number; total: number } | null>(null);
 
   const load = async (isAutoRefresh: boolean) => {
     if (isAutoRefresh) setRefreshing(true);
@@ -156,6 +158,25 @@ export default function AdminTransfersPage() {
     }
   };
 
+  const sendPastComprobantesToAdmin = async () => {
+    setPastComprobantesResult(null);
+    setSendingPastComprobantes(true);
+    try {
+      const res = await adminFetch('/api/admin/send-past-comprobantes', { method: 'POST' });
+      const json = (await res.json()) as { success: boolean; sent?: number; failed?: number; total?: number; error?: string };
+      if (!json.success) throw new Error(json.error || 'No se pudo enviar');
+      setPastComprobantesResult({
+        sent: json.sent ?? 0,
+        failed: json.failed ?? 0,
+        total: json.total ?? 0,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al enviar comprobantes');
+    } finally {
+      setSendingPastComprobantes(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
@@ -184,6 +205,31 @@ export default function AdminTransfersPage() {
             {refreshing ? 'Actualizando…' : 'Refrescar'}
           </button>
         </div>
+      </div>
+
+      {/* Enviar comprobantes pasados a administracion@altokeec.com (una vez) */}
+      <div className="mb-6 rounded-xl border p-4" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.12)' }}>
+        <p className="text-sm font-semibold font-[var(--font-dm-sans)] mb-2" style={{ color: '#E5D4FF' }}>
+          Comprobantes pasados
+        </p>
+        <p className="text-xs font-[var(--font-dm-sans)] mb-3" style={{ color: '#9CA3AF' }}>
+          Envía una copia del comprobante de cada orden ya completada a <strong>administracion@altokeec.com</strong>. Úsalo una vez para recibir las que no te llegaron antes.
+        </p>
+        <button
+          type="button"
+          onClick={sendPastComprobantesToAdmin}
+          disabled={sendingPastComprobantes}
+          className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50"
+          style={{ background: '#FFB200', color: '#0F1117' }}
+        >
+          {sendingPastComprobantes ? 'Enviando…' : 'Enviar comprobantes pasados al admin'}
+        </button>
+        {pastComprobantesResult && (
+          <p className="mt-2 text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+            Enviados: {pastComprobantesResult.sent} de {pastComprobantesResult.total}
+            {pastComprobantesResult.failed > 0 && ` · Fallidos: ${pastComprobantesResult.failed}`}
+          </p>
+        )}
       </div>
 
       {/* Buscar por código/ID (para cuando llega por WhatsApp) */}

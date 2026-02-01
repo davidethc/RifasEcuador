@@ -50,8 +50,8 @@ interface OrderWithRelations {
 export async function POST(request: NextRequest) {
   try {
     logger.debug('📧 [EMAIL] Iniciando envío de correo de confirmación');
-    const body = await request.json();
-    const { orderId } = body;
+    const body = await request.json().catch(() => ({}));
+    const { orderId, sendCopyToAdminOnly } = body as { orderId?: string; sendCopyToAdminOnly?: boolean };
 
     logger.debug('📧 [EMAIL] OrderId recibido:', orderId);
 
@@ -377,23 +377,26 @@ export async function POST(request: NextRequest) {
         ? 'Altokeec <administracion@altokeec.com>'
         : fromEmail;
 
-    const emailSubject = 'Factura de tu compra – Altokeec';
-    
-    logger.debug('📧 [EMAIL] Enviando correo a:', client.email);
+    const ADMIN_EMAIL = 'administracion@altokeec.com';
+    const emailSubject = sendCopyToAdminOnly
+      ? `Copia comprobante – Orden ${orderId} – ${client.name}`
+      : 'Factura de tu compra – Altokeec';
+
+    logger.debug('📧 [EMAIL] Enviando correo a:', sendCopyToAdminOnly ? ADMIN_EMAIL : client.email);
     logger.debug('📧 [EMAIL] Desde (original):', fromEmail);
     logger.debug('📧 [EMAIL] Desde (final):', finalFromEmail);
     logger.debug('📧 [EMAIL] Asunto:', emailSubject);
 
-    // Admin siempre recibe copia del comprobante (Payphone o transferencia aprobada)
-    const ADMIN_EMAIL = 'altokeec@yahoo.com';
+    // Si sendCopyToAdminOnly: solo a admin (para reenviar comprobantes pasados). Si no: al cliente + BCC admin
     const bccExtra = process.env.RESEND_BCC_EMAIL?.trim() || undefined;
-    const bccList = [ADMIN_EMAIL, bccExtra].filter(Boolean) as string[];
+    const bccList = sendCopyToAdminOnly ? [] : [ADMIN_EMAIL, bccExtra].filter(Boolean) as string[];
+    const toEmail = sendCopyToAdminOnly ? ADMIN_EMAIL : client.email;
     const payload: { from: string; to: string; subject: string; html: string; bcc?: string[] } = {
       from: finalFromEmail,
-      to: client.email,
+      to: toEmail,
       subject: emailSubject,
       html: emailHtml,
-      bcc: bccList,
+      ...(bccList.length > 0 && { bcc: bccList }),
     };
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
