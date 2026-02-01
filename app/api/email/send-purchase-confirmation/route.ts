@@ -150,7 +150,8 @@ export async function POST(request: NextRequest) {
     logger.debug('📧 [EMAIL] Tipo de numbers:', typeof typedOrderData.numbers);
     logger.debug('📧 [EMAIL] Numbers raw:', typedOrderData.numbers);
 
-    if (!client?.email) {
+    // Solo validar email del cliente si NO es envío exclusivo al admin
+    if (!sendCopyToAdminOnly && !client?.email) {
       logger.error('❌ [EMAIL] Email del cliente no encontrado');
       return NextResponse.json(
         { success: false, error: 'Email del cliente no encontrado' },
@@ -379,10 +380,10 @@ export async function POST(request: NextRequest) {
 
     const ADMIN_EMAIL = 'administracion@altokeec.com';
     const emailSubject = sendCopyToAdminOnly
-      ? `Copia comprobante – Orden ${orderId} – ${client.name}`
+      ? `Copia comprobante – Orden ${orderId} – ${client?.name || client?.email || 'Cliente'}`
       : 'Factura de tu compra – Altokeec';
 
-    logger.debug('📧 [EMAIL] Enviando correo a:', sendCopyToAdminOnly ? ADMIN_EMAIL : client.email);
+    logger.debug('📧 [EMAIL] Enviando correo a:', sendCopyToAdminOnly ? ADMIN_EMAIL : client?.email);
     logger.debug('📧 [EMAIL] Desde (original):', fromEmail);
     logger.debug('📧 [EMAIL] Desde (final):', finalFromEmail);
     logger.debug('📧 [EMAIL] Asunto:', emailSubject);
@@ -390,7 +391,7 @@ export async function POST(request: NextRequest) {
     // Si sendCopyToAdminOnly: solo a admin (para reenviar comprobantes pasados). Si no: al cliente + BCC admin
     const bccExtra = process.env.RESEND_BCC_EMAIL?.trim() || undefined;
     const bccList = sendCopyToAdminOnly ? [] : [ADMIN_EMAIL, bccExtra].filter(Boolean) as string[];
-    const toEmail = sendCopyToAdminOnly ? ADMIN_EMAIL : client.email;
+    const toEmail = sendCopyToAdminOnly ? ADMIN_EMAIL : (client?.email || '');
     const payload: { from: string; to: string; subject: string; html: string; bcc?: string[] } = {
       from: finalFromEmail,
       to: toEmail,

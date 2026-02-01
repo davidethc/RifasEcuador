@@ -42,10 +42,10 @@ export default function AdminHomePage() {
   useEffect(() => {
     void fetchDashboard(false);
 
-    // Actualización automática: cada 15 s y al volver a la pestaña
+    // Actualización automática: cada 5 s y al volver a la pestaña
     const id = window.setInterval(() => {
       void fetchDashboard(true);
-    }, 15000);
+    }, 5000);
 
     const onVisibility = () => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
@@ -68,11 +68,17 @@ export default function AdminHomePage() {
         <div>
           <h1 className="text-3xl font-extrabold text-white font-[var(--font-comfortaa)]">Dashboard</h1>
           <p className="text-sm font-[var(--font-dm-sans)] mt-1" style={{ color: '#9CA3AF' }}>
-            Resumen de tu negocio: ventas, reservas y recaudación. Se actualiza solo cada 15 segundos.
+            Resumen de tu negocio: ventas, reservas y recaudación. Se actualiza solo cada 5 segundos.
           </p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
-          {lastUpdatedAt && (
+          {refreshing && (
+            <span className="flex items-center gap-2 text-xs font-[var(--font-dm-sans)] px-2 py-1 rounded" style={{ background: 'rgba(168, 62, 245, 0.15)', color: '#A83EF5' }}>
+              <span className="animate-pulse">●</span>
+              Actualizando...
+            </span>
+          )}
+          {!refreshing && lastUpdatedAt && (
             <span className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               Actualizado: {lastUpdatedAt}
             </span>
@@ -80,11 +86,11 @@ export default function AdminHomePage() {
           <button
             type="button"
             onClick={() => void fetchDashboard(true)}
-            disabled={loading || refreshing}
+            disabled={loading}
             className="px-3 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
             style={{ background: 'rgba(255,255,255,0.10)', color: '#E5E7EB', border: '1px solid rgba(255,255,255,0.12)' }}
           >
-            {refreshing ? 'Actualizando…' : 'Refrescar'}
+            Refrescar
           </button>
         </div>
       </div>

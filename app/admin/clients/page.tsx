@@ -308,7 +308,7 @@ export default function AdminClientsPage() {
                   Total pagado
                 </th>
                 <th className="text-left px-4 py-3" style={{ color: '#9CA3AF' }}>
-                  ID
+                  ID de orden (última)
                 </th>
               </tr>
             </thead>
@@ -339,8 +339,28 @@ export default function AdminClientsPage() {
                   <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
                     {formatMoney(c.total_paid)}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs" style={{ color: '#9CA3AF' }}>
-                    {c.id}
+                  <td className="px-4 py-3" style={{ color: '#9CA3AF' }}>
+                    {c.last_order_id ? (
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs truncate max-w-[180px]" title={c.last_order_id}>
+                          {c.last_order_id}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(c.last_order_id || '');
+                            // Opcional: mostrar feedback visual
+                          }}
+                          className="px-2 py-1 rounded text-xs font-semibold hover:opacity-80 transition-opacity"
+                          style={{ background: 'rgba(168, 62, 245, 0.2)', color: '#A83EF5' }}
+                          title="Copiar ID de orden"
+                        >
+                          Copiar
+                        </button>
+                      </div>
+                    ) : (
+                      '-'
+                    )}
                   </td>
                 </tr>
               ))}
