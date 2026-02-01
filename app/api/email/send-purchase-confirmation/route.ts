@@ -384,15 +384,17 @@ export async function POST(request: NextRequest) {
     logger.debug('📧 [EMAIL] Desde (final):', finalFromEmail);
     logger.debug('📧 [EMAIL] Asunto:', emailSubject);
 
-    // BCC opcional: en Vercel añade RESEND_BCC_EMAIL (ej. tu Gmail) para recibir copia de cada factura
-    const bccEmail = process.env.RESEND_BCC_EMAIL?.trim() || undefined;
-    const payload: { from: string; to: string; subject: string; html: string; bcc?: string } = {
+    // Admin siempre recibe copia del comprobante (Payphone o transferencia aprobada)
+    const ADMIN_EMAIL = 'altokeec@yahoo.com';
+    const bccExtra = process.env.RESEND_BCC_EMAIL?.trim() || undefined;
+    const bccList = [ADMIN_EMAIL, bccExtra].filter(Boolean) as string[];
+    const payload: { from: string; to: string; subject: string; html: string; bcc?: string[] } = {
       from: finalFromEmail,
       to: client.email,
       subject: emailSubject,
       html: emailHtml,
+      bcc: bccList,
     };
-    if (bccEmail) payload.bcc = bccEmail;
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
