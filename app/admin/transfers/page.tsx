@@ -34,7 +34,7 @@ export default function AdminTransfersPage() {
   const [invoiceSending, setInvoiceSending] = useState<string | null>(null);
   const [invoiceMessage, setInvoiceMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
   const [sendingPastComprobantes, setSendingPastComprobantes] = useState(false);
-  const [pastComprobantesResult, setPastComprobantesResult] = useState<{ sent: number; failed: number; total: number } | null>(null);
+  const [pastComprobantesResult, setPastComprobantesResult] = useState<{ sent: number; failed: number; total: number; errors?: { orderId: string; error: string }[] } | null>(null);
   const [cancelOrderIds, setCancelOrderIds] = useState('');
   const [cancellingOrders, setCancellingOrders] = useState(false);
   const [cancelResult, setCancelResult] = useState<{ ok: number; failed: number; results: { orderId: string; ok: boolean; error?: string }[] } | null>(null);
@@ -166,12 +166,20 @@ export default function AdminTransfersPage() {
     setSendingPastComprobantes(true);
     try {
       const res = await adminFetch('/api/admin/send-past-comprobantes', { method: 'POST' });
-      const json = (await res.json()) as { success: boolean; sent?: number; failed?: number; total?: number; error?: string };
+      const json = (await res.json()) as { 
+        success: boolean; 
+        sent?: number; 
+        failed?: number; 
+        total?: number; 
+        errors?: { orderId: string; error: string }[];
+        error?: string;
+      };
       if (!json.success) throw new Error(json.error || 'No se pudo enviar');
       setPastComprobantesResult({
         sent: json.sent ?? 0,
         failed: json.failed ?? 0,
         total: json.total ?? 0,
+        errors: json.errors,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error al enviar comprobantes');
@@ -266,10 +274,22 @@ export default function AdminTransfersPage() {
           {sendingPastComprobantes ? 'Enviando…' : 'Enviar comprobantes pasados al admin'}
         </button>
         {pastComprobantesResult && (
-          <p className="mt-2 text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
-            Enviados: {pastComprobantesResult.sent} de {pastComprobantesResult.total}
-            {pastComprobantesResult.failed > 0 && ` · Fallidos: ${pastComprobantesResult.failed}`}
-          </p>
+          <div className="mt-2">
+            <p className="text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+              Enviados: {pastComprobantesResult.sent} de {pastComprobantesResult.total}
+              {pastComprobantesResult.failed > 0 && ` · Fallidos: ${pastComprobantesResult.failed}`}
+            </p>
+            {pastComprobantesResult.errors && pastComprobantesResult.errors.length > 0 && (
+              <div className="mt-2 p-3 rounded-lg border text-xs" style={{ background: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#FCA5A5' }}>
+                <p className="font-semibold mb-1">Órdenes que fallaron:</p>
+                {pastComprobantesResult.errors.map((err) => (
+                  <div key={err.orderId} className="font-mono">
+                    {err.orderId.substring(0, 8)}... → {err.error}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
 

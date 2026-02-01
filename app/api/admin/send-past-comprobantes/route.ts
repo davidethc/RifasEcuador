@@ -44,7 +44,8 @@ export async function POST(request: Request) {
   let failed = 0;
   const errors: { orderId: string; error: string }[] = [];
 
-  for (const { id: orderId } of orders) {
+  for (let i = 0; i < orders.length; i++) {
+    const orderId = orders[i].id;
     try {
       const res = await fetch(emailUrl, {
         method: 'POST',
@@ -54,13 +55,22 @@ export async function POST(request: Request) {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
         sent++;
+        logger.info(`[send-past-comprobantes] ✓ Enviado: ${orderId}`);
       } else {
         failed++;
-        errors.push({ orderId, error: (data as { error?: string }).error || res.statusText });
+        const errorMsg = (data as { error?: string }).error || res.statusText;
+        errors.push({ orderId, error: errorMsg });
+        logger.error(`[send-past-comprobantes] ✗ Falló: ${orderId} - ${errorMsg}`);
+      }
+      // Pequeño delay para evitar rate limits (200ms entre cada correo)
+      if (i < orders.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
     } catch (e) {
       failed++;
-      errors.push({ orderId, error: e instanceof Error ? e.message : 'Error de red' });
+      const errorMsg = e instanceof Error ? e.message : 'Error de red';
+      errors.push({ orderId, error: errorMsg });
+      logger.error(`[send-past-comprobantes] ✗ Error: ${orderId} - ${errorMsg}`);
     }
   }
 
