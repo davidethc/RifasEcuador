@@ -35,6 +35,9 @@ export default function AdminTransfersPage() {
   const [invoiceMessage, setInvoiceMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
   const [sendingPastComprobantes, setSendingPastComprobantes] = useState(false);
   const [pastComprobantesResult, setPastComprobantesResult] = useState<{ sent: number; failed: number; total: number } | null>(null);
+  const [cancelOrderIds, setCancelOrderIds] = useState('');
+  const [cancellingOrders, setCancellingOrders] = useState(false);
+  const [cancelResult, setCancelResult] = useState<{ ok: number; failed: number; results: { orderId: string; ok: boolean; error?: string }[] } | null>(null);
 
   const load = async (isAutoRefresh: boolean) => {
     if (isAutoRefresh) setRefreshing(true);
@@ -177,6 +180,44 @@ export default function AdminTransfersPage() {
     }
   };
 
+  const cancelAndReleaseOrders = async () => {
+    const ids = cancelOrderIds
+      .split(/[\n,;\s]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (ids.length === 0) {
+      setError('Escribe al menos un ID de orden');
+      return;
+    }
+    setCancelResult(null);
+    setCancellingOrders(true);
+    setError(null);
+    try {
+      const res = await adminFetch('/api/admin/orders/cancel-and-release', {
+        method: 'POST',
+        body: JSON.stringify({ orderIds: ids }),
+      });
+      const json = (await res.json()) as {
+        success: boolean;
+        ok?: number;
+        failed?: number;
+        results?: { orderId: string; ok: boolean; error?: string }[];
+        error?: string;
+      };
+      if (!json.success) throw new Error(json.error || 'No se pudo anular');
+      setCancelResult({
+        ok: json.ok ?? 0,
+        failed: json.failed ?? 0,
+        results: json.results ?? [],
+      });
+      void load(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al anular órdenes');
+    } finally {
+      setCancellingOrders(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
@@ -228,6 +269,44 @@ export default function AdminTransfersPage() {
           <p className="mt-2 text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
             Enviados: {pastComprobantesResult.sent} de {pastComprobantesResult.total}
             {pastComprobantesResult.failed > 0 && ` · Fallidos: ${pastComprobantesResult.failed}`}
+          </p>
+        )}
+      </div>
+
+      {/* Anular órdenes de prueba y liberar boletos */}
+      <div className="mb-6 rounded-xl border p-4" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.12)' }}>
+        <p className="text-sm font-semibold font-[var(--font-dm-sans)] mb-2" style={{ color: '#E5D4FF' }}>
+          Anular órdenes de prueba
+        </p>
+        <p className="text-xs font-[var(--font-dm-sans)] mb-3" style={{ color: '#9CA3AF' }}>
+          Quita estas órdenes de las ventas: se eliminan los pagos, se liberan los boletos (vuelven a estar disponibles) y la orden queda cancelada. Pega los ID de orden (uno por línea o separados por coma).
+        </p>
+        <textarea
+          value={cancelOrderIds}
+          onChange={(e) => setCancelOrderIds(e.target.value)}
+          placeholder="9c80cf60-ce31-4798-83bc-cf1765eaa480
+086311c6-9d9a-463f-b120-782c4f89e555"
+          rows={3}
+          className="w-full px-3 py-2 rounded-lg border text-sm font-mono"
+          style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
+        />
+        <button
+          type="button"
+          onClick={cancelAndReleaseOrders}
+          disabled={cancellingOrders || !cancelOrderIds.trim()}
+          className="mt-2 px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50"
+          style={{ background: '#EF4444', color: '#FFF' }}
+        >
+          {cancellingOrders ? 'Anulando…' : 'Anular y liberar boletos'}
+        </button>
+        {cancelResult && (
+          <p className="mt-2 text-sm font-[var(--font-dm-sans)]" style={{ color: '#E5E7EB' }}>
+            Anuladas: {cancelResult.ok} · Fallidas: {cancelResult.failed}
+            {cancelResult.results.some((r) => !r.ok && r.error) && (
+              <span className="block mt-1 text-xs" style={{ color: '#9CA3AF' }}>
+                {cancelResult.results.filter((r) => !r.ok).map((r) => `${r.orderId}: ${r.error}`).join(' · ')}
+              </span>
+            )}
           </p>
         )}
       </div>
