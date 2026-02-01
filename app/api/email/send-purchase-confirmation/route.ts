@@ -257,9 +257,9 @@ export async function POST(request: NextRequest) {
           <div style="flex: 1 1 260px;">
             <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">Datos del cliente</div>
             <div style="font-size: 14px;">
-              <div><strong>Nombre:</strong> ${client.name}</div>
-              ${client.email ? `<div><strong>Mail:</strong> ${client.email}</div>` : ''}
-              ${client.phone ? `<div><strong>Teléfono:</strong> ${client.phone}</div>` : ''}
+              <div><strong>Nombre:</strong> ${client?.name || 'Cliente'}</div>
+              ${client?.email ? `<div><strong>Mail:</strong> ${client?.email}</div>` : ''}
+              ${client?.phone ? `<div><strong>Teléfono:</strong> ${client?.phone}</div>` : ''}
             </div>
           </div>
 
