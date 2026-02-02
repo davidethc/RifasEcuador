@@ -357,7 +357,7 @@ export default function ComprarPage() {
                            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-white/30" style={{ background: 'linear-gradient(135deg, #A83EF5 0%, #b92163 100%)' }} aria-hidden="true">
                               <Image src="/legacy/img/1.png" alt="" width={40} height={40} loading="lazy" />
                            </div>
-                           <p className="text-xl font-bold leading-tight" style={{ color: '#fff' }}>1.ELIGE<br /><small className="text-base font-normal">Tu número ganador</small></p>
+                           <p className="text-xl font-bold leading-tight" style={{ color: '#fff' }}>1.ELIGE<br /><small className="text-base font-normal">elige la cantidad de boletos que desees</small></p>
                         </div>
                      </div>
                   </div>

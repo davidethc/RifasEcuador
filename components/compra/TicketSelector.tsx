@@ -25,7 +25,7 @@ export function TicketSelector({
   // Definir combos disponibles
   const bundles: TicketBundle[] = [
     { quantity: 1, label: '1 Boleto', pricePerTicket, totalPrice: pricePerTicket },
-    { quantity: 5, label: 'Combo 5', pricePerTicket, totalPrice: pricePerTicket * 5 },
+    { quantity: 5, label: '5 boletos + 1 gratis', pricePerTicket, totalPrice: pricePerTicket * 5 },
     { quantity: 10, label: 'Combo 10', pricePerTicket, totalPrice: pricePerTicket * 10 },
     { quantity: 20, label: 'Combo 20', pricePerTicket, totalPrice: pricePerTicket * 20 },
   ];
@@ -159,11 +159,11 @@ export function TicketSelector({
                   {formatPrice(bundle.pricePerTicket)} c/u
                 </p>
                 
-                {/* Badge de regalo para combo 10 y 20 */}
-                {(bundle.quantity === 10 || bundle.quantity === 20) && (
+                {/* Badge de regalo para combo 5, 10 y 20 */}
+                {(bundle.quantity === 5 || bundle.quantity === 10 || bundle.quantity === 20) && (
                   <div className="mt-2 pt-2 border-t" style={{ borderColor: 'rgba(26, 26, 26, 0.2)' }}>
                     <p className="text-xs font-semibold font-[var(--font-dm-sans)]" style={{ color: '#1A1A1A', opacity: 0.9 }}>
-                      {bundle.quantity === 10 ? 'Te regalamos 2 oportunidades más' : 'Te regalamos 4 oportunidades más'}
+                      {bundle.quantity === 5 ? 'Te regalamos 1 oportunidad más' : bundle.quantity === 10 ? 'Te regalamos 2 oportunidades más' : 'Te regalamos 4 oportunidades más'}
                     </p>
                   </div>
                 )}

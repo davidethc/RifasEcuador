@@ -159,7 +159,7 @@ export const purchaseService = {
           .in('status', ['reserved', 'paid']);
 
         const availableTickets = raffle.total_numbers - (reservedCount || 0);
-        const totalTicketsNeeded = quantity === 10 ? 12 : quantity === 20 ? 24 : quantity;
+        const totalTicketsNeeded = quantity === 5 ? 6 : quantity === 10 ? 12 : quantity === 20 ? 24 : quantity;
         
         if (availableTickets < totalTicketsNeeded) {
           logger.error('❌ [ERROR] No hay suficientes tickets disponibles:', {
@@ -235,12 +235,17 @@ export const purchaseService = {
       }
 
       // 3. Calcular cantidad total de tickets (incluyendo regalos)
+      // Combo 5: regalamos 1 ticket adicional (total 6)
       // Combo 10: regalamos 2 tickets adicionales (total 12)
       // Combo 20: regalamos 4 tickets adicionales (total 24)
       let totalTicketsToReserve = quantity;
       let bonusTickets = 0;
 
-      if (quantity === 10) {
+      if (quantity === 5) {
+        bonusTickets = 1;
+        totalTicketsToReserve = 6;
+        logger.debug('🎁 [BONUS] Combo 5: agregando 1 ticket adicional (total: 6)');
+      } else if (quantity === 10) {
         bonusTickets = 2;
         totalTicketsToReserve = 12;
         logger.debug('🎁 [BONUS] Combo 10: agregando 2 tickets adicionales (total: 12)');

@@ -175,7 +175,7 @@ export function PurchaseFormWithPayment({
     }).format(price);
   };
 
-  const bonusTickets = quantity === 10 ? 2 : quantity === 20 ? 4 : 0;
+  const bonusTickets = quantity === 5 ? 1 : quantity === 10 ? 2 : quantity === 20 ? 4 : 0;
   const paidPlusBonusLabel = bonusTickets > 0 ? `${quantity} + ${bonusTickets} gratis` : `${quantity}`;
 
   // Mostrar formulario y método de pago en la misma vista cuando está completado
