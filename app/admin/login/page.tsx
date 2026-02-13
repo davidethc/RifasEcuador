@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { LoginForm } from '@/components/LoginForm';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,14 +10,17 @@ export default function AdminLoginPage() {
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const hasRedirectedToAdmin = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-      if (user) {
+      // Redirigir solo si hay usuario y no hemos redirigido ya (evita rebotes)
+      if (user && !hasRedirectedToAdmin.current) {
+        hasRedirectedToAdmin.current = true;
         router.replace('/admin');
       }
-    }, 100);
+    }, 150);
 
     return () => clearTimeout(timer);
   }, [user, router]);
@@ -36,9 +39,11 @@ export default function AdminLoginPage() {
           return;
         }
 
+        hasRedirectedToAdmin.current = true;
         router.replace('/admin');
       } else {
         await signInWithEmail(email, password);
+        hasRedirectedToAdmin.current = true;
         router.replace('/admin');
       }
     } catch (e) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,19 +11,34 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   const [checking, setChecking] = useState(true);
   const [allowed, setAllowed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasRedirectedToLogin = useRef(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     const run = async () => {
       if (isLoading) return;
+
+      // Evitar múltiples redirecciones en rebote
+      if (hasRedirectedToLogin.current) return;
+
       // Evitar redirigir de inmediato: la sesión puede tardar un momento en hidratarse
-      // (especialmente tras login o recarga de página)
       let currentUser = user;
       if (!currentUser) {
         const { data } = await supabase.auth.getSession();
         currentUser = data.session?.user ?? null;
+        if (cancelled) return;
         if (!currentUser) {
-          router.replace('/admin/login');
-          return;
+          // Dar una segunda oportunidad: esperar 400ms y re-verificar (evita rebotes)
+          await new Promise((r) => setTimeout(r, 400));
+          if (cancelled) return;
+          const { data: retry } = await supabase.auth.getSession();
+          currentUser = retry.session?.user ?? null;
+          if (!currentUser) {
+            hasRedirectedToLogin.current = true;
+            router.replace('/admin/login');
+            return;
+          }
         }
       }
 
@@ -33,9 +48,10 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', currentUser.id)
+          .eq('user_id', currentUser!.id)
           .maybeSingle();
 
+        if (cancelled) return;
         if (error) {
           setAllowed(false);
           setError('No se pudo validar permisos');
@@ -50,11 +66,14 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
         setAllowed(true);
       } finally {
-        setChecking(false);
+        if (!cancelled) setChecking(false);
       }
     };
 
     void run();
+    return () => {
+      cancelled = true;
+    };
   }, [isLoading, user, router]);
 
   if (isLoading || checking) {
