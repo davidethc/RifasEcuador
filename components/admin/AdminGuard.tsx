@@ -15,9 +15,16 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const run = async () => {
       if (isLoading) return;
-      if (!user) {
-        router.replace('/admin/login');
-        return;
+      // Evitar redirigir de inmediato: la sesión puede tardar un momento en hidratarse
+      // (especialmente tras login o recarga de página)
+      let currentUser = user;
+      if (!currentUser) {
+        const { data } = await supabase.auth.getSession();
+        currentUser = data.session?.user ?? null;
+        if (!currentUser) {
+          router.replace('/admin/login');
+          return;
+        }
       }
 
       setChecking(true);
@@ -26,7 +33,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
+          .eq('user_id', currentUser.id)
           .maybeSingle();
 
         if (error) {
