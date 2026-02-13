@@ -21,10 +21,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <AdminGuard>
       <div className="min-h-screen" style={{ backgroundColor: '#100235' }}>
-        <div className="mx-auto max-w-7xl px-4 py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+        <div className="mx-auto px-3 py-10" style={{ maxWidth: '1800px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-4">
             <aside
-              className="rounded-2xl border p-4 h-fit"
+              className="rounded-2xl border p-3 h-fit"
               style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(15, 17, 23, 0.6)' }}
             >
               <p className="text-sm font-semibold mb-1 font-[var(--font-dm-sans)]" style={{ color: '#E5D4FF' }}>
@@ -33,14 +33,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <p className="text-xs font-[var(--font-dm-sans)] mb-3" style={{ color: '#9CA3AF' }}>
                 Resumen de ventas, transferencias y clientes
               </p>
-              <nav className="space-y-2">
+              <nav className="space-y-1.5">
                 {navItems.map((item) => {
                   const active = pathname === item.href;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="block px-3 py-2 rounded-lg text-sm font-semibold font-[var(--font-dm-sans)]"
+                      className="block px-2.5 py-2 rounded-lg text-sm font-semibold font-[var(--font-dm-sans)]"
                       style={{
                         background: active ? 'rgba(168, 62, 245, 0.22)' : 'transparent',
                         border: active ? '1px solid rgba(168, 62, 245, 0.35)' : '1px solid transparent',
@@ -55,7 +55,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </aside>
 
             <section
-              className="rounded-2xl border p-6"
+              className="rounded-2xl border p-6 overflow-hidden"
               style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(15, 17, 23, 0.6)' }}
             >
               {children}

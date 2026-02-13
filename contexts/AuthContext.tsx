@@ -40,14 +40,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Initial session check
+    console.log('[AuthContext] Initializing, checking session...');
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[AuthContext] Initial session:', { 
+        hasSession: !!session, 
+        userId: session?.user?.id,
+        userEmail: session?.user?.email 
+      });
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[AuthContext] Auth state changed:', event, {
+        hasSession: !!session,
+        userId: session?.user?.id,
+        userEmail: session?.user?.email
+      });
+      
+      // IMPORTANTE: Ignorar TOKEN_REFRESHED para evitar loops infinitos
+      // El token se actualiza internamente en Supabase, no necesitamos re-renderizar
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('[AuthContext] Ignoring TOKEN_REFRESHED to prevent loops');
+        return;
+      }
+      
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
@@ -70,33 +89,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     },
     signInWithEmail: async (email: string, password: string) => {
+      console.log('[AuthContext] signInWithEmail called for:', email);
+      
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
-      if (authError) throw authError;
-
-      // Check if user was previously soft-deleted
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_deleted, deleted_at')
-        .eq('id', authData.user?.id)
-        .single();
-
-      if (profile?.is_deleted) {
-        // Reactivate the account
-        await supabase
-          .from('profiles')
-          .update({ 
-            is_deleted: false, 
-            deleted_at: null,
-            reactivated_at: new Date().toISOString() 
-          })
-          .eq('id', authData.user?.id);
-
-        // You could trigger a welcome back notification here
+      if (authError) {
+        console.error('[AuthContext] Sign in error:', authError);
+        throw authError;
       }
+
+      console.log('[AuthContext] Sign in successful:', {
+        userId: authData.user?.id,
+        userEmail: authData.user?.email,
+        hasSession: !!authData.session
+      });
 
       return authData;
     },

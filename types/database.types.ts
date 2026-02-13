@@ -24,9 +24,6 @@ export interface Profile {
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
-  is_deleted?: boolean;
-  deleted_at?: string | null;
-  reactivated_at?: string | null;
 }
 
 export interface Ticket {

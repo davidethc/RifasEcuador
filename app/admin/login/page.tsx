@@ -42,11 +42,24 @@ export default function AdminLoginPage() {
         hasRedirectedToAdmin.current = true;
         router.replace('/admin');
       } else {
-        await signInWithEmail(email, password);
+        console.log('[AdminLogin] Attempting sign in for:', email);
+        const result = await signInWithEmail(email, password);
+        console.log('[AdminLogin] Sign in result:', { 
+          hasUser: !!result.user, 
+          hasSession: !!result.session,
+          userId: result.user?.id,
+          userEmail: result.user?.email
+        });
+        
+        // Esperar un momento para que la sesión se propague al AuthContext
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         hasRedirectedToAdmin.current = true;
+        console.log('[AdminLogin] Redirecting to /admin');
         router.replace('/admin');
       }
     } catch (e) {
+      console.error('[AdminLogin] Error:', e);
       setError(e instanceof Error ? e.message : 'Authentication failed');
     } finally {
       setIsLoading(false);

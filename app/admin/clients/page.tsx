@@ -32,6 +32,29 @@ type ClientsResponse = {
   error?: string;
 };
 
+type Raffle = {
+  id: string;
+  title: string;
+  price_per_ticket: number;
+  total_numbers: number;
+  status: string;
+};
+
+type RafflesResponse = {
+  success: boolean;
+  raffles?: Raffle[];
+  error?: string;
+};
+
+type AssignResponse = {
+  success: boolean;
+  order_id?: string;
+  numbers?: string[];
+  total?: number;
+  message?: string;
+  error?: string;
+};
+
 const PAGE_SIZE = 5;
 type StatusFilter = 'all' | 'paid' | 'pending' | 'rejected';
 
@@ -51,12 +74,13 @@ const prettyStatus = (s: string | null | undefined) => {
   return v;
 };
 
-/** Método de pago: solo mostrar transfer/payphone; "pending" o vacío = "-" */
+/** Método de pago: mostrar transfer/payphone/cash; "pending" o vacío = "-" */
 const prettyPaymentMethod = (method: string | null | undefined, provider: string | null | undefined) => {
   const v = (method || provider || '').toLowerCase().trim();
   if (!v || v === 'pending') return '-';
   if (v === 'transfer') return 'Transferencia';
   if (v === 'payphone') return 'Payphone';
+  if (v === 'cash') return 'Efectivo';
   return v;
 };
 
@@ -98,6 +122,15 @@ export default function AdminClientsPage() {
   const [creating, setCreating] = useState(false);
   const [createdMsg, setCreatedMsg] = useState<string | null>(null);
 
+  // Estados para asignación de boletos
+  const [raffles, setRaffles] = useState<Raffle[]>([]);
+  const [selectedRaffleId, setSelectedRaffleId] = useState('');
+  const [ticketQuantity, setTicketQuantity] = useState(1);
+  const [selectedClientId, setSelectedClientId] = useState<string>('');
+  const [assigning, setAssigning] = useState(false);
+  const [assignedMsg, setAssignedMsg] = useState<string | null>(null);
+  const [assignedNumbers, setAssignedNumbers] = useState<string[]>([]);
+
   const load = async (nextPage?: number, nextStatus?: StatusFilter) => {
     const p = Math.max(1, nextPage ?? page);
     const effectiveStatus = nextStatus ?? status;
@@ -122,8 +155,32 @@ export default function AdminClientsPage() {
 
   useEffect(() => {
     void load(1);
+    void loadRaffles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const loadRaffles = async () => {
+    try {
+      console.log('[loadRaffles] Fetching raffles...');
+      const res = await adminFetch('/api/admin/raffles');
+      const json = (await res.json()) as RafflesResponse;
+      console.log('[loadRaffles] Response:', json);
+      
+      if (json.success && json.raffles) {
+        console.log('[loadRaffles] Raffles loaded:', json.raffles.length);
+        setRaffles(json.raffles);
+        // Seleccionar la primera rifa por defecto
+        if (json.raffles.length > 0) {
+          setSelectedRaffleId(json.raffles[0].id);
+          console.log('[loadRaffles] Selected raffle:', json.raffles[0].id);
+        }
+      } else {
+        console.error('[loadRaffles] No raffles or error:', json.error);
+      }
+    } catch (e) {
+      console.error('[loadRaffles] Error:', e);
+    }
+  };
 
   // Actualización automática: cada 20s y al volver a la pestaña (pagos en tiempo casi real)
   useEffect(() => {
@@ -149,6 +206,8 @@ export default function AdminClientsPage() {
     setCreating(true);
     setCreatedMsg(null);
     setError(null);
+    setAssignedMsg(null);
+    setAssignedNumbers([]);
     try {
       const res = await adminFetch('/api/admin/clients', {
         method: 'POST',
@@ -156,7 +215,16 @@ export default function AdminClientsPage() {
       });
       const json = (await res.json()) as { success: boolean; clientId?: string; error?: string };
       if (!json.success) throw new Error(json.error || 'No se pudo crear');
-      setCreatedMsg(`Cliente listo (id: ${json.clientId})`);
+      
+      console.log('[createClient] Cliente creado:', json.clientId);
+      setCreatedMsg(`✅ Cliente creado exitosamente`);
+      
+      // Seleccionar automáticamente el cliente recién creado
+      if (json.clientId) {
+        setSelectedClientId(json.clientId);
+        console.log('[createClient] Cliente seleccionado para asignación:', json.clientId);
+      }
+      
       setName('');
       setEmail('');
       setPhone('');
@@ -166,6 +234,68 @@ export default function AdminClientsPage() {
       setError(e instanceof Error ? e.message : 'Error');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const assignTickets = async () => {
+    console.log('[assignTickets] Starting...', {
+      selectedClientId,
+      selectedRaffleId,
+      ticketQuantity,
+      raffles: raffles.length,
+    });
+
+    if (!selectedClientId) {
+      setError('Selecciona un cliente primero');
+      return;
+    }
+    if (!selectedRaffleId) {
+      setError('Selecciona una rifa');
+      return;
+    }
+    if (ticketQuantity < 1 || ticketQuantity > 1000) {
+      setError('La cantidad debe estar entre 1 y 1000');
+      return;
+    }
+
+    setAssigning(true);
+    setAssignedMsg(null);
+    setAssignedNumbers([]);
+    setError(null);
+    try {
+      console.log('[assignTickets] Calling API...');
+      const res = await adminFetch('/api/admin/assign-tickets', {
+        method: 'POST',
+        body: JSON.stringify({
+          client_id: selectedClientId,
+          raffle_id: selectedRaffleId,
+          quantity: ticketQuantity,
+        }),
+      });
+      const json = (await res.json()) as AssignResponse;
+      console.log('[assignTickets] API Response:', json);
+      
+      if (!json.success) throw new Error(json.error || 'No se pudo asignar');
+      
+      setAssignedMsg(json.message || '✅ Boletos asignados exitosamente');
+      setAssignedNumbers(json.numbers || []);
+      
+      // Resetear estados
+      setSelectedClientId('');
+      setTicketQuantity(1);
+      setCreatedMsg(null);
+      
+      // Pequeño delay para asegurar que la DB se actualice
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Recargar la tabla para mostrar los cambios
+      console.log('[assignTickets] Reloading clients table...');
+      await load(page);
+    } catch (e) {
+      console.error('[assignTickets] Error:', e);
+      setError(e instanceof Error ? e.message : 'Error');
+    } finally {
+      setAssigning(false);
     }
   };
 
@@ -190,11 +320,26 @@ export default function AdminClientsPage() {
           {createdMsg}
         </div>
       )}
+      {assignedMsg && (
+        <div className="mb-4 rounded-xl border p-4" style={{ background: 'rgba(34, 197, 94, 0.10)', borderColor: 'rgba(34, 197, 94, 0.25)', color: '#E5E7EB' }}>
+          <p className="font-semibold mb-2">{assignedMsg}</p>
+          {assignedNumbers.length > 0 && (
+            <div>
+              <p className="text-xs mb-1" style={{ color: '#9CA3AF' }}>
+                Números asignados:
+              </p>
+              <p className="font-mono text-xs" style={{ color: '#E5D4FF' }}>
+                {assignedNumbers.join(', ')}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="rounded-xl border p-4" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.12)' }}>
           <p className="text-sm font-semibold font-[var(--font-dm-sans)] mb-3" style={{ color: '#E5D4FF' }}>
-            Nuevo cliente
+            1️⃣ Nuevo cliente
           </p>
           <div className="space-y-2">
             <input
@@ -222,13 +367,95 @@ export default function AdminClientsPage() {
               type="button"
               onClick={createClient}
               disabled={creating || (!email.trim() && !phone.trim())}
-              className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50"
+              className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50 w-full"
               style={{ background: '#FFB200', color: '#0F1117' }}
             >
-              {creating ? 'Creando...' : 'Guardar'}
+              {creating ? 'Creando...' : '✅ Crear cliente'}
             </button>
             <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-              Tip: con email o teléfono es suficiente. El sistema reutiliza clientes existentes si ya hay uno con ese email.
+              Tip: con email o teléfono es suficiente.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-xl border p-4" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.12)' }}>
+          <p className="text-sm font-semibold font-[var(--font-dm-sans)] mb-3" style={{ color: '#E5D4FF' }}>
+            2️⃣ Asignar boletos (pago físico)
+          </p>
+          <div className="space-y-2">
+            <div>
+              <label className="text-xs font-[var(--font-dm-sans)] mb-1 block" style={{ color: '#9CA3AF' }}>
+                Cliente
+              </label>
+              <select
+                value={selectedClientId}
+                onChange={(e) => setSelectedClientId(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border text-sm"
+                style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
+              >
+                <option value="">Selecciona un cliente...</option>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name || c.email || c.phone || `Cliente ${c.id.slice(0, 8)}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-[var(--font-dm-sans)] mb-1 block" style={{ color: '#9CA3AF' }}>
+                Rifa activa
+              </label>
+              <select
+                value={selectedRaffleId}
+                onChange={(e) => setSelectedRaffleId(e.target.value)}
+                disabled={raffles.length === 0}
+                className="w-full px-3 py-2 rounded-lg border text-sm disabled:opacity-50"
+                style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
+              >
+                {raffles.length === 0 ? (
+                  <option>No hay rifas activas</option>
+                ) : (
+                  raffles.map((raffle) => (
+                    <option key={raffle.id} value={raffle.id}>
+                      {raffle.title} - ${raffle.price_per_ticket}/boleto
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-[var(--font-dm-sans)] mb-1 block" style={{ color: '#9CA3AF' }}>
+                Cantidad de boletos (aleatorios)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="1000"
+                value={ticketQuantity}
+                onChange={(e) => setTicketQuantity(Math.max(1, Math.min(1000, parseInt(e.target.value) || 1)))}
+                className="w-full px-3 py-2 rounded-lg border text-sm"
+                style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={assignTickets}
+              disabled={assigning || !selectedClientId || !selectedRaffleId || raffles.length === 0}
+              className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50 w-full"
+              style={{ background: '#A83EF5', color: '#FFFFFF' }}
+            >
+              {assigning ? 'Asignando...' : '🎲 Asignar boletos aleatorios'}
+            </button>
+            <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+              {selectedClientId && raffles.length > 0
+                ? `✅ Listo. ${ticketQuantity} boleto(s) de $${
+                    raffles.find((r) => r.id === selectedRaffleId)?.price_per_ticket || 0
+                  } c/u = $${(
+                    ticketQuantity * (raffles.find((r) => r.id === selectedRaffleId)?.price_per_ticket || 0)
+                  ).toFixed(2)}`
+                : raffles.length === 0
+                ? '⚠️ No hay rifas activas'
+                : '⚠️ Selecciona un cliente'}
             </p>
           </div>
         </div>
@@ -280,69 +507,75 @@ export default function AdminClientsPage() {
       </div>
 
       <div className="mt-6">
-        <div className="relative overflow-x-auto rounded-xl border" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+        {/* Scroll indicator hint */}
+        <p className="text-xs mb-2 font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
+          💡 Tip: Desliza horizontalmente para ver todas las columnas →
+        </p>
+        <div className="relative overflow-x-auto rounded-xl border shadow-xl" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
           {/* Keep table mounted to avoid scroll "rebote" when loading */}
-          <table className="min-w-full text-sm">
+          <table className="w-full text-xs">
             <thead>
               <tr style={{ background: 'rgba(0,0,0,0.15)' }}>
-                <th className="text-left px-4 py-3 text-white">Nombre</th>
-                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
+                <th className="text-left px-3 py-2.5 text-white font-semibold whitespace-nowrap">Nombre</th>
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                   Email
                 </th>
-                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                   Teléfono
                 </th>
-                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
-                  Estado (última orden)
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
+                  Estado
                 </th>
-                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
-                  Método de pago (última orden)
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
+                  Método de pago
                 </th>
-                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
-                  Monto (última)
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
+                  Monto
                 </th>
-                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
-                  Números (última orden)
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
+                  Números
                 </th>
-                <th className="text-left px-4 py-3" style={{ color: '#E5D4FF' }}>
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                   Total pagado
                 </th>
-                <th className="text-left px-4 py-3" style={{ color: '#9CA3AF' }}>
-                  ID de orden (última)
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#9CA3AF' }}>
+                  ID de orden
                 </th>
               </tr>
             </thead>
             <tbody style={loading ? { opacity: 0.55 } : undefined}>
               {clients.map((c) => (
                 <tr key={c.id} style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                  <td className="px-4 py-3 text-white">{c.name || '-'}</td>
-                  <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
+                  <td className="px-3 py-2.5 text-white whitespace-nowrap">{c.name || '-'}</td>
+                  <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {c.email || '-'}
                   </td>
-                  <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
+                  <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {c.phone || '-'}
                   </td>
-                  <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
+                  <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {prettyStatus(c.last_order_status || null)}
                   </td>
-                  <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
+                  <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {prettyPaymentMethod(c.last_order_payment_method ?? null, c.last_payment_provider ?? null)}
                   </td>
-                  <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
+                  <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {c.last_order_total != null ? formatMoney(c.last_order_total) : '-'}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs" style={{ color: '#E5D4FF' }}>
-                    {Array.isArray(c.last_order_numbers) && c.last_order_numbers.length > 0
-                      ? c.last_order_numbers.join(', ')
-                      : '-'}
+                  <td className="px-3 py-2.5 font-mono whitespace-nowrap" style={{ color: '#E5D4FF', maxWidth: '200px' }}>
+                    <div className="truncate" title={Array.isArray(c.last_order_numbers) ? c.last_order_numbers.join(', ') : ''}>
+                      {Array.isArray(c.last_order_numbers) && c.last_order_numbers.length > 0
+                        ? c.last_order_numbers.join(', ')
+                        : '-'}
+                    </div>
                   </td>
-                  <td className="px-4 py-3" style={{ color: '#E5D4FF' }}>
+                  <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {formatMoney(c.total_paid)}
                   </td>
-                  <td className="px-4 py-3" style={{ color: '#9CA3AF' }}>
+                  <td className="px-3 py-2.5" style={{ color: '#9CA3AF' }}>
                     {c.last_order_id ? (
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs truncate max-w-[180px]" title={c.last_order_id}>
+                      <div className="flex items-center gap-2 whitespace-nowrap">
+                        <span className="font-mono truncate max-w-[120px]" title={c.last_order_id}>
                           {c.last_order_id}
                         </span>
                         <button
@@ -351,8 +584,8 @@ export default function AdminClientsPage() {
                             navigator.clipboard.writeText(c.last_order_id || '');
                             // Opcional: mostrar feedback visual
                           }}
-                          className="px-2 py-1 rounded text-xs font-semibold hover:opacity-80 transition-opacity"
-                          style={{ background: 'rgba(168, 62, 245, 0.2)', color: '#A83EF5' }}
+                          className="px-2 py-0.5 rounded font-semibold hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
+                          style={{ background: 'rgba(168, 62, 245, 0.2)', color: '#A83EF5', fontSize: '10px' }}
                           title="Copiar ID de orden"
                         >
                           Copiar
@@ -366,14 +599,14 @@ export default function AdminClientsPage() {
               ))}
               {!loading && clients.length === 0 && (
                 <tr>
-                  <td className="px-4 py-4" colSpan={9} style={{ color: '#9CA3AF' }}>
+                  <td className="px-3 py-4 text-center" colSpan={9} style={{ color: '#9CA3AF' }}>
                     Sin resultados
                   </td>
                 </tr>
               )}
               {loading && clients.length === 0 && (
                 <tr>
-                  <td className="px-4 py-4 text-white" colSpan={9}>
+                  <td className="px-3 py-4 text-white text-center" colSpan={9}>
                     Cargando...
                   </td>
                 </tr>

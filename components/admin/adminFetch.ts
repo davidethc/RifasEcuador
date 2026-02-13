@@ -21,24 +21,33 @@ export async function adminFetch(input: string, init?: RequestInit) {
       headers: buildHeaders(token),
     });
 
+  // Get current session (without refresh)
   const { data } = await supabase.auth.getSession();
-  let token = data.session?.access_token ?? null;
+  const token = data.session?.access_token ?? null;
 
-  // If missing/expired, try refresh once (keeps UX simple)
+  // If no token at all, return 401
   if (!token) {
-    const refreshed = await supabase.auth.refreshSession();
-    token = refreshed.data.session?.access_token ?? null;
+    return new Response(JSON.stringify({ error: 'No authentication token' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
-  // First attempt
+  // First attempt with existing token
   const res = await doFetch(token);
-  if (res.status !== 401) return res;
+  
+  // Only retry if we get 401 (token expired)
+  if (res.status === 401) {
+    // Try to refresh the session once
+    const refreshed = await supabase.auth.refreshSession();
+    const nextToken = refreshed.data.session?.access_token ?? null;
+    
+    if (nextToken && nextToken !== token) {
+      // Retry with new token
+      return doFetch(nextToken);
+    }
+  }
 
-  // If token exists but is expired/invalid, refresh + retry once
-  const refreshed = await supabase.auth.refreshSession();
-  const nextToken = refreshed.data.session?.access_token ?? null;
-  if (!nextToken || nextToken === token) return res;
-
-  return doFetch(nextToken);
+  return res;
 }
 
