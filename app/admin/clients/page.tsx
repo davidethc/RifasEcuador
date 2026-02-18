@@ -127,6 +127,7 @@ export default function AdminClientsPage() {
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [selectedRaffleId, setSelectedRaffleId] = useState('');
   const [ticketQuantity, setTicketQuantity] = useState(1);
+  const [ticketQuantityInput, setTicketQuantityInput] = useState('1'); // Estado para el input (permite vacío)
   const [selectedClientId, setSelectedClientId] = useState<string>('');
   const [assigning, setAssigning] = useState(false);
   const [assignedMsg, setAssignedMsg] = useState<string | null>(null);
@@ -163,24 +164,18 @@ export default function AdminClientsPage() {
 
   const loadRaffles = async () => {
     try {
-      console.log('[loadRaffles] Fetching raffles...');
       const res = await adminFetch('/api/admin/raffles');
       const json = (await res.json()) as RafflesResponse;
-      console.log('[loadRaffles] Response:', json);
       
       if (json.success && json.raffles) {
-        console.log('[loadRaffles] Raffles loaded:', json.raffles.length);
         setRaffles(json.raffles);
         // Seleccionar la primera rifa por defecto
         if (json.raffles.length > 0) {
           setSelectedRaffleId(json.raffles[0].id);
-          console.log('[loadRaffles] Selected raffle:', json.raffles[0].id);
         }
-      } else {
-        console.error('[loadRaffles] No raffles or error:', json.error);
       }
     } catch (e) {
-      console.error('[loadRaffles] Error:', e);
+      // Error silencioso - la UI mostrará que no hay rifas disponibles
     }
   };
 
@@ -218,13 +213,11 @@ export default function AdminClientsPage() {
       const json = (await res.json()) as { success: boolean; clientId?: string; error?: string };
       if (!json.success) throw new Error(json.error || 'No se pudo crear');
       
-      console.log('[createClient] Cliente creado:', json.clientId);
       setCreatedMsg(`✅ Cliente creado exitosamente`);
       
       // Seleccionar automáticamente el cliente recién creado
       if (json.clientId) {
         setSelectedClientId(json.clientId);
-        console.log('[createClient] Cliente seleccionado para asignación:', json.clientId);
       }
       
       setName('');
@@ -240,13 +233,6 @@ export default function AdminClientsPage() {
   };
 
   const assignTickets = async () => {
-    console.log('[assignTickets] Starting...', {
-      selectedClientId,
-      selectedRaffleId,
-      ticketQuantity,
-      raffles: raffles.length,
-    });
-
     if (!selectedClientId) {
       setError('Selecciona un cliente primero');
       return;
@@ -266,7 +252,6 @@ export default function AdminClientsPage() {
     setAssignedEmailSent(false);
     setError(null);
     try {
-      console.log('[assignTickets] Calling API...');
       const res = await adminFetch('/api/admin/assign-tickets', {
         method: 'POST',
         body: JSON.stringify({
@@ -276,7 +261,6 @@ export default function AdminClientsPage() {
         }),
       });
       const json = (await res.json()) as AssignResponse;
-      console.log('[assignTickets] API Response:', json);
       
       if (!json.success) throw new Error(json.error || 'No se pudo asignar');
       
@@ -287,16 +271,15 @@ export default function AdminClientsPage() {
       // Resetear estados
       setSelectedClientId('');
       setTicketQuantity(1);
+      setTicketQuantityInput('1');
       setCreatedMsg(null);
       
       // Pequeño delay para asegurar que la DB se actualice
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Recargar la tabla para mostrar los cambios
-      console.log('[assignTickets] Reloading clients table...');
       await load(page);
     } catch (e) {
-      console.error('[assignTickets] Error:', e);
       setError(e instanceof Error ? e.message : 'Error');
     } finally {
       setAssigning(false);
@@ -437,11 +420,43 @@ export default function AdminClientsPage() {
                 Cantidad de boletos (aleatorios)
               </label>
               <input
-                type="number"
-                min="1"
-                max="1000"
-                value={ticketQuantity}
-                onChange={(e) => setTicketQuantity(Math.max(1, Math.min(1000, parseInt(e.target.value) || 1)))}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={ticketQuantityInput}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Solo permitir números y campo vacío
+                  if (value === '' || /^\d+$/.test(value)) {
+                    setTicketQuantityInput(value);
+                    // Actualizar el valor numérico solo si es válido
+                    const num = parseInt(value, 10);
+                    if (!isNaN(num) && num >= 1 && num <= 1000) {
+                      setTicketQuantity(num);
+                    }
+                  }
+                }}
+                onBlur={(e) => {
+                  // Cuando pierde el foco, validar y normalizar
+                  const value = e.target.value.trim();
+                  if (value === '') {
+                    setTicketQuantityInput('1');
+                    setTicketQuantity(1);
+                  } else {
+                    const num = parseInt(value, 10);
+                    if (isNaN(num) || num < 1) {
+                      setTicketQuantityInput('1');
+                      setTicketQuantity(1);
+                    } else if (num > 1000) {
+                      setTicketQuantityInput('1000');
+                      setTicketQuantity(1000);
+                    } else {
+                      setTicketQuantityInput(String(num));
+                      setTicketQuantity(num);
+                    }
+                  }
+                }}
+                placeholder="1"
                 className="w-full px-3 py-2 rounded-lg border text-sm"
                 style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
               />

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminFromRequest } from '@/lib/server/adminAuth';
 import { getSupabaseAdmin } from '@/lib/server/supabaseAdmin';
+import { logger } from '@/utils/logger';
 
 type AssignRequest = {
   client_id: string;
@@ -59,7 +60,6 @@ export async function POST(req: NextRequest) {
     // Nota: Obtenemos más boletos de los necesarios y seleccionamos aleatoriamente
     const fetchLimit = Math.min(quantity * 10, 5000); // Obtener 10x la cantidad o máximo 5000
     
-    console.log('[assign-tickets] Fetching up to', fetchLimit, 'available tickets...');
     const { data: availableTickets, error: ticketsError } = await supabase
       .from('tickets')
       .select('id, number')
@@ -68,11 +68,8 @@ export async function POST(req: NextRequest) {
       .limit(fetchLimit);
 
     if (ticketsError) {
-      console.error('[assign-tickets] Error fetching tickets:', ticketsError);
       return NextResponse.json({ success: false, error: 'Error al buscar boletos disponibles' }, { status: 500 });
     }
-
-    console.log('[assign-tickets] Found', availableTickets?.length || 0, 'available tickets');
 
     if (!availableTickets || availableTickets.length < quantity) {
       return NextResponse.json(
@@ -93,7 +90,6 @@ export async function POST(req: NextRequest) {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     const selectedTickets = shuffled.slice(0, quantity);
-    console.log('[assign-tickets] Selected', selectedTickets.length, 'random tickets');
 
     const ticketIds = selectedTickets.map((t) => t.id);
     const numbers = selectedTickets.map((t) => t.number);
@@ -114,7 +110,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (orderError || !order) {
-      console.error('[assign-tickets] Error creating order:', orderError);
       return NextResponse.json({ success: false, error: 'Error al crear la orden' }, { status: 500 });
     }
 
@@ -128,7 +123,6 @@ export async function POST(req: NextRequest) {
       .in('id', ticketIds);
 
     if (updateError) {
-      console.error('[assign-tickets] Error updating tickets:', updateError);
       // Intentar revertir la orden (marcar como cancelled)
       await supabase.from('orders').update({ status: 'cancelled' }).eq('id', order.id);
       return NextResponse.json({ success: false, error: 'Error al asignar boletos' }, { status: 500 });
@@ -144,8 +138,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (paymentError) {
-      console.error('[assign-tickets] Error creating payment:', paymentError);
-      // No revertir, solo loguear el error
+      // No revertir, solo continuar (el pago puede crearse después)
     }
 
     // 7. Enviar correo de confirmación al cliente si tiene email
@@ -162,26 +155,11 @@ export async function POST(req: NextRequest) {
         });
         if (emailRes.ok) {
           emailSent = true;
-          console.log('[assign-tickets] Correo enviado al cliente:', clientEmail);
-        } else {
-          console.error('[assign-tickets] Error al enviar correo:', await emailRes.text());
         }
       } catch (emailErr) {
-        console.error('[assign-tickets] Error al enviar correo:', emailErr);
+        // Error silencioso - el correo puede enviarse después
       }
-    } else {
-      console.log('[assign-tickets] Cliente sin email, no se envía correo');
     }
-
-    console.log('[assign-tickets] SUCCESS:', {
-      orderId: order.id,
-      clientId: client_id,
-      raffleId: raffle_id,
-      quantity,
-      numbers,
-      total,
-      emailSent,
-    });
 
     const successMsg = emailSent
       ? `✅ ${quantity} boletos asignados. Correo enviado a ${client.email}.`
@@ -196,7 +174,7 @@ export async function POST(req: NextRequest) {
       email_sent: emailSent,
     });
   } catch (error) {
-    console.error('[assign-tickets] Unexpected error:', error);
+    logger.error('[assign-tickets] Unexpected error:', error);
     return NextResponse.json({ success: false, error: 'Error interno del servidor' }, { status: 500 });
   }
 }
