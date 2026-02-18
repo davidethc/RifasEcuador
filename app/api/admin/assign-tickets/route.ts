@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
       // No revertir, solo continuar (el pago puede crearse después)
     }
 
-    // 7. Enviar correo de confirmación al cliente si tiene email
+    // 7. Enviar correo de confirmación al cliente con los números asignados (misma API que compra online)
     let emailSent = false;
     const clientEmail = (client.email || '').trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -155,9 +155,12 @@ export async function POST(req: NextRequest) {
         });
         if (emailRes.ok) {
           emailSent = true;
+        } else {
+          const errBody = await emailRes.text();
+          logger.error('[assign-tickets] Error al enviar correo al cliente:', emailRes.status, errBody);
         }
       } catch (emailErr) {
-        // Error silencioso - el correo puede enviarse después
+        logger.error('[assign-tickets] Error al llamar API de correo:', emailErr);
       }
     }
 

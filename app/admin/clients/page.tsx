@@ -126,8 +126,8 @@ export default function AdminClientsPage() {
   // Estados para asignación de boletos
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [selectedRaffleId, setSelectedRaffleId] = useState('');
-  const [ticketQuantity, setTicketQuantity] = useState(1);
-  const [ticketQuantityInput, setTicketQuantityInput] = useState('1'); // Estado para el input (permite vacío)
+  const [ticketQuantity, setTicketQuantity] = useState(0);
+  const [ticketQuantityInput, setTicketQuantityInput] = useState('0'); // Permite vacío y solo números
   const [selectedClientId, setSelectedClientId] = useState<string>('');
   const [assigning, setAssigning] = useState(false);
   const [assignedMsg, setAssignedMsg] = useState<string | null>(null);
@@ -174,7 +174,7 @@ export default function AdminClientsPage() {
           setSelectedRaffleId(json.raffles[0].id);
         }
       }
-    } catch (e) {
+    } catch {
       // Error silencioso - la UI mostrará que no hay rifas disponibles
     }
   };
@@ -270,8 +270,8 @@ export default function AdminClientsPage() {
       
       // Resetear estados
       setSelectedClientId('');
-      setTicketQuantity(1);
-      setTicketQuantityInput('1');
+      setTicketQuantity(0);
+      setTicketQuantityInput('0');
       setCreatedMsg(null);
       
       // Pequeño delay para asegurar que la DB se actualice
@@ -426,27 +426,24 @@ export default function AdminClientsPage() {
                 value={ticketQuantityInput}
                 onChange={(e) => {
                   const value = e.target.value;
-                  // Solo permitir números y campo vacío
+                  // Solo números y campo vacío; se puede borrar todo
                   if (value === '' || /^\d+$/.test(value)) {
                     setTicketQuantityInput(value);
-                    // Actualizar el valor numérico solo si es válido
-                    const num = parseInt(value, 10);
-                    if (!isNaN(num) && num >= 1 && num <= 1000) {
-                      setTicketQuantity(num);
-                    }
+                    const num = value === '' ? 0 : parseInt(value, 10);
+                    setTicketQuantity(isNaN(num) ? 0 : Math.min(1000, Math.max(0, num)));
                   }
                 }}
-                onBlur={(e) => {
-                  // Cuando pierde el foco, validar y normalizar
-                  const value = e.target.value.trim();
+                onBlur={() => {
+                  // Normalizar al perder foco: vacío = 0, límite 0-1000
+                  const value = ticketQuantityInput.trim();
                   if (value === '') {
-                    setTicketQuantityInput('1');
-                    setTicketQuantity(1);
+                    setTicketQuantityInput('0');
+                    setTicketQuantity(0);
                   } else {
                     const num = parseInt(value, 10);
-                    if (isNaN(num) || num < 1) {
-                      setTicketQuantityInput('1');
-                      setTicketQuantity(1);
+                    if (isNaN(num) || num < 0) {
+                      setTicketQuantityInput('0');
+                      setTicketQuantity(0);
                     } else if (num > 1000) {
                       setTicketQuantityInput('1000');
                       setTicketQuantity(1000);
@@ -456,7 +453,7 @@ export default function AdminClientsPage() {
                     }
                   }
                 }}
-                placeholder="1"
+                placeholder="0"
                 className="w-full px-3 py-2 rounded-lg border text-sm"
                 style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
               />
@@ -464,7 +461,14 @@ export default function AdminClientsPage() {
             <button
               type="button"
               onClick={assignTickets}
-              disabled={assigning || !selectedClientId || !selectedRaffleId || raffles.length === 0}
+              disabled={
+                assigning ||
+                !selectedClientId ||
+                !selectedRaffleId ||
+                raffles.length === 0 ||
+                ticketQuantity < 1 ||
+                ticketQuantity > 1000
+              }
               className="px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50 w-full"
               style={{ background: '#A83EF5', color: '#FFFFFF' }}
             >
@@ -472,14 +476,16 @@ export default function AdminClientsPage() {
             </button>
             <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
               {selectedClientId && raffles.length > 0
-                ? `✅ Listo. ${ticketQuantity} boleto(s) de $${
-                    raffles.find((r) => r.id === selectedRaffleId)?.price_per_ticket || 0
-                  } c/u = $${(
-                    ticketQuantity * (raffles.find((r) => r.id === selectedRaffleId)?.price_per_ticket || 0)
-                  ).toFixed(2)}`
+                ? ticketQuantity >= 1
+                  ? `✅ Listo. ${ticketQuantity} boleto(s) de $${
+                      raffles.find((r) => r.id === selectedRaffleId)?.price_per_ticket ?? 0
+                    } c/u = $${(
+                      ticketQuantity * (raffles.find((r) => r.id === selectedRaffleId)?.price_per_ticket ?? 0)
+                    ).toFixed(2)}`
+                  : '⚠️ Ingresa cantidad (mín. 1, máx. 1000)'
                 : raffles.length === 0
-                ? '⚠️ No hay rifas activas'
-                : '⚠️ Selecciona un cliente'}
+                  ? '⚠️ No hay rifas activas'
+                  : '⚠️ Selecciona un cliente'}
             </p>
           </div>
         </div>
