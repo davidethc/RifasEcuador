@@ -134,6 +134,15 @@ export default function AdminClientsPage() {
   const [assignedNumbers, setAssignedNumbers] = useState<string[]>([]);
   const [assignedEmailSent, setAssignedEmailSent] = useState(false);
 
+  // Estados para el selector de clientes mejorado
+  const [clientSearchQuery, setClientSearchQuery] = useState('');
+  const [clientSelectorOpen, setClientSelectorOpen] = useState(false);
+  const [clientSelectorClients, setClientSelectorClients] = useState<ClientRow[]>([]);
+  const [clientSelectorLoading, setClientSelectorLoading] = useState(false);
+  const [clientSelectorPage, setClientSelectorPage] = useState(1);
+  const [clientSelectorTotal, setClientSelectorTotal] = useState(0);
+  const [clientSelectorTotalPages, setClientSelectorTotalPages] = useState(1);
+
   const load = async (nextPage?: number, nextStatus?: StatusFilter) => {
     const p = Math.max(1, nextPage ?? page);
     const effectiveStatus = nextStatus ?? status;
@@ -162,6 +171,20 @@ export default function AdminClientsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Cerrar selector al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.client-selector-container')) {
+        setClientSelectorOpen(false);
+      }
+    };
+    if (clientSelectorOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [clientSelectorOpen]);
+
   const loadRaffles = async () => {
     try {
       const res = await adminFetch('/api/admin/raffles');
@@ -178,6 +201,49 @@ export default function AdminClientsPage() {
       // Error silencioso - la UI mostrará que no hay rifas disponibles
     }
   };
+
+  // Cargar clientes para el selector (con búsqueda y paginación)
+  const loadClientSelector = async (searchQuery: string = '', pageNum: number = 1, append: boolean = false) => {
+    setClientSelectorLoading(true);
+    try {
+      const res = await adminFetch(
+        `/api/admin/clients?q=${encodeURIComponent(searchQuery.trim())}&status=all&page=${pageNum}`
+      );
+      const json = (await res.json()) as ClientsResponse;
+      if (json.success) {
+        if (append) {
+          setClientSelectorClients((prev) => [...prev, ...(json.clients || [])]);
+        } else {
+          setClientSelectorClients(json.clients || []);
+        }
+        setClientSelectorPage(json.page ?? pageNum);
+        setClientSelectorTotal(json.total ?? 0);
+        setClientSelectorTotalPages(json.totalPages ?? 1);
+      }
+    } catch {
+      // Error silencioso
+    } finally {
+      setClientSelectorLoading(false);
+    }
+  };
+
+  // Efecto para buscar clientes cuando cambia el query (con debounce)
+  useEffect(() => {
+    if (!clientSelectorOpen) return;
+    
+    const timeoutId = setTimeout(() => {
+      void loadClientSelector(clientSearchQuery, 1, false);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [clientSearchQuery, clientSelectorOpen]);
+
+  // Cargar primera página cuando se abre el selector
+  useEffect(() => {
+    if (clientSelectorOpen && clientSelectorClients.length === 0) {
+      void loadClientSelector(clientSearchQuery, 1, false);
+    }
+  }, [clientSelectorOpen, clientSelectorClients.length, clientSearchQuery]);
 
   // Actualización automática: cada 20s y al volver a la pestaña (pagos en tiempo casi real)
   useEffect(() => {
@@ -218,6 +284,10 @@ export default function AdminClientsPage() {
       // Seleccionar automáticamente el cliente recién creado
       if (json.clientId) {
         setSelectedClientId(json.clientId);
+        // Recargar el selector para incluir el nuevo cliente
+        if (clientSelectorOpen) {
+          void loadClientSelector(clientSearchQuery, 1, false);
+        }
       }
       
       setName('');
@@ -375,23 +445,137 @@ export default function AdminClientsPage() {
             2️⃣ Asignar boletos (pago físico)
           </p>
           <div className="space-y-2">
-            <div>
+            <div className="relative client-selector-container">
               <label className="text-xs font-[var(--font-dm-sans)] mb-1 block" style={{ color: '#9CA3AF' }}>
                 Cliente
               </label>
-              <select
-                value={selectedClientId}
-                onChange={(e) => setSelectedClientId(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border text-sm"
-                style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
-              >
-                <option value="">Selecciona un cliente...</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name || c.email || c.phone || `Cliente ${c.id.slice(0, 8)}`}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                {/* Input que muestra el cliente seleccionado y permite buscar */}
+                <div
+                  onClick={() => setClientSelectorOpen(!clientSelectorOpen)}
+                  className="w-full px-3 py-2 rounded-lg border text-sm cursor-pointer flex items-center justify-between"
+                  style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
+                >
+                  <span className="truncate">
+                    {selectedClientId
+                      ? (() => {
+                          const selectedClient =
+                            clientSelectorClients.find((c) => c.id === selectedClientId) ||
+                            clients.find((c) => c.id === selectedClientId);
+                          return selectedClient
+                            ? selectedClient.name || selectedClient.email || selectedClient.phone || `Cliente ${selectedClient.id.slice(0, 8)}`
+                            : 'Cliente seleccionado';
+                        })()
+                      : 'Selecciona un cliente...'}
+                  </span>
+                  <span style={{ color: '#9CA3AF' }}>{clientSelectorOpen ? '▲' : '▼'}</span>
+                </div>
+
+                {/* Dropdown con búsqueda y paginación */}
+                {clientSelectorOpen && (
+                  <div
+                    className="absolute z-50 w-full mt-1 rounded-lg border shadow-xl"
+                    style={{
+                      background: 'rgba(15, 17, 23, 0.98)',
+                      borderColor: 'rgba(255,255,255,0.12)',
+                      maxHeight: '400px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    {/* Campo de búsqueda */}
+                    <div className="p-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+                      <input
+                        type="text"
+                        value={clientSearchQuery}
+                        onChange={(e) => {
+                          setClientSearchQuery(e.target.value);
+                          setClientSelectorPage(1);
+                        }}
+                        placeholder="Buscar por nombre o email..."
+                        className="w-full px-3 py-2 rounded-lg border text-sm"
+                        style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+
+                    {/* Lista de clientes con scroll */}
+                    <div className="overflow-y-auto flex-1" style={{ maxHeight: '280px' }}>
+                      {clientSelectorLoading && clientSelectorClients.length === 0 ? (
+                        <div className="p-4 text-center text-sm" style={{ color: '#9CA3AF' }}>
+                          Cargando...
+                        </div>
+                      ) : clientSelectorClients.length === 0 ? (
+                        <div className="p-4 text-center text-sm" style={{ color: '#9CA3AF' }}>
+                          {clientSearchQuery ? 'No se encontraron clientes' : 'No hay clientes'}
+                        </div>
+                      ) : (
+                        <>
+                          {clientSelectorClients.map((c) => {
+                            const displayName = c.name || c.email || c.phone || `Cliente ${c.id.slice(0, 8)}`;
+                            const isSelected = c.id === selectedClientId;
+                            return (
+                              <div
+                                key={c.id}
+                                onClick={() => {
+                                  setSelectedClientId(c.id);
+                                  setClientSelectorOpen(false);
+                                  setClientSearchQuery('');
+                                }}
+                                className="px-3 py-2 cursor-pointer hover:bg-opacity-50 text-sm"
+                                style={{
+                                  background: isSelected ? 'rgba(168, 62, 245, 0.22)' : 'transparent',
+                                  color: '#E5E7EB',
+                                }}
+                              >
+                                <div className="font-medium">{displayName}</div>
+                                {(c.email || c.phone) && (
+                                  <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
+                                    {c.email && c.phone ? `${c.email} • ${c.phone}` : c.email || c.phone}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                          {/* Botón cargar más si hay más páginas */}
+                          {clientSelectorPage < clientSelectorTotalPages && (
+                            <div className="p-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  void loadClientSelector(clientSearchQuery, clientSelectorPage + 1, true);
+                                }}
+                                disabled={clientSelectorLoading}
+                                className="w-full px-3 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                                style={{
+                                  background: 'rgba(168, 62, 245, 0.15)',
+                                  color: '#A83EF5',
+                                  border: '1px solid rgba(168, 62, 245, 0.25)',
+                                }}
+                              >
+                                {clientSelectorLoading
+                                  ? 'Cargando...'
+                                  : `Cargar más (${clientSelectorTotal - clientSelectorClients.length} restantes)`}
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    {/* Footer con información de paginación */}
+                    {clientSelectorTotal > 0 && (
+                      <div className="p-2 border-t text-xs text-center" style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#9CA3AF' }}>
+                        Mostrando {clientSelectorClients.length} de {clientSelectorTotal} cliente
+                        {clientSelectorTotal !== 1 ? 's' : ''}
+                        {clientSearchQuery && ` (filtrado)`}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <label className="text-xs font-[var(--font-dm-sans)] mb-1 block" style={{ color: '#9CA3AF' }}>
