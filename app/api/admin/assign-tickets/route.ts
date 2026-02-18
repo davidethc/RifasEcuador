@@ -148,6 +148,31 @@ export async function POST(req: NextRequest) {
       // No revertir, solo loguear el error
     }
 
+    // 7. Enviar correo de confirmación al cliente si tiene email
+    let emailSent = false;
+    const clientEmail = (client.email || '').trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (clientEmail && emailRegex.test(clientEmail)) {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const emailRes = await fetch(`${baseUrl}/api/email/send-purchase-confirmation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: order.id }),
+        });
+        if (emailRes.ok) {
+          emailSent = true;
+          console.log('[assign-tickets] Correo enviado al cliente:', clientEmail);
+        } else {
+          console.error('[assign-tickets] Error al enviar correo:', await emailRes.text());
+        }
+      } catch (emailErr) {
+        console.error('[assign-tickets] Error al enviar correo:', emailErr);
+      }
+    } else {
+      console.log('[assign-tickets] Cliente sin email, no se envía correo');
+    }
+
     console.log('[assign-tickets] SUCCESS:', {
       orderId: order.id,
       clientId: client_id,
@@ -155,14 +180,20 @@ export async function POST(req: NextRequest) {
       quantity,
       numbers,
       total,
+      emailSent,
     });
+
+    const successMsg = emailSent
+      ? `✅ ${quantity} boletos asignados. Correo enviado a ${client.email}.`
+      : `✅ ${quantity} boletos asignados exitosamente a ${client.name || client.email}${!clientEmail ? ' (sin email, no se envió correo)' : ''}`;
 
     return NextResponse.json({
       success: true,
       order_id: order.id,
       numbers,
       total,
-      message: `✅ ${quantity} boletos asignados exitosamente a ${client.name || client.email}`,
+      message: successMsg,
+      email_sent: emailSent,
     });
   } catch (error) {
     console.error('[assign-tickets] Unexpected error:', error);

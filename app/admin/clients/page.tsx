@@ -52,6 +52,7 @@ type AssignResponse = {
   numbers?: string[];
   total?: number;
   message?: string;
+  email_sent?: boolean;
   error?: string;
 };
 
@@ -130,6 +131,7 @@ export default function AdminClientsPage() {
   const [assigning, setAssigning] = useState(false);
   const [assignedMsg, setAssignedMsg] = useState<string | null>(null);
   const [assignedNumbers, setAssignedNumbers] = useState<string[]>([]);
+  const [assignedEmailSent, setAssignedEmailSent] = useState(false);
 
   const load = async (nextPage?: number, nextStatus?: StatusFilter) => {
     const p = Math.max(1, nextPage ?? page);
@@ -261,6 +263,7 @@ export default function AdminClientsPage() {
     setAssigning(true);
     setAssignedMsg(null);
     setAssignedNumbers([]);
+    setAssignedEmailSent(false);
     setError(null);
     try {
       console.log('[assignTickets] Calling API...');
@@ -279,6 +282,7 @@ export default function AdminClientsPage() {
       
       setAssignedMsg(json.message || '✅ Boletos asignados exitosamente');
       setAssignedNumbers(json.numbers || []);
+      setAssignedEmailSent(!!json.email_sent);
       
       // Resetear estados
       setSelectedClientId('');
@@ -323,6 +327,11 @@ export default function AdminClientsPage() {
       {assignedMsg && (
         <div className="mb-4 rounded-xl border p-4" style={{ background: 'rgba(34, 197, 94, 0.10)', borderColor: 'rgba(34, 197, 94, 0.25)', color: '#E5E7EB' }}>
           <p className="font-semibold mb-2">{assignedMsg}</p>
+          {assignedEmailSent && (
+            <p className="text-sm mb-2" style={{ color: '#86EFAC' }}>
+              📧 El cliente recibió un correo con los números y el comprobante.
+            </p>
+          )}
           {assignedNumbers.length > 0 && (
             <div>
               <p className="text-xs mb-1" style={{ color: '#9CA3AF' }}>
@@ -373,7 +382,7 @@ export default function AdminClientsPage() {
               {creating ? 'Creando...' : '✅ Crear cliente'}
             </button>
             <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-              Tip: con email o teléfono es suficiente.
+              Tip: con email o teléfono es suficiente. Si pones email, al asignar boletos (pago físico) el cliente recibirá un correo con los números y el comprobante.
             </p>
           </div>
         </div>
