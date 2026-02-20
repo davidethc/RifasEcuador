@@ -9,6 +9,7 @@ type ClientRow = {
   name: string | null;
   email: string | null;
   phone: string | null;
+  cedula: string | null;
   created_at: string | null;
   last_order_id?: string | null;
   last_order_status?: string | null;
@@ -119,6 +120,7 @@ export default function AdminClientsPage() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [cedula, setCedula] = useState(''); // Solo números, máx. 10 (cédula Ecuador)
   const [phone, setPhone] = useState('');
   const [creating, setCreating] = useState(false);
   const [createdMsg, setCreatedMsg] = useState<string | null>(null);
@@ -272,9 +274,15 @@ export default function AdminClientsPage() {
     setAssignedMsg(null);
     setAssignedNumbers([]);
     try {
+      const cedulaTrimmed = cedula.replace(/\D/g, '').slice(0, 10);
       const res = await adminFetch('/api/admin/clients', {
         method: 'POST',
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim() }),
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          cedula: cedulaTrimmed.length === 10 ? cedulaTrimmed : null,
+        }),
       });
       const json = (await res.json()) as { success: boolean; clientId?: string; error?: string };
       if (!json.success) throw new Error(json.error || 'No se pudo crear');
@@ -292,6 +300,7 @@ export default function AdminClientsPage() {
       
       setName('');
       setEmail('');
+      setCedula('');
       setPhone('');
       setPage(1);
       await load(1);
@@ -419,6 +428,19 @@ export default function AdminClientsPage() {
               style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
             />
             <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={cedula}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                setCedula(value);
+              }}
+              placeholder="Cédula (10 dígitos, opcional)"
+              className="w-full px-3 py-2 rounded-lg border text-sm"
+              style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
+            />
+            <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Teléfono (opcional)"
@@ -435,7 +457,7 @@ export default function AdminClientsPage() {
               {creating ? 'Creando...' : '✅ Crear cliente'}
             </button>
             <p className="text-xs font-[var(--font-dm-sans)]" style={{ color: '#9CA3AF' }}>
-              Tip: con email o teléfono es suficiente. Si pones email, al asignar boletos (pago físico) el cliente recibirá un correo con los números y el comprobante.
+              Tip: email o teléfono es suficiente. La cédula es opcional (10 dígitos, solo números). Con email, al asignar boletos el cliente recibirá el correo con los números.
             </p>
           </div>
         </div>
@@ -682,7 +704,7 @@ export default function AdminClientsPage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nombre/email/teléfono"
+              placeholder="Buscar por nombre, email, teléfono o cédula"
               className="flex-1 px-3 py-2 rounded-lg border text-sm"
               style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
             />
@@ -735,6 +757,9 @@ export default function AdminClientsPage() {
                   Email
                 </th>
                 <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
+                  Cédula
+                </th>
+                <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                   Teléfono
                 </th>
                 <th className="text-left px-3 py-2.5 font-semibold whitespace-nowrap" style={{ color: '#E5D4FF' }}>
@@ -763,6 +788,9 @@ export default function AdminClientsPage() {
                   <td className="px-3 py-2.5 text-white whitespace-nowrap">{c.name || '-'}</td>
                   <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {c.email || '-'}
+                  </td>
+                  <td className="px-3 py-2.5 whitespace-nowrap font-mono" style={{ color: '#E5D4FF' }}>
+                    {c.cedula || '-'}
                   </td>
                   <td className="px-3 py-2.5 whitespace-nowrap" style={{ color: '#E5D4FF' }}>
                     {c.phone || '-'}
@@ -813,14 +841,14 @@ export default function AdminClientsPage() {
               ))}
               {!loading && clients.length === 0 && (
                 <tr>
-                  <td className="px-3 py-4 text-center" colSpan={9} style={{ color: '#9CA3AF' }}>
+                  <td className="px-3 py-4 text-center" colSpan={10} style={{ color: '#9CA3AF' }}>
                     Sin resultados
                   </td>
                 </tr>
               )}
               {loading && clients.length === 0 && (
                 <tr>
-                  <td className="px-3 py-4 text-white text-center" colSpan={9}>
+                  <td className="px-3 py-4 text-white text-center" colSpan={10}>
                     Cargando...
                   </td>
                 </tr>

@@ -8,6 +8,7 @@ type ClientRow = {
   name: string | null;
   email: string | null;
   phone: string | null;
+  cedula: string | null;
   created_at: string | null;
 };
 
@@ -104,16 +105,18 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from('clients')
-    .select('id,auth_user_id,name,email,phone,created_at', { count: 'exact' });
+    .select('id,auth_user_id,name,email,phone,cedula,created_at', { count: 'exact' });
 
   if (filteredClientIds) {
     query = query.in('id', filteredClientIds);
   }
 
-  // Simple search (email exact-ish, name/phone partial) without adding fields
+  // Búsqueda por email, name, phone o cedula
   if (q) {
-    // Note: PostgREST `or` filter uses comma-separated expressions.
-    query = query.or(`email.ilike.%${q}%,name.ilike.%${q}%,phone.ilike.%${q}%`);
+    const qEsc = q.replace(/'/g, "''");
+    query = query.or(
+      `email.ilike.%${qEsc}%,name.ilike.%${qEsc}%,phone.ilike.%${qEsc}%,cedula.ilike.%${qEsc}%`
+    );
   }
 
   query = query.order('created_at', { ascending: false }).range(from, to);
@@ -228,10 +231,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
 
-  const body = (await request.json().catch(() => null)) as { name?: string; email?: string; phone?: string } | null;
+  const body = (await request.json().catch(() => null)) as {
+    name?: string;
+    email?: string;
+    phone?: string;
+    cedula?: string | null;
+  } | null;
   const name = body?.name?.trim() || null;
   const email = body?.email?.trim().toLowerCase() || null;
   const phone = body?.phone?.trim() || null;
+  const cedulaRaw = body?.cedula;
+  const cedula =
+    cedulaRaw != null && typeof cedulaRaw === 'string'
+      ? cedulaRaw.replace(/\D/g, '').slice(0, 10)
+      : null;
+  const cedulaFinal = cedula && cedula.length === 10 ? cedula : null;
 
   if (!email && !phone) {
     return NextResponse.json({ success: false, error: 'email o phone requerido' }, { status: 400 });
@@ -239,7 +253,6 @@ export async function POST(request: Request) {
 
   const supabase = getSupabaseAdmin();
 
-  // Reuse existing security-definer function (no RLS headaches, no duplicates by email/auth_user_id)
   const { data: clientId, error: rpcErr } = await supabase.rpc('get_or_create_client', {
     p_email: email,
     p_name: name,
@@ -249,6 +262,10 @@ export async function POST(request: Request) {
 
   if (rpcErr || !clientId) {
     return NextResponse.json({ success: false, error: rpcErr?.message || 'No se pudo crear cliente' }, { status: 500 });
+  }
+
+  if (cedulaFinal) {
+    await supabase.from('clients').update({ cedula: cedulaFinal }).eq('id', clientId);
   }
 
   return NextResponse.json({ success: true, clientId });
