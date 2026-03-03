@@ -82,16 +82,20 @@ export function formatPhoneWhileTyping(input: string): string {
   // Solo prefijo 593 (código país) → mostrar "+593 " para que pueda seguir escribiendo
   // NO usar 593 como dígitos locales (eso hacía que al borrar el 5 reapareciera "59 3")
   if (digitsOnly === '593') return '+593 ';
-//dd
+
   let localDigits: string;
   if (digitsOnly.startsWith('593')) {
     localDigits = digitsOnly.substring(3, 12); // solo dígitos después del 593
   } else if (digitsOnly.startsWith('0') && digitsOnly.length > 1) {
-    localDigits = digitsOnly.substring(1, 10);
+    localDigits = digitsOnly.substring(1, 10); // quitar el 0 inicial (09... → 9...)
   } else {
     localDigits = digitsOnly.substring(0, 9);
   }
 
+  // Quitar 0 inicial si quedó (ej: 593 09... → no mostrar "09")
+  if (localDigits.startsWith('0')) {
+    localDigits = localDigits.replace(/^0+/, '').substring(0, 9);
+  }
   localDigits = localDigits.substring(0, 9);
   if (localDigits.length === 0) return '+593 ';
 
