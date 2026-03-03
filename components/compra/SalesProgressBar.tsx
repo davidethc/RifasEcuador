@@ -51,8 +51,8 @@ export function SalesProgressBar({ raffleId, totalNumbers }: SalesProgressBarPro
     }
   }, [raffleId, totalNumbers]);
 
-  // Porcentaje quemado en 8 (mostrar siempre 8% hasta que se desee usar el real)
-  const percentage = 8;
+  // Porcentaje quemado en 10.5 (mostrar siempre 10.5% hasta que se desee usar el real)
+  const percentage = 10.5;
 
   return (
     <div className="w-full">

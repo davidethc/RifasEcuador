@@ -57,23 +57,10 @@ export function PhoneInput({
   }, [value]);
 
   const handleChange = (newValue: string) => {
-    // Si el usuario está escribiendo "0" al inicio, permitirlo temporalmente
-    // Solo formatear cuando tenga más de 1 dígito o cuando sea un formato completo
-
-    // Si el valor es solo "0", mantenerlo sin formatear
-    if (newValue.trim() === '0' || newValue.trim() === '+') {
-      setDisplayValue(newValue);
-      // Guardar el valor tal cual para que el usuario pueda seguir escribiendo
-      onChange(newValue);
-      return;
-    }
-
-    // Formatear mientras el usuario escribe
+    // formatPhoneWhileTyping extrae solo dígitos → evita duplicar +593 al borrar y reescribir
     const formatted = formatPhoneWhileTyping(newValue);
     setDisplayValue(formatted);
-
-    // Normalizar y enviar el valor formateado (sin espacios para almacenamiento)
-    const normalized = normalizePhoneNumber(formatted);
+    const normalized = formatted ? normalizePhoneNumber(formatted) : '';
     onChange(normalized);
   };
 

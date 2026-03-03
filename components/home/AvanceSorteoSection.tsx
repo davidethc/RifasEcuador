@@ -23,8 +23,8 @@ export function AvanceSorteoSection() {
     return () => clearInterval(interval);
   }, [totalTickets]);
 
-  // Porcentaje quemado en 8 (mostrar siempre 8% hasta que se desee usar el real)
-  const percentage = 8;
+  // Porcentaje quemado en 10.5 (mostrar siempre 10.5% hasta que se desee usar el real)
+  const percentage = 10.5;
 
   return (
     <section className="relative w-full py-12 md:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden" style={{
