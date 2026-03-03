@@ -87,7 +87,7 @@ export function formatPhoneWhileTyping(input: string): string {
   if (digitsOnly.startsWith('593')) {
     localDigits = digitsOnly.substring(3, 12); // solo dígitos después del 593
   } else if (digitsOnly.startsWith('0') && digitsOnly.length > 1) {
-    localDigits = digitsOnly.substring(1, 10); // quitar el 0 inicial (09... → 9...)
+    localDigits = digitsOnly.substring(1, 11); // quitar el 0 inicial (09... → 9...)
   } else {
     localDigits = digitsOnly.substring(0, 9);
   }

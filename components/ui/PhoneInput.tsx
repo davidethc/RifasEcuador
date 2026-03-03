@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MaterialInput } from './MaterialInput';
 import { formatPhoneWhileTyping, normalizePhoneNumber, isValidEcuadorianPhone } from '@/utils/phoneFormatter';
 
@@ -41,27 +41,29 @@ export function PhoneInput({
   showSuccess = false,
 }: PhoneInputProps) {
   const [displayValue, setDisplayValue] = useState(() => {
-    // Inicializar con formato si hay valor
     return value ? formatPhoneWhileTyping(value) : '';
   });
+  const lastSentRef = useRef<string>(value);
 
-  // Sincronizar displayValue cuando value cambia externamente
+  // Sincronizar displayValue cuando value cambia externamente (load form, reset)
   useEffect(() => {
-    if (value) {
-      const formatted = formatPhoneWhileTyping(value);
+    const formatted = value ? formatPhoneWhileTyping(value) : '';
+    if (value === lastSentRef.current) {
       setDisplayValue(formatted);
-    } else {
-      setDisplayValue('');
+    } else if (formatted.length <= displayValue.length || !displayValue) {
+      setDisplayValue(formatted);
+      lastSentRef.current = value;
     }
-
-  }, [value]);
+    // Si formatted sería más largo que displayValue: padre tiene valor viejo (usuario acaba de borrar)
+    // → no sobrescribir para permitir borrar el 5
+  }, [value, displayValue]);
 
   const handleChange = (newValue: string) => {
-    // formatPhoneWhileTyping extrae solo dígitos → evita duplicar +593 al borrar y reescribir
     const formatted = formatPhoneWhileTyping(newValue);
     setDisplayValue(formatted);
-    const normalized = formatted ? normalizePhoneNumber(formatted) : '';
-    onChange(normalized);
+    const toSend = formatted ? normalizePhoneNumber(formatted) : '';
+    lastSentRef.current = toSend;
+    onChange(toSend);
   };
 
   const handleBlurInternal = () => {
