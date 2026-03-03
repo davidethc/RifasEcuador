@@ -76,36 +76,29 @@ export function formatPhoneForDisplay(phone: string): string {
  * @returns El número formateado para mostrar: +593 XX XXX XXXX
  */
 export function formatPhoneWhileTyping(input: string): string {
-  // Extraer SOLO dígitos (0-9) - evita que "+" u otros caracteres causen duplicados
   const digitsOnly = input.replace(/\D/g, '');
-  if (digitsOnly.length === 0) {
-    return '';
-  }
-  // Obtener los 9 dígitos locales (Ecuador)
+  if (digitsOnly.length === 0) return '';
+
+  // Solo prefijo 593 (código país) → mostrar "+593 " para que pueda seguir escribiendo
+  // NO usar 593 como dígitos locales (eso hacía que al borrar el 5 reapareciera "59 3")
+  if (digitsOnly === '593') return '+593 ';
+//dd
   let localDigits: string;
-  if (digitsOnly.startsWith('593') && digitsOnly.length > 3) {
-    localDigits = digitsOnly.substring(3, 12);
+  if (digitsOnly.startsWith('593')) {
+    localDigits = digitsOnly.substring(3, 12); // solo dígitos después del 593
   } else if (digitsOnly.startsWith('0') && digitsOnly.length > 1) {
     localDigits = digitsOnly.substring(1, 10);
   } else {
     localDigits = digitsOnly.substring(0, 9);
   }
-  // Máximo 9 dígitos
+
   localDigits = localDigits.substring(0, 9);
-  if (localDigits.length === 0) {
-    return '';
-  }
-  // Formato: +593 XX XXX XXXX
+  if (localDigits.length === 0) return '+593 ';
+
   let formatted = '+593';
-  if (localDigits.length > 0) {
-    formatted += ' ' + localDigits.substring(0, 2);
-  }
-  if (localDigits.length > 2) {
-    formatted += ' ' + localDigits.substring(2, 5);
-  }
-  if (localDigits.length > 5) {
-    formatted += ' ' + localDigits.substring(5, 9);
-  }
+  if (localDigits.length > 0) formatted += ' ' + localDigits.substring(0, 2);
+  if (localDigits.length > 2) formatted += ' ' + localDigits.substring(2, 5);
+  if (localDigits.length > 5) formatted += ' ' + localDigits.substring(5, 9);
   return formatted.trim();
 }
 

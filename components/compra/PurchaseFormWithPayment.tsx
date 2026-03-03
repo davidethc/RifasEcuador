@@ -257,6 +257,7 @@ export function PurchaseFormWithPayment({
                 error={errors.whatsapp && touched.has('whatsapp') ? errors.whatsapp : undefined}
                 variant="outlined"
                 showSuccess={!!formData.whatsapp && !errors.whatsapp && touched.has('whatsapp')}
+                className="min-w-[340px] sm:min-w-[380px]"
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

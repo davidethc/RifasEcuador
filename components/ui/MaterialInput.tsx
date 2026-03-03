@@ -17,6 +17,7 @@ interface MaterialInputProps {
   variant?: 'filled' | 'outlined';
   autoFocus?: boolean;
   showSuccess?: boolean; // Mostrar indicador de éxito cuando el campo está completo y válido
+  className?: string;
 }
 
 /**
@@ -41,6 +42,7 @@ export function MaterialInput({
   variant = 'filled',
   autoFocus = false,
   showSuccess = false,
+  className,
 }: MaterialInputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
@@ -78,7 +80,7 @@ export function MaterialInput({
   const showSuccessIndicator = showSuccess && hasValue && !error && !isFocused;
 
   // Clases base para el contenedor
-  const containerBaseClasses = 'relative w-full';
+  const containerBaseClasses = ['relative w-full', className].filter(Boolean).join(' ');
   
   // Clases base para el input - Más compacto pero visible, optimizado para escritura rápida
   const inputBaseClasses = 'w-full px-4 pt-6 pb-2 text-base font-[var(--font-dm-sans)] transition-all duration-200 outline-none min-h-[50px] disabled:opacity-[0.38] disabled:cursor-not-allowed';
