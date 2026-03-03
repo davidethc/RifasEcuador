@@ -121,7 +121,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [isLoading, user?.id, router]); // Solo reaccionar cuando cambie el USER ID, no el objeto completo
+  }, [isLoading, user, router]); // Dependemos de user completo para evitar warning de ESLint
 
   if (isLoading || checking) {
     return (
