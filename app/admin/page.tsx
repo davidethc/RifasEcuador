@@ -9,11 +9,11 @@ type DashboardResponse = {
   metrics?: {
     soldTickets: number;
     totalTickets: number;
-    reservedTickets: number;
     availableTickets: number;
     totalRevenue: number;
     revenuePayphone: number;
     revenueTransfer: number;
+    revenueCash: number;
     pendingTransfers: number;
   };
 };
@@ -68,7 +68,7 @@ export default function AdminHomePage() {
         <div>
           <h1 className="text-3xl font-extrabold text-white font-[var(--font-comfortaa)]">Dashboard</h1>
           <p className="text-sm font-[var(--font-dm-sans)] mt-1" style={{ color: '#9CA3AF' }}>
-            Resumen de tu negocio: ventas, reservas y recaudación. Se actualiza solo cada 5 segundos.
+            Resumen de tu negocio: ventas y recaudación. Se actualiza solo cada 5 segundos.
           </p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
@@ -108,7 +108,7 @@ export default function AdminHomePage() {
       )}
 
       {!loading && data?.success && m && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StatCard
             title="Boletos vendidos"
             help="Ya pagados y confirmados"
@@ -116,16 +116,10 @@ export default function AdminHomePage() {
             subtitle={`De ${m.totalTickets} total · Quedan ${m.availableTickets} por vender`}
           />
           <StatCard
-            title="Reservados"
-            help="Con reserva, aún no pagados"
-            value={`${m.reservedTickets}`}
-            subtitle={`Disponibles para vender: ${m.availableTickets}`}
-          />
-          <StatCard
             title="Recaudación"
             help="Dinero ya cobrado"
             value={`$${m.totalRevenue.toFixed(2)}`}
-            subtitle={`Payphone: $${m.revenuePayphone.toFixed(2)} · Transferencia: $${m.revenueTransfer.toFixed(2)} · Pendientes por aprobar: ${m.pendingTransfers}`}
+            subtitle={`Payphone: $${m.revenuePayphone.toFixed(2)} · Transferencia: $${m.revenueTransfer.toFixed(2)} · Efectivo: $${m.revenueCash.toFixed(2)} · Pendientes por aprobar: ${m.pendingTransfers}`}
           />
         </div>
       )}

@@ -65,17 +65,38 @@ export async function GET(request: Request) {
   // - paid -> completed
   // - pending -> reserved / pending / pending_approval
   // - rejected -> rejected
+  // - sin_ordenes -> clients with zero orders (no state)
   const statusToOrderStatuses = (): string[] | null => {
     if (status === 'paid') return ['completed'];
     if (status === 'pending') return ['reserved', 'pending', 'pending_approval'];
     if (status === 'rejected') return ['rejected'];
-    return null; // "all" or unknown => no filter
+    return null; // "all" or "sin_ordenes" handled separately
   };
 
   const orderStatuses = statusToOrderStatuses();
   let filteredClientIds: string[] | null = null;
+  let excludeClientIdsWithOrders = false;
 
-  if (orderStatuses) {
+  if (status === 'sin_ordenes') {
+    // Clientes sin órdenes: excluir a los que tienen al menos una orden
+    const { data: orderRows, error: orderErr } = await supabase
+      .from('orders')
+      .select('client_id');
+
+    if (orderErr) {
+      return NextResponse.json({ success: false, error: orderErr.message }, { status: 500 });
+    }
+
+    const idsWithOrders = Array.from(
+      new Set(
+        (orderRows || [])
+          .map((r) => (r as { client_id: string | null }).client_id)
+          .filter((v): v is string => Boolean(v))
+      )
+    );
+    excludeClientIdsWithOrders = idsWithOrders.length > 0;
+    filteredClientIds = excludeClientIdsWithOrders ? idsWithOrders : [];
+  } else if (orderStatuses) {
     const { data: orderRows, error: orderErr } = await supabase
       .from('orders')
       .select('client_id')
@@ -107,7 +128,10 @@ export async function GET(request: Request) {
     .from('clients')
     .select('id,auth_user_id,name,email,phone,cedula,created_at', { count: 'exact' });
 
-  if (filteredClientIds) {
+  if (excludeClientIdsWithOrders && filteredClientIds && filteredClientIds.length > 0) {
+    const quotedIds = filteredClientIds.map((id) => `"${id}"`).join(',');
+    query = query.not('id', 'in', `(${quotedIds})`);
+  } else if (filteredClientIds && !excludeClientIdsWithOrders) {
     query = query.in('id', filteredClientIds);
   }
 

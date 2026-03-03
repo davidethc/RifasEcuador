@@ -58,7 +58,7 @@ type AssignResponse = {
 };
 
 const PAGE_SIZE = 5;
-type StatusFilter = 'all' | 'paid' | 'pending' | 'rejected';
+type StatusFilter = 'all' | 'paid' | 'pending' | 'rejected' | 'sin_ordenes';
 
 const formatMoney = (v: number | null | undefined) => {
   const n = typeof v === 'number' ? v : 0;
@@ -720,6 +720,7 @@ export default function AdminClientsPage() {
               style={{ background: 'rgba(0,0,0,0.25)', borderColor: 'rgba(255,255,255,0.12)', color: '#E5E7EB' }}
             >
               <option value="all">Todos</option>
+              <option value="sin_ordenes">Sin órdenes</option>
               <option value="paid">Pagados</option>
               <option value="pending">Pendientes</option>
               <option value="rejected">Rechazados</option>

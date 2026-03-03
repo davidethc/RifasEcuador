@@ -25,11 +25,11 @@ export async function GET(request: Request) {
   const soldTickets = progress.reduce((acc, r) => acc + Number(r.sold_tickets || 0), 0);
   const totalTickets = progress.reduce((acc, r) => acc + Number(r.total_tickets || 0), 0);
 
-  // 2) Reserved / Available counts (tickets table)
-  const [{ count: reservedTickets }, { count: availableTickets }] = await Promise.all([
-    supabase.from('tickets').select('*', { count: 'exact', head: true }).eq('status', 'reserved'),
-    supabase.from('tickets').select('*', { count: 'exact', head: true }).eq('status', 'available'),
-  ]);
+  // 2) Available count (tickets table) - no reservados: transfer rechazada/cancelada libera boletos
+  const { count: availableTickets } = await supabase
+    .from('tickets')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'available');
 
   // 3) Revenue (approved payments) - total + breakdown by provider
   const { data: revenueRows, error: revError } = await supabase
@@ -44,17 +44,17 @@ export async function GET(request: Request) {
   const revenue = (revenueRows || []) as unknown as RevenueRow[];
   let revenuePayphone = 0;
   let revenueTransfer = 0;
-  let revenueOther = 0;
+  let revenueCash = 0;
 
   for (const r of revenue) {
     const amt = Number(r.amount || 0);
     const provider = (r.provider || '').toLowerCase();
     if (provider === 'payphone') revenuePayphone += amt;
     else if (provider === 'transfer') revenueTransfer += amt;
-    else revenueOther += amt;
+    else if (provider === 'cash') revenueCash += amt;
   }
 
-  const totalRevenue = revenuePayphone + revenueTransfer + revenueOther;
+  const totalRevenue = revenuePayphone + revenueTransfer + revenueCash;
 
   // 4) Pending transfers
   const { count: pendingTransfers, error: pendErr } = await supabase
@@ -73,11 +73,11 @@ export async function GET(request: Request) {
       metrics: {
         soldTickets,
         totalTickets,
-        reservedTickets: reservedTickets || 0,
         availableTickets: availableTickets || 0,
         totalRevenue,
         revenuePayphone,
         revenueTransfer,
+        revenueCash,
         pendingTransfers: pendingTransfers || 0,
       },
     },
